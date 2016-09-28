@@ -7,8 +7,8 @@ TEMPLATE = lib
 
 DEFINES += CPLUSPLUS_BASE_LIBRARY_LIBRARY
 
-include( $$PWD/cplusplus_base_library.pri )
-
+include($$PWD/cplusplus_base_library.pri )
+include($$PWD/gumbo/gumbo.pri)
 include($$PWD/../BaiduTieBaBase.pri)
 DESTDIR=$$THIS_PROJECT_DESTDIR
 
