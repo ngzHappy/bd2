@@ -19,7 +19,7 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
-#include <strings.h>
+#include "gumbo_strings.h"
 
 #include "attribute.h"
 #include "error.h"
