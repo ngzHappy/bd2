@@ -597,6 +597,7 @@ static StateResult emit_char_ref(GumboParser* parser,
     emit_char(parser, '&', output);
   }
   return status ? RETURN_SUCCESS : RETURN_ERROR;
+  (void)is_in_attribute;
 }
 
 // Emits a comment token.  Comments use the temporary buffer to accumulate their
@@ -756,7 +757,8 @@ static void finish_tag_name(GumboParser* parser) {
 }
 
 // Adds an ERR_DUPLICATE_ATTR parse error to the parser's error struct.
-static void add_duplicate_attr_error(GumboParser* parser, const char* attr_name,
+static void add_duplicate_attr_error(
+    GumboParser* parser, const char* attr_name,
     int original_index, int new_index) {
   GumboError* error = gumbo_add_error(parser);
   if (!error) {
@@ -770,6 +772,7 @@ static void add_duplicate_attr_error(GumboParser* parser, const char* attr_name,
   error->v.duplicate_attr.new_index = new_index;
   copy_over_tag_buffer(parser, &error->v.duplicate_attr.name);
   reinitialize_tag_buffer(parser);
+  (void)attr_name;
 }
 
 // Creates a new attribute in the current tag, copying the current tag buffer to
@@ -919,6 +922,7 @@ static StateResult handle_char_ref_in_data_state(GumboParser* parser,
     GumboTokenizerState* tokenizer, int c, GumboToken* output) {
   gumbo_tokenizer_set_state(parser, GUMBO_LEX_DATA);
   return emit_char_ref(parser, ' ', false, output);
+  (void)c; (void)tokenizer;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete5/tokenization.html#rcdata-state
@@ -948,6 +952,7 @@ static StateResult handle_char_ref_in_rcdata_state(GumboParser* parser,
     GumboTokenizerState* tokenizer, int c, GumboToken* output) {
   gumbo_tokenizer_set_state(parser, GUMBO_LEX_RCDATA);
   return emit_char_ref(parser, ' ', false, output);
+  (void)c; (void)tokenizer;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete5/tokenization.html#rawtext-state
@@ -966,6 +971,7 @@ static StateResult handle_rawtext_state(GumboParser* parser,
     default:
       return emit_current_char(parser, output);
   }
+  (void)tokenizer;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete5/tokenization.html#script-data-state
@@ -984,6 +990,7 @@ static StateResult handle_script_state(GumboParser* parser,
     default:
       return emit_current_char(parser, output);
   }
+  (void)tokenizer;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete5/tokenization.html#plaintext-state
@@ -997,6 +1004,7 @@ static StateResult handle_plaintext_state(GumboParser* parser,
     default:
       return emit_current_char(parser, output);
   }
+  (void)tokenizer;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete5/tokenization.html#tag-open-state
@@ -1030,6 +1038,7 @@ static StateResult handle_tag_open_state(GumboParser* parser,
         return RETURN_ERROR;
       }
   }
+  (void)tokenizer;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete5/tokenization.html#end-tag-open-state
@@ -1057,6 +1066,7 @@ static StateResult handle_end_tag_open_state(GumboParser* parser,
       }
       return NEXT_CHAR;
   }
+  (void)tokenizer;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete5/tokenization.html#tag-name-state
@@ -1090,7 +1100,7 @@ static StateResult handle_tag_name_state(GumboParser* parser,
     default:
       append_char_to_tag_buffer(parser, ensure_lowercase(c), true);
       return NEXT_CHAR;
-  }
+  }(void)tokenizer;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete.html#rcdata-less-than-sign-state
@@ -1121,7 +1131,7 @@ static StateResult handle_rcdata_end_tag_open_state(GumboParser* parser,
     gumbo_tokenizer_set_state(parser, GUMBO_LEX_RCDATA);
     return emit_temporary_buffer(parser, output);
   }
-  return true;
+  return true;(void)tokenizer;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete.html#rcdata-end-tag-name-state
@@ -1183,7 +1193,7 @@ static StateResult handle_rawtext_end_tag_open_state(GumboParser* parser,
   } else {
     gumbo_tokenizer_set_state(parser, GUMBO_LEX_RAWTEXT);
     return emit_temporary_buffer(parser, output);
-  }
+  }(void)tokenizer;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete5/tokenization.html#rawtext-end-tag-name-state
@@ -1252,7 +1262,7 @@ static StateResult handle_script_end_tag_open_state(GumboParser* parser,
   } else {
     gumbo_tokenizer_set_state(parser, GUMBO_LEX_SCRIPT);
     return emit_temporary_buffer(parser, output);
-  }
+  }(void)tokenizer;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete5/tokenization.html#script-data-end-tag-name-state
@@ -1332,7 +1342,7 @@ static StateResult handle_script_escaped_state(GumboParser* parser,
       return emit_eof(parser, output);
     default:
       return emit_current_char(parser, output);
-  }
+  }(void)tokenizer;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete5/tokenization.html#script-data-escaped-dash-state
@@ -1357,7 +1367,7 @@ static StateResult handle_script_escaped_dash_state(GumboParser* parser,
     default:
       gumbo_tokenizer_set_state(parser, GUMBO_LEX_SCRIPT_ESCAPED);
       return emit_current_char(parser, output);
-  }
+  }(void)tokenizer;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete5/tokenization.html#script-data-escaped-dash-dash-state
@@ -1384,7 +1394,7 @@ static StateResult handle_script_escaped_dash_dash_state(GumboParser* parser,
     default:
       gumbo_tokenizer_set_state(parser, GUMBO_LEX_SCRIPT_ESCAPED);
       return emit_current_char(parser, output);
-  }
+  }(void)tokenizer;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete5/tokenization.html#script-data-escaped-less-than-sign-state
@@ -1420,7 +1430,7 @@ static StateResult handle_script_escaped_end_tag_open_state(GumboParser* parser,
   } else {
     gumbo_tokenizer_set_state(parser, GUMBO_LEX_SCRIPT_ESCAPED);
     return emit_temporary_buffer(parser, output);
-  }
+  }(void)tokenizer;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete5/tokenization.html#script-data-escaped-end-tag-name-state
@@ -1502,7 +1512,7 @@ static StateResult handle_script_double_escaped_state(GumboParser* parser,
       return NEXT_CHAR;
     default:
       return emit_current_char(parser, output);
-  }
+  }(void)tokenizer;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete5/tokenization.html#script-data-double-escaped-dash-state
@@ -1526,7 +1536,7 @@ static StateResult handle_script_double_escaped_dash_state(GumboParser* parser,
     default:
       gumbo_tokenizer_set_state(parser, GUMBO_LEX_SCRIPT_DOUBLE_ESCAPED);
       return emit_current_char(parser, output);
-  }
+  }(void)tokenizer;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete5/tokenization.html#script-data-double-escaped-dash-dash-state
@@ -1552,7 +1562,7 @@ static StateResult handle_script_double_escaped_dash_dash_state(
     default:
       gumbo_tokenizer_set_state(parser, GUMBO_LEX_SCRIPT_DOUBLE_ESCAPED);
       return emit_current_char(parser, output);
-  }
+  }(void)tokenizer;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete5/tokenization.html#script-data-double-escaped-less-than-sign-state
@@ -1633,7 +1643,7 @@ static StateResult handle_before_attr_name_state(GumboParser* parser,
       gumbo_tokenizer_set_state(parser, GUMBO_LEX_ATTR_NAME);
       append_char_to_tag_buffer(parser, ensure_lowercase(c), true);
       return NEXT_CHAR;
-  }
+  }(void)tokenizer;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete5/tokenization.html#attribute-name-state
@@ -1676,7 +1686,7 @@ static StateResult handle_attr_name_state(GumboParser* parser,
     default:
       append_char_to_tag_buffer(parser, ensure_lowercase(c), true);
       return NEXT_CHAR;
-  }
+  }(void)tokenizer;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete5/tokenization.html#after-attribute-name-state
@@ -1716,7 +1726,7 @@ static StateResult handle_after_attr_name_state(GumboParser* parser,
       gumbo_tokenizer_set_state(parser, GUMBO_LEX_ATTR_NAME);
       append_char_to_tag_buffer(parser, ensure_lowercase(c), true);
       return NEXT_CHAR;
-  }
+  }(void)tokenizer;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete5/tokenization.html#before-attribute-value-state
@@ -1793,7 +1803,7 @@ static StateResult handle_attr_value_double_quoted_state(GumboParser* parser,
     default:
       append_char_to_tag_buffer(parser, c, false);
       return NEXT_CHAR;
-  }
+  }(void)output;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete5/tokenization.html#attribute-value-single-quoted-state
@@ -1821,7 +1831,7 @@ static StateResult handle_attr_value_single_quoted_state(GumboParser* parser,
     default:
       append_char_to_tag_buffer(parser, c, false);
       return NEXT_CHAR;
-  }
+  }(void)output;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete5/tokenization.html#attribute-value-unquoted-state
@@ -1906,7 +1916,7 @@ static StateResult handle_char_ref_in_attr_value_state(GumboParser* parser,
     append_char_to_tag_buffer(parser, '&', is_unquoted);
   }
   gumbo_tokenizer_set_state(parser, tokenizer->_tag_state._attr_value_state);
-  return NEXT_CHAR;
+  return NEXT_CHAR; (void)output; (void)c;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete5/tokenization.html#after-attribute-value-quoted-state
@@ -2008,7 +2018,7 @@ static StateResult handle_markup_declaration_state(GumboParser* parser,
     tokenizer->_reconsume_current_input = true;
     clear_temporary_buffer(parser);
   }
-  return NEXT_CHAR;
+  return NEXT_CHAR; (void)output; (void)c;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete.html#comment-start-state
@@ -2037,7 +2047,7 @@ static StateResult handle_comment_start_state(GumboParser* parser,
       gumbo_tokenizer_set_state(parser, GUMBO_LEX_COMMENT);
       append_char_to_temporary_buffer(parser, c);
       return NEXT_CHAR;
-  }
+  }(void)tokenizer;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete.html#comment-start-dash-state
@@ -2068,7 +2078,7 @@ static StateResult handle_comment_start_dash_state(GumboParser* parser,
       append_char_to_temporary_buffer(parser, '-');
       append_char_to_temporary_buffer(parser, c);
       return NEXT_CHAR;
-  }
+  }(void)tokenizer;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete.html#comment-state
@@ -2090,7 +2100,7 @@ static StateResult handle_comment_state(GumboParser* parser,
     default:
       append_char_to_temporary_buffer(parser, c);
       return NEXT_CHAR;
-  }
+  }(void)tokenizer;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete.html#comment-end-dash-state
@@ -2116,7 +2126,7 @@ static StateResult handle_comment_end_dash_state(GumboParser* parser,
       append_char_to_temporary_buffer(parser, '-');
       append_char_to_temporary_buffer(parser, c);
       return NEXT_CHAR;
-  }
+  }(void)tokenizer;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete.html#comment-end-state
@@ -2155,7 +2165,7 @@ static StateResult handle_comment_end_state(GumboParser* parser,
       append_char_to_temporary_buffer(parser, '-');
       append_char_to_temporary_buffer(parser, c);
       return NEXT_CHAR;
-  }
+  }(void)tokenizer;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete.html#comment-end-bang-state
@@ -2191,7 +2201,7 @@ static StateResult handle_comment_end_bang_state(GumboParser* parser,
       append_char_to_temporary_buffer(parser, '!');
       append_char_to_temporary_buffer(parser, c);
       return NEXT_CHAR;
-  }
+  }(void)tokenizer;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete5/tokenization.html#doctype-state
@@ -2747,6 +2757,7 @@ static StateResult handle_bogus_doctype_state(GumboParser* parser,
     return RETURN_ERROR;
   }
   return NEXT_CHAR;
+  (void)tokenizer;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete.html#cdata-section-state
