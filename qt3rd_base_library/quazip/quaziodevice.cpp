@@ -23,6 +23,7 @@ see quazip/(un)zip.h files for details. Basically it's the zlib license.
 */
 
 #include "quaziodevice.h"
+#include "../private_qt3rd_base_library/zlib/zlib.h"
 
 #define QUAZIO_INBUFSIZE 4096
 #define QUAZIO_OUTBUFSIZE 4096

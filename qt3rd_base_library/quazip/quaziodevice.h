@@ -28,8 +28,6 @@ see quazip/(un)zip.h files for details. Basically it's the zlib license.
 #include <QIODevice>
 #include "quazip_global.h"
 
-#include "../private_qt3rd_base_library/zlib/zlib.h"
-
 class QuaZIODevicePrivate;
 
 /// A class to compress/decompress QIODevice.

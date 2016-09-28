@@ -25,7 +25,8 @@ quazip/(un)zip.h files for details, basically it's zlib license.
 #include <QFile>
 #include <QFlags>
 #include <QHash>
-
+#include "zip.h"
+#include "unzip.h"
 #include "quazip.h"
 
 /// All the internal stuff for the QuaZip class.
@@ -219,8 +220,9 @@ QuaZip::~QuaZip()
   delete p;
 }
 
-bool QuaZip::open(Mode mode, zlib_filefunc_def* ioApi)
+bool QuaZip::open(Mode mode, void* _arg_ioApi)
 {
+    auto ioApi=reinterpret_cast<zlib_filefunc_def*>(_arg_ioApi);
   p->zipError=UNZ_OK;
   if(isOpen()) {
     qWarning("QuaZip::open(): ZIP already opened");

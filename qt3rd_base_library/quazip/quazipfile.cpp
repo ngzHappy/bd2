@@ -23,6 +23,8 @@ quazip/(un)zip.h files for details, basically it's zlib license.
  **/
 
 #include "quazipfile.h"
+#include "zip.h"
+#include "unzip.h"
 
 using namespace std;
 
@@ -529,3 +531,9 @@ qint64 QuaZipFile::bytesAvailable() const
 {
     return size() - pos();
 }
+
+int QuaZipFile::_p_Z_DEFAULT_STRATEGY() { return Z_DEFAULT_STRATEGY; }
+int QuaZipFile::_p_DEF_MEM_LEVEL() { return DEF_MEM_LEVEL; }
+int QuaZipFile::_p_MAX_WBITS() { return MAX_WBITS; }
+int QuaZipFile::_p_Z_DEFAULT_COMPRESSION() { return Z_DEFAULT_COMPRESSION; }
+int QuaZipFile::_p_Z_DEFLATED() { return Z_DEFLATED; }

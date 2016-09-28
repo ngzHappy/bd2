@@ -30,7 +30,6 @@ quazip/(un)zip.h files for details, basically it's zlib license.
 #include <QString>
 
 #include "quazip_global.h"
-
 #include "quazipfileinfo.h"
 
 /// Information about a file to be created.
