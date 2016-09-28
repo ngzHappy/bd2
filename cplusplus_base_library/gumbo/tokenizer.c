@@ -1,4 +1,4 @@
-// Copyright 2010 Google Inc. All Rights Reserved.
+﻿// Copyright 2010 Google Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -378,7 +378,7 @@ static bool temporary_buffer_equals(GumboParser* parser,const char* text) {
     // it with an explicit sizeof(literal) if necessary.  I don't think it will
     // be, as this is only used in a couple of rare states.
     int text_len=strlen(text);
-    return text_len==buffer->length &&
+    return ((size_t)(text_len)==buffer->length) &&
         memcmp(buffer->data,text,text_len)==0;
 }
 #endif

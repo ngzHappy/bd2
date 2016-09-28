@@ -210,7 +210,7 @@ void do_1(const QString & fileName) {
 void changeAllFiles(const DutyFiles * arg) {
 
     const auto &varFiles=arg->files;
-    std::atomic<bool> varIsFinished=false;
+    std::atomic<bool> varIsFinished{false};
 
     {
         std::thread varThread([&]() mutable {

@@ -1,4 +1,4 @@
-// Copyright 2010 Google Inc. All Rights Reserved.
+﻿// Copyright 2010 Google Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -151,7 +151,7 @@ static const char* find_next_newline(
   const char* c = error_location;
   for (; *c && *c != '\n'; ++c)
     ;
-  return c;
+  return c;(void)original_text;
 }
 
 GumboError* gumbo_add_error(GumboParser* parser) {

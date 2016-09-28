@@ -1,4 +1,4 @@
-// Copyright 2010 Google Inc. All Rights Reserved.
+﻿// Copyright 2010 Google Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -101,7 +101,7 @@ char* gumbo_string_buffer_to_string(
 
 void gumbo_string_buffer_clear(
     struct GumboInternalParser* parser, GumboStringBuffer* input) {
-  input->length = 0;
+  input->length = 0;(void)parser;
 }
 
 void gumbo_string_buffer_destroy(
