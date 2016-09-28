@@ -47,11 +47,11 @@ see quazip/(un)zip.h files for details. Basically it's the zlib license.
 #endif
 #endif // QUAZIP_STATIC
 
-#ifdef __GNUC__
-#define UNUSED __attribute__((__unused__))
-#else
-#define UNUSED
-#endif
+//#ifdef __GNUC__
+//#define UNUSED __attribute__((__unused__))
+//#else
+//#define UNUSED
+//#endif
 
 #define QUAZIP_EXTRA_NTFS_MAGIC 0x000Au
 #define QUAZIP_EXTRA_NTFS_TIME_MAGIC 0x0001u

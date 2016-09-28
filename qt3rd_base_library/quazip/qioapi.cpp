@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "zlib.h"
+#include "../private_qt3rd_base_library/zlib/zlib.h"
 #include "ioapi.h"
 #include "quazip_global.h"
 #include <QIODevice>

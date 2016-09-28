@@ -33,9 +33,9 @@
 
 #include "zconf.h"
 
-#include <qglobal.h>
+//#include <qglobal.h>
 #undef ZEXTERN
-#define ZEXTERN Q_CORE_EXPORT
+#define ZEXTERN extern
 
 #ifdef __cplusplus
 extern "C" {

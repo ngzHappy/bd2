@@ -24,7 +24,7 @@ see quazip/(un)zip.h files for details. Basically it's the zlib license.
 
 #include "quacrc32.h"
 
-#include "zlib.h"
+#include "../private_qt3rd_base_library/zlib/zlib.h"
 
 QuaCrc32::QuaCrc32()
 {
