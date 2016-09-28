@@ -521,7 +521,7 @@ static void emit_doctype(GumboParser* parser,GumboToken* output) {
 // it can be asserted on tag creation, verifying that there are no memory leaks.
 static void mark_tag_state_as_empty(GumboTagState* tag_state) {
 #ifndef NDEBUG
-    tag_state->_attributes=kGumboEmptyVector;
+    tag_state->_attributes=kGumboEmptyVector; (void)tag_state;
 #endif
 }
 
@@ -1170,7 +1170,7 @@ static StateResult handle_rcdata_end_tag_name_state(GumboParser* parser,
     }
     gumbo_tokenizer_set_state(parser,GUMBO_LEX_RCDATA);
     abandon_current_tag(parser);
-    return emit_temporary_buffer(parser,output);
+    return emit_temporary_buffer(parser,output); (void)tokenizer;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete5/tokenization.html#rawtext-less-than-sign-state
@@ -1308,7 +1308,7 @@ static StateResult handle_script_end_tag_name_state(GumboParser* parser,
     }
     gumbo_tokenizer_set_state(parser,GUMBO_LEX_SCRIPT);
     abandon_current_tag(parser);
-    return emit_temporary_buffer(parser,output);
+    return emit_temporary_buffer(parser,output); (void)tokenizer;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete5/tokenization.html#script-data-escape-start-state
@@ -1482,7 +1482,7 @@ static StateResult handle_script_escaped_end_tag_name_state(GumboParser* parser,
     }
     gumbo_tokenizer_set_state(parser,GUMBO_LEX_SCRIPT_ESCAPED);
     abandon_current_tag(parser);
-    return emit_temporary_buffer(parser,output);
+    return emit_temporary_buffer(parser,output); (void)tokenizer;
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/complete5/tokenization.html#script-data-double-escape-start-state
