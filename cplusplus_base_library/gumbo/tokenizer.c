@@ -521,8 +521,9 @@ static void emit_doctype(GumboParser* parser,GumboToken* output) {
 // it can be asserted on tag creation, verifying that there are no memory leaks.
 static void mark_tag_state_as_empty(GumboTagState* tag_state) {
 #ifndef NDEBUG
-    tag_state->_attributes=kGumboEmptyVector; (void)tag_state;
+    tag_state->_attributes=kGumboEmptyVector;  
 #endif
+    (void)tag_state;
 }
 
 // Writes out the current tag as a start or end tag token.

@@ -1,4 +1,4 @@
-// Copyright 2010 Google Inc. All Rights Reserved.
+﻿// Copyright 2010 Google Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -79,7 +79,7 @@ void* gumbo_vector_pop(
   if (vector->length == 0) {
     return NULL;
   }
-  return vector->data[--vector->length];
+  return vector->data[--vector->length];(void)parser;
 }
 
 int gumbo_vector_index_of(GumboVector* vector, const void* element) {
@@ -119,5 +119,5 @@ void* gumbo_vector_remove_at(struct GumboInternalParser* parser,
   memmove(&vector->data[index], &vector->data[index + 1],
       sizeof(void*) * (vector->length - index - 1));
   --vector->length;
-  return result;
+  return result;(void)parser;
 }

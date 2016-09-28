@@ -2497,7 +2497,7 @@ static bool consume_named_ref(
     if (last_char == ';') {
       bool matched = utf8iterator_maybe_consume_match(input, start, len, true);
       assert(matched);
-      return true;
+      return true;(void)matched;
     } else if (is_in_attribute && (*te == '=' || isalnum(*te))) {
       output->first = kGumboNoChar;
       output->second = kGumboNoChar;
@@ -2510,7 +2510,7 @@ static bool consume_named_ref(
       add_named_reference_error(
           parser, input, GUMBO_ERR_NAMED_CHAR_REF_WITHOUT_SEMICOLON, bad_ref);
       bool matched = utf8iterator_maybe_consume_match(input, start, len, true);
-      assert(matched);
+      assert(matched);(void)matched;
       return false;
     }
   } else {
