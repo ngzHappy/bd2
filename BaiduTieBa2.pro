@@ -14,8 +14,12 @@ TEMPLATE = subdirs
 #tool:boost_change_name
 tool_boost_change_name.file=$$PWD/cplusplus_base_library/boost_tool/tool_boost_change_name/boost_change_name.pro
 
+#cplusplus_base_library
+library_cplusplus_base_library.file=$$PWD/cplusplus_base_library/cplusplus_base_library.pro
+
 SUBDIRS += \
-    tool_boost_change_name
+    tool_boost_change_name \
+    library_cplusplus_base_library
 
 
 
