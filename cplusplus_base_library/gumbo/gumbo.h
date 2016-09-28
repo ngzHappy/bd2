@@ -49,6 +49,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include "../private_cplusplus_base_library/cplusplus_base_library_global.hpp"
 
 #ifdef __cplusplus
 extern "C" {
@@ -100,14 +101,14 @@ extern const GumboStringPiece kGumboEmptyString;
  * Compares two GumboStringPieces, and returns true if they're equal or false
  * otherwise.
  */
-bool gumbo_string_equals(
+CPLUSPLUS_BASE_LIBRARYSHARED_EXPORT bool gumbo_string_equals(
     const GumboStringPiece* str1, const GumboStringPiece* str2);
 
 /**
  * Compares two GumboStringPieces ignoring case, and returns true if they're
  * equal or false otherwise.
  */
-bool gumbo_string_equals_ignore_case(
+CPLUSPLUS_BASE_LIBRARYSHARED_EXPORT bool gumbo_string_equals_ignore_case(
     const GumboStringPiece* str1, const GumboStringPiece* str2);
 
 /**
@@ -139,7 +140,7 @@ extern const GumboVector kGumboEmptyVector;
  * Returns the first index at which an element appears in this vector (testing
  * by pointer equality), or -1 if it never does.
  */
-int gumbo_vector_index_of(GumboVector* vector, const void* element);
+CPLUSPLUS_BASE_LIBRARYSHARED_EXPORT int gumbo_vector_index_of(GumboVector* vector, const void* element);
 
 /**
  * An enum for all the tags defined in the HTML5 standard.  These correspond to
@@ -169,7 +170,7 @@ typedef enum {
  * tag name for an GumboTag enum.  Return value is static data owned by the
  * library.
  */
-const char* gumbo_normalized_tagname(GumboTag tag);
+CPLUSPLUS_BASE_LIBRARYSHARED_EXPORT const char* gumbo_normalized_tagname(GumboTag tag);
 
 /**
  * Extracts the tag name from the original_text field of an element or token by
@@ -181,7 +182,7 @@ const char* gumbo_normalized_tagname(GumboTag tag);
  * empty (NULL data pointer), then this function will exit successfully as a
  * no-op.
  */
-void gumbo_tag_from_original_text(GumboStringPiece* text);
+CPLUSPLUS_BASE_LIBRARYSHARED_EXPORT void gumbo_tag_from_original_text(GumboStringPiece* text);
 
 /**
  * Fixes the case of SVG elements that are not all lowercase.
@@ -195,14 +196,14 @@ void gumbo_tag_from_original_text(GumboStringPiece* text);
  * no normalization is called for.  The return value is static data and owned by
  * the library.
  */
-const char* gumbo_normalize_svg_tagname(const GumboStringPiece* tagname);
+CPLUSPLUS_BASE_LIBRARYSHARED_EXPORT const char* gumbo_normalize_svg_tagname(const GumboStringPiece* tagname);
 
 /**
  * Converts a tag name string (which may be in upper or mixed case) to a tag
  * enum. The `tag` version expects `tagname` to be NULL-terminated
  */
-GumboTag gumbo_tag_enum(const char* tagname);
-GumboTag gumbo_tagn_enum(const char* tagname, unsigned int length);
+CPLUSPLUS_BASE_LIBRARYSHARED_EXPORT GumboTag gumbo_tag_enum(const char* tagname);
+CPLUSPLUS_BASE_LIBRARYSHARED_EXPORT GumboTag gumbo_tagn_enum(const char* tagname, unsigned int length);
 
 /**
  * Attribute namespaces.
@@ -282,7 +283,7 @@ typedef struct {
  * and return it, or NULL if no such attribute exists.  This uses a
  * case-insensitive match, as HTML is case-insensitive.
  */
-GumboAttribute* gumbo_get_attribute(const GumboVector* attrs, const char* name);
+CPLUSPLUS_BASE_LIBRARYSHARED_EXPORT GumboAttribute* gumbo_get_attribute(const GumboVector* attrs, const char* name);
 
 /**
  * Enum denoting the type of node.  This determines the type of the node.v
@@ -652,17 +653,17 @@ typedef struct GumboInternalOutput {
  *
  * This doesn't support buffers longer than 4 gigabytes.
  */
-GumboOutput* gumbo_parse(const char* buffer);
+CPLUSPLUS_BASE_LIBRARYSHARED_EXPORT GumboOutput* gumbo_parse(const char* buffer);
 
 /**
  * Extended version of gumbo_parse that takes an explicit options structure,
  * buffer, and length.
  */
-GumboOutput* gumbo_parse_with_options(
+CPLUSPLUS_BASE_LIBRARYSHARED_EXPORT GumboOutput* gumbo_parse_with_options(
     const GumboOptions* options, const char* buffer, size_t buffer_length);
 
 /** Release the memory used for the parse tree & parse errors. */
-void gumbo_destroy_output(const GumboOptions* options, GumboOutput* output);
+CPLUSPLUS_BASE_LIBRARYSHARED_EXPORT void gumbo_destroy_output(const GumboOptions* options, GumboOutput* output);
 
 #ifdef __cplusplus
 }
