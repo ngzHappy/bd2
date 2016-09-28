@@ -15,6 +15,9 @@ DESTDIR=$$THIS_PROJECT_DESTDIR
 SOURCES += \
     $$PWD/source_cplusplus_base_library/source_cpp_global.cpp
 
+HEADERS += \
+    $$PWD/cplusplus_base_library.hpp
+
 
 
 
