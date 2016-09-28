@@ -17,9 +17,14 @@ tool_boost_change_name.file=$$PWD/cplusplus_base_library/boost_tool/tool_boost_c
 #cplusplus_base_library
 library_cplusplus_base_library.file=$$PWD/cplusplus_base_library/cplusplus_base_library.pro
 
+#qt3rd_base_library
+library_qt3rd_base_library.file=$$PWD/qt3rd_base_library/qt3rd_base_library.pro
+library_qt3rd_base_library.depends+=library_cplusplus_base_library
+
 SUBDIRS += \
     tool_boost_change_name \
-    library_cplusplus_base_library
+    library_cplusplus_base_library \
+    library_qt3rd_base_library
 
 
 
