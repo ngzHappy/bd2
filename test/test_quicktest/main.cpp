@@ -13,6 +13,8 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
+    TestStaticPointer static_pointer_test;
+
     MainWindow window;
     window.show();
 

@@ -1,4 +1,5 @@
-﻿#include "TestStaticPointer.hpp"
+﻿#include <iostream>
+#include "TestStaticPointer.hpp"
 #include <memory/MemoryLibrary.hpp>
 
 namespace {
@@ -11,15 +12,21 @@ public:
     TestClass() :a(0),b(1),c(2),
     e(0),f(1),g(2),
     i(0),j(1),k(2){}
-    ~TestClass() {}
+    ~TestClass() {
+        std::cout<<"this should not be run!"<<std::endl;
+    }
 };
 
 static unsigned char test_data[sizeof(TestClass)];
-
+static unsigned char test_data1[sizeof(TestClass)];
 }
 
 TestStaticPointer::TestStaticPointer(){
 
-    static memory::StaticPoionter<TestClass> test(test_data);
-
+    {/*标准测试*/
+        static memory::StaticPoionter<TestClass> test(test_data);
+    }
+    {/*测试析构*/
+        memory::StaticPoionter<TestClass> test1(test_data1);
+    }
 }
