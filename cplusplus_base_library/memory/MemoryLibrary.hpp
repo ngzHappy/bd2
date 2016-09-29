@@ -1,4 +1,4 @@
-#ifndef _z____MEMOEY__HPP__CPP_L
+﻿#ifndef _z____MEMOEY__HPP__CPP_L
 #define _z____MEMOEY__HPP__CPP_L
 
 #include "Allocator.hpp"
@@ -6,6 +6,7 @@
 #include "MakeShared.hpp"
 #include "Memory.hpp"
 #include "MemoryStatic.hpp"
+#include "MemoryApplication.hpp"
 
 #endif
 

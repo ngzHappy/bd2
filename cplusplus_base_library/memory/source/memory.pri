@@ -1,5 +1,6 @@
 SOURCES += \
-    $$PWD/Memory.cpp
+    $$PWD/Memory.cpp \
+    $$PWD/MemoryApplication.cpp
 
 HEADERS += \
     $$PWD/../Allocator.hpp \
@@ -7,4 +8,5 @@ HEADERS += \
     $$PWD/../MakeShared.hpp \
     $$PWD/../Memory.hpp \
     $$PWD/../MemoryLibrary.hpp \
-    $$PWD/../MemoryStatic.hpp
+    $$PWD/../MemoryStatic.hpp \
+    $$PWD/../MemoryApplication.hpp
