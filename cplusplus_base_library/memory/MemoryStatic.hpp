@@ -26,9 +26,10 @@ inline void constructStatic() {
 namespace _ns_static_pointer_private_memory_ {
 template<typename _T_>
 class StaticPointerPOD {
+protected:
+    _T_ * _m_Data;
+    StaticPointerPOD()=default;
 private:
-    _T_ * const _m_Data;
-
     template<typename _U_,bool _I_>
     class __Construct {
     public:
@@ -55,12 +56,11 @@ public:
     auto & operator*() { return *pointer(); }
     const auto & operator*() const { return *pointer(); }
 public:
+    StaticPointerPOD(const StaticPointerPOD&)=default;
+    StaticPointerPOD(StaticPointerPOD&&)=default;
+    StaticPointerPOD&operator=(const StaticPointerPOD&)=default;
+    StaticPointerPOD&operator=(StaticPointerPOD&&)=default;
     ~StaticPointerPOD()=default;
-    StaticPointerPOD()=delete;
-    StaticPointerPOD(const StaticPointerPOD&)=delete;
-    StaticPointerPOD(StaticPointerPOD&&)=delete;
-    StaticPointerPOD&operator=(const StaticPointerPOD&)=delete;
-    StaticPointerPOD&operator=(StaticPointerPOD&&)=delete;
 public:
     template<typename ..._Args_>
     StaticPointerPOD(const void * argData,_Args_&&...args)
@@ -92,7 +92,7 @@ template<
     bool _is_plugin_=IS_PLUGIN_FIRE,
     bool _is_pod_=std::is_pod<_T_>::value/*false*/
 >
-class StaticPoionter :
+class StaticPoionter final :
     private _ns_static_pointer_private_memory_::NoPODConstruct,
     public _ns_static_pointer_private_memory_::StaticPointerPOD<_T_> {
     using _N_=_ns_static_pointer_private_memory_::NoPODConstruct;
@@ -108,6 +108,12 @@ class StaticPoionter :
         :public std::true_type {
         template<typename _D_>static void close(_D_*arg) { arg->close(); }
     };
+public:
+    StaticPoionter()=delete;
+    StaticPoionter(const StaticPoionter&)=delete;
+    StaticPoionter(StaticPoionter&&)=delete;
+    StaticPoionter&operator=(const StaticPoionter&)=delete;
+    StaticPoionter&operator=(StaticPoionter&&)=delete;
 public:
     template<typename ..._Args_>
     StaticPoionter(const void *argData,_Args_&&...args)
@@ -145,11 +151,19 @@ template<
     typename _T_,
     bool _need_close_,
     bool _is_plugin_
->class StaticPoionter<_T_,_need_close_,_is_plugin_,true> :
+>class StaticPoionter<_T_,_need_close_,_is_plugin_,true> final :
     public _ns_static_pointer_private_memory_::StaticPointerPOD<_T_> {
     using _S_=_ns_static_pointer_private_memory_::StaticPointerPOD<_T_>;
+    StaticPoionter()=default;
 public:
     using _S_::_S_;
+    template<typename _U_,bool _0_,bool _1_>
+    StaticPoionter(const StaticPoionter<_U_,_0_,_1_,true>&arg) { this->_m_Data=arg.pointer(); }
+    template<typename _U_,bool _0_,bool _1_>
+    StaticPoionter(StaticPoionter<_U_,_0_,_1_,true>&&arg) { this->_m_Data=arg.pointer(); }
+    StaticPoionter&operator=(const StaticPoionter&)=default;
+    StaticPoionter&operator=(StaticPoionter&&)=default;
+    ~StaticPoionter()=default;
 };
 
 }/*~memory*/

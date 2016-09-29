@@ -17,8 +17,13 @@ public:
     }
 };
 
+class TestClass2 {};
+class TestClass3 :public TestClass2 {};
+
 static unsigned char test_data[sizeof(TestClass)];
 static unsigned char test_data1[sizeof(TestClass)];
+static unsigned char test_data2[sizeof(TestClass2)];
+static unsigned char test_data3[sizeof(TestClass3)];
 }
 
 TestStaticPointer::TestStaticPointer(){
@@ -28,5 +33,11 @@ TestStaticPointer::TestStaticPointer(){
     }
     {/*测试析构*/
         memory::StaticPoionter<TestClass> test1(test_data1);
+    }
+    {
+        memory::StaticPoionter<TestClass2> test2(test_data2);
+        memory::StaticPoionter<TestClass3> test3(test_data3);
+        test2=test3;
+       
     }
 }
