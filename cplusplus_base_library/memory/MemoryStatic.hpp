@@ -1,6 +1,7 @@
 ﻿#ifndef _m_MEMORY_STATIC_HPP_CPP_
 #define _m_MEMORY_STATIC_HPP_CPP_() 1
 
+#include <cassert>
 #include "Memory.hpp"
 #include "Allocator.hpp"
 #include "MemoryApplication.hpp"
@@ -64,6 +65,7 @@ public:
     template<typename ..._Args_>
     StaticPointerPOD(const void * argData,_Args_&&...args)
         :_m_Data(reinterpret_cast<_T_ *>(const_cast<void*>(argData))) {
+        assert(argData);
         __Construct<_T_,std::is_constructible<
             _T_,_Args_...>::value>::construct(
                 const_cast<void*>(argData),
@@ -71,6 +73,7 @@ public:
     }
     StaticPointerPOD(const void * argData)
         :_m_Data(reinterpret_cast<_T_ *>(const_cast<void*>(argData))) {
+        assert(argData);
         ::new(const_cast<void*>(argData)) _T_{};
     }
 };
@@ -111,6 +114,7 @@ public:
         :_N_(),_S_(argData,std::forward<_Args_>(args)...) {}
 
     ~StaticPoionter() {
+
         /*c++17将if改为if constexpr*/
         constexpr bool _has_close=__Close<void>::value;
 
