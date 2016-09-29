@@ -21,10 +21,16 @@ library_cplusplus_base_library.file=$$PWD/cplusplus_base_library/cplusplus_base_
 library_qt3rd_base_library.file=$$PWD/qt3rd_base_library/qt3rd_base_library.pro
 library_qt3rd_base_library.depends+=library_cplusplus_base_library
 
+#test_quicktest
+test_quicktest.file=$$PWD/test/test_quicktest/test_quicktest.pro
+test_quicktest.depends+=library_qt3rd_base_library
+
 SUBDIRS += \
     tool_boost_change_name \
     library_cplusplus_base_library \
-    library_qt3rd_base_library
+    library_qt3rd_base_library \
+    test_quicktest
+
 
 
 

@@ -96,10 +96,15 @@ class StaticPoionter :
     using _S_=_ns_static_pointer_private_memory_::StaticPointerPOD<_T_>;
     template<typename ...>using _void_t=void;
     template<typename _U_,typename _C_=void>
-    class __Close:public std::false_type {};
+    class __Close :public std::false_type {
+    public:
+        template<typename _D_>static void close(_D_*) {}
+    };
     template<typename _U_>
     class __Close<_U_,_void_t<decltype(std::declval<_T_*>()->close())>>
-        :public std::true_type{};
+        :public std::true_type {
+        template<typename _D_>static void close(_D_*arg) { arg->close(); }
+    };
 public:
     template<typename ..._Args_>
     StaticPoionter(const void *argData,_Args_&&...args)
@@ -110,20 +115,22 @@ public:
         constexpr bool _has_close=__Close<void>::value;
 
         /*关闭非内存资源*/
-        if(_need_close_&&_has_close) {
-            _S_::pointer()->close();
+        if (_need_close_&&_has_close) {
+            __Close<void>::close(_S_::pointer());
         }
 
         /*执行析构释放内存资源*/
         if (std::is_trivially_destructible<_T_>::value) {
             return/*平凡的析构函数*/;
-        }else if(_is_plugin_) {
+        }
+        else if (_is_plugin_) {
             if (memory::Application::isMainQuit()) {
                 return/*主函数已经退出不必释放内存*/;
             }
             _S_::pointer()->~_T_()/*用析构释放内存*/;
             return/*插件需要析构*/;
-        }else {
+        }
+        else {
             return/*非插件不必析构释放内存*/;
         }
 
@@ -132,7 +139,7 @@ public:
 
 template<
     typename _T_,
-    bool _need_close_
+    bool _need_close_,
     bool _is_plugin_
 >class StaticPoionter<_T_,_need_close_,_is_plugin_,true> :
     public _ns_static_pointer_private_memory_::StaticPointerPOD<_T_> {
