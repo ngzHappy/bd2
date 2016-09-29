@@ -28,7 +28,7 @@ template<typename _T_>
 class StaticPointerPOD {
 protected:
     _T_ * _m_Data;
-    StaticPointerPOD()=default;
+    StaticPointerPOD():_m_Data(nullptr) {}
 private:
     template<typename _U_,bool _I_>
     class __Construct {
@@ -97,14 +97,14 @@ class StaticPoionter final :
     public _ns_static_pointer_private_memory_::StaticPointerPOD<_T_> {
     using _N_=_ns_static_pointer_private_memory_::NoPODConstruct;
     using _S_=_ns_static_pointer_private_memory_::StaticPointerPOD<_T_>;
-    template<typename ...>using _void_t=void;
+    template<typename ...>using __void_t=void;
     template<typename _U_,typename _C_=void>
     class __Close :public std::false_type {
     public:
         template<typename _D_>static void close(_D_*) {}
     };
     template<typename _U_>
-    class __Close<_U_,_void_t<decltype(std::declval<_T_*>()->close())>>
+    class __Close<_U_,__void_t<decltype(std::declval<_U_*>()->close())>>
         :public std::true_type {
         template<typename _D_>static void close(_D_*arg) { arg->close(); }
     };
@@ -122,11 +122,11 @@ public:
     ~StaticPoionter() {
 
         /*c++17将if改为if constexpr*/
-        constexpr bool _has_close=__Close<void>::value;
+        constexpr bool _has_close=__Close<_T_>::value;
 
         /*关闭非内存资源*/
         if (_need_close_&&_has_close) {
-            __Close<void>::close(_S_::pointer());
+            __Close<_T_>::close(this->pointer());
         }
 
         /*执行析构释放内存资源*/
@@ -137,7 +137,7 @@ public:
             if (memory::Application::isMainQuit()) {
                 return/*主函数已经退出不必释放内存*/;
             }
-            _S_::pointer()->~_T_()/*用析构释放内存*/;
+            this->pointer()->~_T_()/*用析构释放内存*/;
             return/*插件需要析构*/;
         }
         else {
@@ -154,8 +154,8 @@ template<
 >class StaticPoionter<_T_,_need_close_,_is_plugin_,true> final :
     public _ns_static_pointer_private_memory_::StaticPointerPOD<_T_> {
     using _S_=_ns_static_pointer_private_memory_::StaticPointerPOD<_T_>;
-    StaticPoionter()=default;
 public:
+    StaticPoionter()=default;
     using _S_::_S_;
     template<typename _U_,bool _0_,bool _1_>
     StaticPoionter(const StaticPoionter<_U_,_0_,_1_,true>&arg) { this->_m_Data=arg.pointer(); }
