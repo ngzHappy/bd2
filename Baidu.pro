@@ -14,8 +14,14 @@ TEMPLATE = subdirs
 #baidu_core_library
 library_baidu_core_library.file=$$PWD/baidu_core_library/baidu_core_library.pro
 
+#test_baidu_core
+test_baidu_core.file=$$PWD/test/test_baidu_core/test_baidu_core.pro
+test_baidu_core.depends+=library_baidu_core_library
+
 SUBDIRS += \
-    library_baidu_core_library
+    library_baidu_core_library \
+    test_baidu_core
+
 
 
 

@@ -25,11 +25,19 @@ library_qt3rd_base_library.depends+=library_cplusplus_base_library
 test_quicktest.file=$$PWD/test/test_quicktest/test_quicktest.pro
 test_quicktest.depends+=library_qt3rd_base_library
 
+#setgetutilit
+tool_setgetutility.file=$$PWD/tool/setgetutility/setgetutility.pro
+
+#index_class_maker
+tool_indexclassmaker.file=$$PWD/tool/indexclassmaker/indexclassmaker.pro
+
 SUBDIRS += \
     tool_boost_change_name \
     library_cplusplus_base_library \
     library_qt3rd_base_library \
-    test_quicktest
+    test_quicktest \
+    tool_setgetutility \
+    tool_indexclassmaker
 
 
 

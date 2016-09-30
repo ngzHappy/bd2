@@ -1,6 +1,7 @@
 QT += core
 QT += gui
 QT += network
+QT += concurrent
 
 TARGET = baidu_core_library
 TEMPLATE = lib
@@ -14,6 +15,8 @@ HEADERS += BaiduCoreLibrary.hpp\
     RunInMainThread.hpp
 
 include($$PWD/src/baidu_core_source.pri)
+
+########################################
 
 include($$PWD/../BaiduTieBaBase.pri)
 DESTDIR=$$THIS_PROJECT_DESTDIR
