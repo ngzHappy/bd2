@@ -38,7 +38,8 @@ SUBDIRS += \
     test_quicktest \
     tool_setgetutility \
     tool_indexclassmaker \
-    tool/deleteclassmaker
+    tool/deleteclassmaker \
+    tool/stringsplit
 
 
 
