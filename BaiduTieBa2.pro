@@ -37,7 +37,8 @@ SUBDIRS += \
     library_qt3rd_base_library \
     test_quicktest \
     tool_setgetutility \
-    tool_indexclassmaker
+    tool_indexclassmaker \
+    tool/deleteclassmaker
 
 
 
