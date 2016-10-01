@@ -16,13 +16,13 @@ MainWindow::~MainWindow()
 
 void MainWindow::updateData(){
     QString varAns=u8R"__(#include <memory>
-template<int> class Value;
+template<typename,typename> class Value;
 
-constexpr int Key$ValueName$ = $ValueIndex$;
+typedef ???? Key$ValueName$;
 typedef ???? Type$ValueName$;
 
-template<>
-class Value<Key$ValueName$>{
+template<typename _ThisClassType_>
+class Value<_ThisClassType_,Key$ValueName$>{
 protected:
     Type$ValueName$ _m_$ValueName$;
     auto & value(){return _m_$ValueName$;}
