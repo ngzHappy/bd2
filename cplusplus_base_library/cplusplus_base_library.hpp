@@ -7,6 +7,8 @@ class CPLUSPLUS_BASE_LIBRARYSHARED_EXPORT cplusplus_base_library {
 public:
     cplusplus_base_library();
     virtual~cplusplus_base_library();
+protected:
+    void test_code_never_used();
 };
 
 
