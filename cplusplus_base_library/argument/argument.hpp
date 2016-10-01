@@ -94,6 +94,10 @@ inline decltype(auto) aget(
 }/*_a0_*/
 
 
+template<typename _A_,typename _B_>
+using key_same=_a0_::_p0_::_is_same<_A_,_B_>/*type*/;
+template<typename _A_>
+using is_key_nullptr=key_same<_A_,decltype(nullptr)>/*type*/;
 using _a0_::KeyValue/*type*/;
 using _a0_::atie/*function*/;
 using _a0_::aget/*function*/;
