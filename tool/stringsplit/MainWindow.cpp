@@ -51,7 +51,8 @@ void MainWindow::updateData() {
     else {
         QString varAns;
         varAns=u8R"(#ifndef CNAME_)"+varString+"\n"
-            "#define CNAME_"+varString+" /*"+varString+"*/";
+            "#define CNAME_"+varString; 
+        QString varSplitedName=QString("/*")+varString+"*/";
         {
             auto pos=varByteArray.cbegin();
             auto posend=varByteArray.cend();
@@ -61,7 +62,7 @@ void MainWindow::updateData() {
                     varTextEdit->setText(QString::fromUtf8(u8R"(仅支持小于127的字符)"));
                     return;
                 }
-                varAns+="(char)("+QString::number(int(i))+")/*"+i+"*/";
+                varSplitedName+=QString("\'")+i+"\'" ;
             }
             for (++pos; pos!=posend; ++pos) {
                 auto i=*pos;
@@ -69,11 +70,19 @@ void MainWindow::updateData() {
                     varTextEdit->setText(QString::fromUtf8(u8R"(仅支持小于127的字符)"));
                     return;
                 }
-                varAns+=",(char)("+QString::number(int(i))+")/*"+i+"*/";
+                varSplitedName+=QString(",\'")+i+"\'" ;
             }
         }
+
+        varAns+=" "+varSplitedName;
         varAns+="\n#endif\n";
-        varTextEdit->setText(varAns);
+
+        varAns+="\n#ifndef cnt_"+varString;
+        varAns+="\n#define cnt_"+varString+" constexpr_string::string< "+
+            std::move(varSplitedName)+" >";
+        varAns+="\n#endif";
+
+        varTextEdit->setText(std::move(varAns)+"\n\n\n");
     }
 
 }
