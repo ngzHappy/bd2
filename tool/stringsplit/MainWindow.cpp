@@ -50,7 +50,8 @@ void MainWindow::updateData() {
     }
     else {
         QString varAns;
-        varAns="/*"+varString+"*/\n";
+        varAns=u8R"(#ifndef CNAME_)"+varString+"\n"
+            "#define CNAME_"+varString+" /*"+varString+"*/";
         {
             auto pos=varByteArray.cbegin();
             auto posend=varByteArray.cend();
@@ -71,6 +72,7 @@ void MainWindow::updateData() {
                 varAns+=",(char)("+QString::number(int(i))+")/*"+i+"*/";
             }
         }
+        varAns+="\n#endif\n";
         varTextEdit->setText(varAns);
     }
 
