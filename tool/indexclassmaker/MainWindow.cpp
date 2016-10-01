@@ -17,12 +17,11 @@ MainWindow::~MainWindow()
 void MainWindow::updateData(){
     QString varAns=u8R"__(#include <memory>
 template<typename,typename> class Value;
+template<typename,int> class Type;
 
-typedef ???? Key$ValueName$;
-typedef ???? Type$ValueName$;
-
-template<typename _ThisClassType_>
+template<>
 class Value<_ThisClassType_,Key$ValueName$>{
+    typedef ???? Type$ValueName$;
 public:
     Type$ValueName$ _m_$ValueName$;
     auto & value(){return _m_$ValueName$;}
@@ -32,6 +31,12 @@ public:
     template<typename _0Type_,typename ... _Type_>
     Value(_0Type_ &&arg0,_Type_&&...args):
         _m_$ValueName$(std::forward<_0Type_>(arg0),std::forward<_Type_>(args)...){}
+};
+
+template<>
+class Type<_ThisClassType_,$ValueIndex$>{
+public:
+    typedef Key$ValueName$ type;
 };
 
 )__";
