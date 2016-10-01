@@ -5,6 +5,12 @@
 #include <utility>
 #include <type_traits>
 
+template<typename,typename> class Value;
+template<typename,int> class Type;
+namespace constexpr_string {
+template<char...>class string;
+}
+
 namespace argument {
 
 namespace _a0_/*version 0.0*/ {
