@@ -23,7 +23,7 @@ typedef ???? Type$ValueName$;
 
 template<typename _ThisClassType_>
 class Value<_ThisClassType_,Key$ValueName$>{
-protected:
+public:
     Type$ValueName$ _m_$ValueName$;
     auto & value(){return _m_$ValueName$;}
     const auto & value()const{return _m_$ValueName$;}
