@@ -37,6 +37,16 @@ void cplusplus_base_library::test_code_never_used(){
         (void)test;
     }
 
+    {
+        int test=0;
+        switch (test) {
+            using namespace std;
+            case 0:break;
+            default:break;
+        }
+        (void)test;
+    }
+
 }
 
 cplusplus_base_library::~cplusplus_base_library(){
