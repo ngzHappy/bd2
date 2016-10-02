@@ -10,7 +10,7 @@ cplusplus_base_library::cplusplus_base_library(){
 
 /*用于测试编译器*/
 void cplusplus_base_library::test_code_never_used(){
-
+#ifndef NDEBUG
     using argument::akv;
     using argument::aget;
     using argument::atie;
@@ -46,7 +46,7 @@ void cplusplus_base_library::test_code_never_used(){
         }
         (void)test;
     }
-
+#endif
 }
 
 cplusplus_base_library::~cplusplus_base_library(){
