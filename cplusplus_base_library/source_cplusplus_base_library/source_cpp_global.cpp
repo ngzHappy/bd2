@@ -17,13 +17,13 @@ void cplusplus_base_library::test_code_never_used(){
 
     {
         int a=12;
-        auto xee=aget<int>(atie(akv<int>(a),akv<double>(2)));
+        int xee=aget<int>(atie(akv<int>(a),akv<double>(2)));
         (void)xee;
     }
 
     {
         int a=12;
-        auto xee=aget<float>(atie(akv<int>(a),akv<double>(2)));
+        void * xee=aget<float>(atie(akv<int>(a),akv<double>(2)));
         (void)xee;
     }
 
@@ -40,8 +40,8 @@ void cplusplus_base_library::test_code_never_used(){
     {
         int test=0;
         switch (test) {
-            using namespace std;
-            case 0:break;
+            case 0: {using namespace std; }break;
+            case 1: {using namespace argument; } break;
             default:break;
         }
         (void)test;
