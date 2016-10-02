@@ -7,8 +7,19 @@
 
 template<typename,typename> class Value;
 template<typename,int> class Type;
+
+namespace _pcios/*private constexpr int or string*/ {
+template<int,int/*-1:string 1:integer*/,char...>class _cT_;
+}
+
 namespace constexpr_string {
-template<char...>class string;
+template<char...__C>
+using string=_pcios::_cT_<-1,-1,__C...>;
+}
+
+namespace constexpr_integer{
+template<int _N_>
+using integer=_pcios::_cT_<_N_,1>;
 }
 
 namespace argument {
@@ -108,6 +119,11 @@ using _a0_::KeyValue/*type*/;
 using _a0_::atie/*function*/;
 using _a0_::aget/*function*/;
 using _a0_::akv/*function*/;
+
+/*
+template<typename ..._K_,typename ..._V_>
+(const std::tuple<const argument::KeyValue<_K_,_V_>&...>&arg)
+*/
 
 }/*argument*/
 
