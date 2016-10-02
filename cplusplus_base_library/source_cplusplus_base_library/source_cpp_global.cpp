@@ -27,6 +27,16 @@ void cplusplus_base_library::test_code_never_used(){
         (void)xee;
     }
 
+    {
+        argument::cat_tuple_t<
+            std::tuple<int>,
+            std::tuple<double,float>,
+            std::tuple<int*>,
+            std::tuple<float*,double*>
+        > test{1,1.0,1.0f,nullptr,nullptr,nullptr};
+        (void)test;
+    }
+
 }
 
 cplusplus_base_library::~cplusplus_base_library(){
