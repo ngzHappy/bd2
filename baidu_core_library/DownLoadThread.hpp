@@ -13,7 +13,7 @@ class PrivateDownLoadThread;
 
 class BAIDU_CORE_LIBRARYSHARED_EXPORT CallBackDownLoadThread :
     public QObject,
-    std::enable_shared_from_this<CallBackDownLoadThread>{
+    public std::enable_shared_from_this<CallBackDownLoadThread>{
     Q_OBJECT
 protected:
     QUrl _m_QUrl;
@@ -22,7 +22,7 @@ protected:
     bool _m_IsFinished=false;
 public:
     CallBackDownLoadThread()=default;
-    
+
     static std::shared_ptr<CallBackDownLoadThread> instance() {
         return memory::make_shared<CallBackDownLoadThread>();
     }
@@ -34,14 +34,14 @@ public:
         connect(o,&QObject::destroyed,this,
             [this]() {_m_IsSourceDeleted.store(true); },Qt::QueuedConnection);
     }
-    
+
     void setUrl(const QUrl &arg) { _m_QUrl=arg; }
     void setUrl(QUrl &&arg) { _m_QUrl=std::move(arg); }
     const QUrl & getUrl() const { return _m_QUrl; }
     bool isSourceDeleted() const { return _m_IsSourceDeleted.load(); }
     void setData(const QByteArray&arg) { _m_IsFinished=true; _m_Data=arg; }
     void setData(QByteArray&&arg) { _m_IsFinished=true; _m_Data=std::move(arg); }
-    
+
 public:
     Q_SIGNAL void finished(std::shared_ptr<CallBackDownLoadThread>);
 public:

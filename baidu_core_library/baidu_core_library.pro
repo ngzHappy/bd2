@@ -12,7 +12,8 @@ HEADERS += BaiduCoreLibrary.hpp\
         baidu_core_library_global.hpp \
     DownLoadThread.hpp \
     private/PrivateDownLoadThread.hpp \
-    RunInMainThread.hpp
+    RunInMainThread.hpp \
+    NetworkAccessManager.hpp
 
 include($$PWD/src/baidu_core_source.pri)
 

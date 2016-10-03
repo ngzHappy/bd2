@@ -11,12 +11,14 @@ SOURCES += main.cpp\
         MainWindow.cpp \
     TestStaticPointer.cpp \
     TestCompiler.cpp \
-    TestNetWork.cpp
+    TestNetWork.cpp \
+    NetworkAccessManager.cpp
 
 HEADERS  += MainWindow.hpp \
     TestStaticPointer.hpp \
     TestCompiler.hpp \
-    TestNetWork.hpp
+    TestNetWork.hpp \
+    NetworkAccessManager.hpp
 
 
 include($$PWD/../../BaiduTieBaBase.pri)

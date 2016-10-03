@@ -113,7 +113,7 @@ void gumbo_vector_remove(
 
 void* gumbo_vector_remove_at(struct GumboInternalParser* parser,
     unsigned int index, GumboVector* vector) {
-  assert(index >= 0);
+  //assert(index >= 0);
   assert(index < vector->length);
   void* result = vector->data[index];
   memmove(&vector->data[index], &vector->data[index + 1],

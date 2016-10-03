@@ -1,5 +1,6 @@
 ﻿#include <QtNetwork>
 #include <QtCore>
+#include "NetworkAccessManager.hpp"
 #include "TestNetWork.hpp"
 
 class Cookies :public QNetworkCookieJar{
@@ -8,13 +9,13 @@ public:
     using QNetworkCookieJar::allCookies;
 
     virtual QList<QNetworkCookie> cookiesForUrl(
-        const QUrl &url) const override{
+            const QUrl &url) const override{
         return QNetworkCookieJar::cookiesForUrl(url);
     }
 
     virtual bool setCookiesFromUrl(
-        const QList<QNetworkCookie> &cookieList,
-        const QUrl &url) override{
+            const QList<QNetworkCookie> &cookieList,
+            const QUrl &url) override{
         return QNetworkCookieJar::setCookiesFromUrl(cookieList,url);
     }
 
@@ -29,9 +30,9 @@ public:
     virtual bool deleteCookie(const QNetworkCookie &cookie) override{
         return QNetworkCookieJar::deleteCookie(cookie);
     }
-    
+
     bool validateCookie(
-        const QNetworkCookie &cookie,const QUrl &url) const {
+            const QNetworkCookie &cookie,const QUrl &url) const {
         return QNetworkCookieJar::validateCookie(cookie,url);
     }
 
@@ -39,37 +40,35 @@ public:
 
 TestNetWork::TestNetWork()
 {
-    auto cookes=new Cookies;
-    QNetworkAccessManager manager;
-    cookes->setParent(&manager);
-    manager.setCookieJar(cookes);
+    for(int i=0;i<10;++i){
 
-    QUrl url(QString::fromUtf8(
-        u8R"(http://tieba.baidu.com/f?kw=%C0%FA%CA%B7&fr=ala0&tpl=5)"));
-    QNetworkRequest req(url);
+        auto cookes=new Cookies;
+        NetworkAccessManager manager;
+        cookes->setParent(&manager);
+        manager.setCookieJar(cookes);
 
-    auto replay=manager.get(req);
-    bool isFinished=false;
+        QUrl url(QString::fromUtf8(
+                     u8R"(http://tieba.baidu.com/f?kw=%C0%FA%CA%B7&fr=ala0&tpl=5)"));
+        QNetworkRequest req(url);
 
-    replay->connect(replay,&QNetworkReply::finished,
-        [replay,&isFinished,cookes]() {
+        auto replay=manager.get(req);
 
-        isFinished=true;
-        replay->deleteLater();
-        //qDebug()<<replay->readAll();
+        replay->connect(replay,&QNetworkReply::finished,
+                        [replay,cookes]() {
 
-        qDebug()<<
-            replay->header(QNetworkRequest::SetCookieHeader);
+            replay->deleteLater();
+            //qDebug()<<replay->readAll();
 
-        QByteArray data_=replay->readAll();
+            qDebug()<<
+                       replay->header(QNetworkRequest::SetCookieHeader);
 
-        qDebug()<<"cookies size:"<<
-        cookes->allCookies() ;
-        
-    });
-        
-    while (false==isFinished) {
-        QCoreApplication::processEvents();
+            QByteArray data_=replay->readAll();
+
+            qDebug()<<"cookies size:"<<
+                      cookes->allCookies() ;
+
+        });
+
     }
 
 }

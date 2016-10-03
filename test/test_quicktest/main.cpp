@@ -1,4 +1,5 @@
 ﻿#include "MainWindow.hpp"
+#include <QtCore>
 #include <QtWidgets/QApplication>
 #include <memory/MemoryLibrary.hpp>
 #include "TestStaticPointer.hpp"
@@ -17,7 +18,11 @@ int main(int argc, char *argv[])
 
     TestStaticPointer static_pointer_test;
     TestCompiler testCompiler;
-    TestNetWork testNetWork;
+    std::unique_ptr<TestNetWork> testNetWork=nullptr;
+    
+    QTimer::singleShot(0,[&testNetWork]() {
+        testNetWork.reset(new TestNetWork);
+    });
 
     testCompiler.get<0>();
 
