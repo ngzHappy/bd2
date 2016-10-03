@@ -1,6 +1,7 @@
 
 QT += core gui
 QT += widgets
+QT += network
 
 TARGET = test_quicktest
 TEMPLATE = app
@@ -9,11 +10,13 @@ TEMPLATE = app
 SOURCES += main.cpp\
         MainWindow.cpp \
     TestStaticPointer.cpp \
-    TestCompiler.cpp
+    TestCompiler.cpp \
+    TestNetWork.cpp
 
 HEADERS  += MainWindow.hpp \
     TestStaticPointer.hpp \
-    TestCompiler.hpp
+    TestCompiler.hpp \
+    TestNetWork.hpp
 
 
 include($$PWD/../../BaiduTieBaBase.pri)

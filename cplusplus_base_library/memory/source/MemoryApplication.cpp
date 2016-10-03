@@ -4,8 +4,8 @@
 namespace memory {
 
 namespace {
-std::atomic<bool> _msp_is_main_quit;
-std::atomic<bool> _msp_is_main_construct;
+std::atomic<bool> _msp_is_main_quit/*false*/;
+std::atomic<bool> _msp_is_main_construct/*false*/;
 }
 
 void Application::_p_setMainConstruct() { _msp_is_main_construct.store(true); }
