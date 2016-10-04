@@ -33,8 +33,8 @@ public:
     static QString userNameToFilePath(const QString&);
     static QString filePathToUserName(const QString&);
 public:
-    void setFileName(const QString& /*fileName*/arg){ _p_setFileName(arg); }
-    void setFileName(QString&& /*fileName*/arg){ _p_setFileName(std::move(arg)); }
+    inline void setFileName(const QString& /*fileName*/arg);
+    inline void setFileName(QString&& /*fileName*/arg){ _p_setFileName(std::move(arg)); }
     void setFileName(QString& /*fileName*/arg) { setFileName(static_cast<const QString&>(arg)); }
     void setFileName(const QString&& /*fileName*/arg) { setFileName(static_cast<const QString&>(arg)); }
     const QString & getFileName() const { return _m_FileName; }
@@ -48,6 +48,10 @@ private:
 template<typename _t_FILENAME_t__>
 inline void BaiDuUserCache::_p_setFileName(_t_FILENAME_t__ &&_fileName_){
     _m_FileName=std::forward<_t_FILENAME_t__>(_fileName_);
+}
+
+inline void BaiDuUserCache::setFileName(const QString& arg) {
+    _p_setFileName(arg);
 }
 
 }/*namespace baidu*/
