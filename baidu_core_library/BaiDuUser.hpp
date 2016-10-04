@@ -12,6 +12,7 @@
 #include "BaiDuUserCache.hpp"
 #include <QtCore/qstring.h>
 #include <QtCore/qbytearray.h>
+#include <QtCore/qobject.h>
 
 namespace baidu {
 
@@ -23,12 +24,11 @@ class BaiDuUser;
 template<typename _TYPE_TAG_,unsigned int _N_>
 auto getThisData(const BaiDuUser *)->_TYPE_TAG_ ;
 
-class BAIDU_CORE_LIBRARYSHARED_EXPORT BaiDuUser {
-public:
-    BaiDuUser(const BaiDuUser&)=default;
-    BaiDuUser&operator=(const BaiDuUser&)=default;
-    BaiDuUser(BaiDuUser&&)=default;
-    BaiDuUser&operator=(BaiDuUser&&)=default;
+class BAIDU_CORE_LIBRARYSHARED_EXPORT BaiDuUser 
+    :public QObject
+    ,public std::enable_shared_from_this<BaiDuUser>{
+    Q_OBJECT
+
 protected:
     using ThisDataType=std::shared_ptr<zone_data::BaiDuUserData>;
     ThisDataType thisData_{nullptr};
@@ -38,9 +38,23 @@ protected:
     zone_data::BaiDuUserData * thisData();
     const zone_data::BaiDuUserData * thisData() const;
 public:
+
+    class StepNext {
+    protected:
+    public:
+        StepNext()=default;
+        virtual ~StepNext()=default;
+        virtual void next()=0;
+    };
+
     explicit BaiDuUser(decltype(nullptr)) {}
     BaiDuUser();
-    ~BaiDuUser();
+    
+    static auto instance() {
+        return std::shared_ptr<BaiDuUser>(
+            new BaiDuUser,[](BaiDuUser*u) {delete u; },
+            memory::Allocator<int>{});
+    }
 public:
     /*如果文件已经打,此函数无效*/
     void open(const QString&/*cache file name*/);
@@ -50,19 +64,30 @@ public:
     bool isOpen()const;
     QString getUsername()const;
     QString getPassword()const;
-    void login();
     bool isLogin()const;
+    void login()/**/;
+public:
+    Q_SIGNAL void loginFinished(bool,QString);
+
 public:
     void openUserName(const QString&argUserName) {
         this->open(BaiDuUserCache::userNameToFilePath(argUserName));
         this->setUserName(argUserName);
     }
 private:
+    BaiDuUser(const BaiDuUser&)=delete;
+    BaiDuUser(BaiDuUser&&)=delete;
+    BaiDuUser&operator=(const BaiDuUser&)=delete;
+    BaiDuUser&operator=(BaiDuUser&&)=delete;
+protected:
+    ~BaiDuUser();
+private:
     MEMORY_CLASS_NEW_DELETE
 };
 
 }/*namespace baidu*/
 
+Q_DECLARE_METATYPE(std::shared_ptr<baidu::BaiDuUser::StepNext>)
 
 #endif
 

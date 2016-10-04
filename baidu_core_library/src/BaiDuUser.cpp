@@ -104,9 +104,93 @@ bool BaiDuUser::isOpen() const {
     return varThisData->_m_BaiDuUserCache.isOpen();
 }
 
-void BaiDuUser::login() {
-    zone_this_data(this);
+namespace __login {
+namespace {
 
+Q_DECL_CONSTEXPR QLatin1Literal operator""_qsl(const char *arg,std::size_t n){
+    return QLatin1Literal(arg,int(n));
+}
+
+class Login final:
+    public BaiDuUser::StepNext,
+    public std::enable_shared_from_this<Login>{
+    Login(const Login&)=delete;
+    Login(Login&&)=delete;
+    Login&operator=(const Login&)=delete;
+    Login&operator=(Login&&)=delete;
+public:
+    Login() {}
+    std::shared_ptr<BaiDuUser> baiDuUser;
+    
+    enum LogInSteps :int{
+        s_error,
+        s_start,
+        s_finished
+    };
+
+    static QString step_to_string(LogInSteps arg) {
+        switch (arg) {
+            case s_error:return "error"_qsl; break;
+            case s_start:return "start"_qsl; break;
+            case s_finished:return "finished"_qsl; break;
+            default:break;
+        }
+        return "unknow step"_qsl;
+    }
+
+    LogInSteps loginStep=s_start;
+    LogInSteps loginStepNext=s_start;
+    QString errorString{"unknow error"_qsl};
+    bool logInFinishedCalled=false;
+
+    void next_step() {
+        switch (loginStepNext) {
+            case s_error:login_error(); break;
+            case s_start:break;
+            case s_finished:login_finished(); break;
+        }
+    }
+
+    void next() override { 
+        next_step();
+    }
+
+    void login_error() {
+        logInFinishedCalled=true;
+        auto var_step_name=step_to_string(loginStep);
+        baiDuUser->loginFinished(false,
+            "login error@"_qsl
+            +std::move(var_step_name)
+            + " : "_qsl
+            +std::move(errorString)
+        );
+    }
+
+    void login_finished() {
+        logInFinishedCalled=true;
+        loginStep=s_finished;
+        loginStepNext=s_finished;
+        baiDuUser->loginFinished(true,{});
+    }
+
+    ~Login() {
+        if (false==logInFinishedCalled) {
+            login_error();
+        }
+    }
+private:
+    MEMORY_CLASS_NEW_DELETE
+};
+
+}/*namespace*/
+}/*namespace __login*/
+
+void BaiDuUser::login() {
+    auto varLogin=memory::make_shared<__login::Login>();
+    {/*init login data*/
+        varLogin->baiDuUser=this->shared_from_this();
+    }
+    varLogin->next_step();
 }
 
 bool BaiDuUser::isLogin() const{
