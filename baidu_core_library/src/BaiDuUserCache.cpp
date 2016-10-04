@@ -230,7 +230,7 @@ QString BaiDuUserCache::getPassWord()const {
     return{};
 }
 
-QString userNameToFilePath(const QString&arg) {
+QString BaiDuUserCache::userNameToFilePath(const QString&arg) {
     static QString varAppDir=QCoreApplication::applicationDirPath();
     auto varFileNameToPathName=arg
         .toUtf8()
@@ -242,7 +242,7 @@ QString userNameToFilePath(const QString&arg) {
         +QLatin1Literal(".gz",3);
 }
 
-QString filePathToUserName(const QString&arg) {
+QString BaiDuUserCache::filePathToUserName(const QString&arg) {
     QFileInfo varFileInfo(arg);
     QByteArray varPathNameToFileName=varFileInfo.completeBaseName().toUtf8();
     varPathNameToFileName=QByteArray::fromPercentEncoding(varPathNameToFileName);

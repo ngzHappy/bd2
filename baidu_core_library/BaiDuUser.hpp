@@ -9,6 +9,7 @@
 #include <type_traits>
 #include <memory/MemoryLibrary.hpp>
 #include "BaiduCoreLibrary.hpp"
+#include "BaiDuUserCache.hpp"
 #include <QtCore/qstring.h>
 #include <QtCore/qbytearray.h>
 
@@ -41,12 +42,21 @@ public:
     BaiDuUser();
     ~BaiDuUser();
 public:
+    /*如果文件已经打,此函数无效*/
     void open(const QString&/*cache file name*/);
+    void close();
     void setUserName(const QString&/*username*/);
     void setPassWord(const QString&/*password*/);
     bool isOpen()const;
     QString getUsername()const;
     QString getPassword()const;
+    void login();
+    bool isLogin()const;
+public:
+    void openUserName(const QString&argUserName) {
+        this->open(BaiDuUserCache::userNameToFilePath(argUserName));
+        this->setUserName(argUserName);
+    }
 private:
     MEMORY_CLASS_NEW_DELETE
 };
@@ -55,6 +65,5 @@ private:
 
 
 #endif
-
 
 

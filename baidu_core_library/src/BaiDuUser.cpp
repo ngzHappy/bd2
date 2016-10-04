@@ -28,6 +28,9 @@ BaiDuUserData::BaiDuUserData() {
     static_assert(
         std::has_virtual_destructor<BaiDuUserData>::value,
         "the class must has virtual destructor");
+
+    _m_NetworkCookieJar=new NetworkCookieJar(&_m_NetworkAccessManager);
+    _m_NetworkAccessManager.setCookieJar(_m_NetworkCookieJar);
 }
 
 
@@ -43,6 +46,7 @@ namespace zone_private_function {
 }
 
 BaiDuUser::~BaiDuUser() {
+    close();
 }
 
 BaiDuUser::BaiDuUser():BaiDuUser(ThisDataType(
@@ -64,8 +68,15 @@ auto BaiDuUser::thisData() const->const zone_data::BaiDuUserData *{
 
 void BaiDuUser::open(const QString&arg){
     zone_this_data(this);
+    if (isOpen()) { return; }
     varThisData->_m_BaiDuUserCache.setFileName(arg);
     varThisData->_m_BaiDuUserCache.open();
+}
+
+void BaiDuUser::close() {
+    zone_this_data(this);
+    varThisData->_m_BaiDuUserCache.write();
+    varThisData->_m_BaiDuUserCache={};
 }
 
 void BaiDuUser::setUserName(const QString&arg){
@@ -89,8 +100,18 @@ QString BaiDuUser::getPassword()const {
 }
 
 bool BaiDuUser::isOpen() const {
-    zone_this_data(this);
+    zone_const_this_data(this);
     return varThisData->_m_BaiDuUserCache.isOpen();
+}
+
+void BaiDuUser::login() {
+    zone_this_data(this);
+
+}
+
+bool BaiDuUser::isLogin() const{
+    zone_const_this_data(this);
+    return varThisData->_m_IsLogin;
 }
 
 }/*namespace baidu*/
