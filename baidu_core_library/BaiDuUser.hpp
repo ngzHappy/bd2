@@ -38,7 +38,8 @@ protected:
     zone_data::BaiDuUserData * thisData();
     const zone_data::BaiDuUserData * thisData() const;
 public:
-
+    static QByteArray gid();
+public:
     class StepNext {
     protected:
     public:
