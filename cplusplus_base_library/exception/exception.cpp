@@ -1,4 +1,4 @@
-#include "exception.hpp"
+﻿#include "exception.hpp"
 #include <iostream>
 #include <sstream>
 #include <cstdlib>
@@ -98,7 +98,8 @@ void exception_handle(
         __private::log_stream()<<"bad_alloc:"
             <<functionName<<":"<<fileName
             <<":"<<line;
-        std::quick_exit(-1);
+        /*std::quick_exit(-1);*/
+        std::exit(-1);
         throw(e);
     }
     catch (...) {

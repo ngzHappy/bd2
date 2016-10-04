@@ -93,7 +93,7 @@ int gumbo_vector_index_of(GumboVector* vector, const void* element) {
 
 void gumbo_vector_insert_at(struct GumboInternalParser* parser, void* element,
     unsigned int index, GumboVector* vector) {
-  assert(index >= 0);
+  //assert(index >= 0);
   assert(index <= vector->length);
   enlarge_vector_if_full(parser, vector);
   ++vector->length;

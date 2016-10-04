@@ -12,13 +12,15 @@ SOURCES += main.cpp\
     TestStaticPointer.cpp \
     TestCompiler.cpp \
     TestNetWork.cpp \
-    NetworkAccessManager.cpp
+    NetworkAccessManager.cpp \
+    TestGzip.cpp
 
 HEADERS  += MainWindow.hpp \
     TestStaticPointer.hpp \
     TestCompiler.hpp \
     TestNetWork.hpp \
-    NetworkAccessManager.hpp
+    NetworkAccessManager.hpp \
+    TestGzip.hpp
 
 
 include($$PWD/../../BaiduTieBaBase.pri)
