@@ -24,7 +24,11 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEdit"/>
+      <widget class="QLineEdit" name="userName">
+       <property name="text">
+        <string>userName</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -38,7 +42,11 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEdit_2"/>
+      <widget class="QLineEdit" name="passWord">
+       <property name="text">
+        <string>passWord</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -56,7 +64,7 @@
     </spacer>
    </item>
    <item>
-    <widget class="QPushButton" name="pushButton">
+    <widget class="QPushButton" name="loginButton">
      <property name="text">
       <string>登录</string>
      </property>

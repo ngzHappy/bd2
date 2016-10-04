@@ -6,6 +6,7 @@
 #include <memory/MemoryLibrary.hpp>
 #include <QtCore/qcoreapplication.h>
 #include <QtCore/qfileinfo.h>
+#include <QtCore/qdir.h>
 
 namespace baidu {
 
@@ -28,6 +29,11 @@ void BaiDuUserCache::open() {
     if (_m_L) { return; }
 
     {
+        {
+            QFileInfo info_(_m_FileName);
+            info_.absoluteDir().mkpath(info_.absolutePath());
+        }
+
         QFile varFile(_m_FileName);
         if(varFile.open(QIODevice::WriteOnly)==false){
             _m_L.reset();

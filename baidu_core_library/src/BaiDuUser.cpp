@@ -120,7 +120,7 @@ class Login final:
     Login&operator=(Login&&)=delete;
 public:
     Login() {}
-    std::shared_ptr<BaiDuUser> baiDuUser;
+    std::weak_ptr<BaiDuUser> baiDuUser;
     
     enum LogInSteps :int{
         s_error,
@@ -158,7 +158,9 @@ public:
     void login_error() {
         logInFinishedCalled=true;
         auto var_step_name=step_to_string(loginStep);
-        baiDuUser->loginFinished(false,
+        auto varBaiDuUser=baiDuUser.lock();
+        if (false==varBaiDuUser) { return; }
+        varBaiDuUser->loginFinished(false,
             "login error@"_qsl
             +std::move(var_step_name)
             + " : "_qsl
@@ -170,7 +172,9 @@ public:
         logInFinishedCalled=true;
         loginStep=s_finished;
         loginStepNext=s_finished;
-        baiDuUser->loginFinished(true,{});
+        auto varBaiDuUser=baiDuUser.lock();
+        if (false==varBaiDuUser) { return; }
+        varBaiDuUser->loginFinished(true,{});
     }
 
     ~Login() {
