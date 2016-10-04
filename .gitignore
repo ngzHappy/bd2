@@ -2,6 +2,7 @@
 *.autosave
 binlib/
 visual_studio_build/
+test/test_baidu_login/login_info/login_info.lua
 
 
 
