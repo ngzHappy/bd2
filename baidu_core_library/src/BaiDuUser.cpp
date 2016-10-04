@@ -291,6 +291,11 @@ NetworkAccessManager * BaiDuUser::getNetworkAccessManager() const {
         &(varThisData->_m_NetworkAccessManager));
 }
 
+QString BaiDuUser::getLocalCacheFilePath()const {
+    zone_const_this_data(this);
+    return varThisData->_m_BaiDuUserCache.fileName();
+}
+
 bool BaiDuUser::isLogin() const {
     zone_const_this_data(this);
     return varThisData->_m_IsLogin;

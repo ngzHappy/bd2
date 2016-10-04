@@ -240,17 +240,20 @@ QString BaiDuUserCache::userNameToFilePath(const QString&arg) {
     static QString varAppDir=QCoreApplication::applicationDirPath();
     auto varFileNameToPathName=arg
         .toUtf8()
-        .toBase64(QByteArray::Base64UrlEncoding)
+        .toBase64(QByteArray::Base64UrlEncoding|QByteArray::OmitTrailingEquals)
         .toPercentEncoding();
     return varAppDir
         +QLatin1Literal("/cache/",7)
         +QString::fromUtf8(varFileNameToPathName)
-        +QLatin1Literal(".gz",3);
+        +QLatin1Literal(".lua.gz",7);
 }
 
 QString BaiDuUserCache::filePathToUserName(const QString&arg) {
     QFileInfo varFileInfo(arg);
     QByteArray varPathNameToFileName=varFileInfo.completeBaseName().toUtf8();
+    if (varPathNameToFileName.endsWith(".lua")) {
+        varPathNameToFileName.chop(4);
+    }
     varPathNameToFileName=QByteArray::fromPercentEncoding(varPathNameToFileName);
     varPathNameToFileName=QByteArray::fromBase64(varPathNameToFileName,QByteArray::Base64UrlEncoding);
     return QString::fromUtf8(varPathNameToFileName);

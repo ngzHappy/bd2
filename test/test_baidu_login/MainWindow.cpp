@@ -1,6 +1,7 @@
 ﻿#include "MainWindow.hpp"
 #include "ui_MainWindow.h"
 
+#include <QtCore>
 #include <BaiDuUserCache.hpp>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -18,7 +19,8 @@ void MainWindow::on_loginButton_clicked(){
 
     baiduUser->openUserName( ui->userName->text() );
     baiduUser->setPassWord( ui->passWord->text() );
-
+    qDebug()<<
+    baidu::BaiDuUserCache::filePathToUserName( baiduUser->getLocalCacheFilePath() );
     
 
 }

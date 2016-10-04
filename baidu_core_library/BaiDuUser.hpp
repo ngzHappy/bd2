@@ -68,6 +68,7 @@ public:
     bool isOpen()const;
     QString getUsername()const;
     QString getPassword()const;
+    QString getLocalCacheFilePath()const;
     bool isLogin()const;
     void login()/**/;
 public:
