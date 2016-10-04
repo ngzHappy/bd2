@@ -6,12 +6,14 @@ QT += network
 TARGET = test_baidu_login
 TEMPLATE = app
 
-DEFINES += THIS_PROJECT_SOURCE_DIR=$$PWD
+DEFINES += THIS_PROJECT_SOURCE_DIR=u8R\\\"_($$PWD)_\\\"
 
 SOURCES += main.cpp\
-        MainWindow.cpp
+        MainWindow.cpp \
+    BaiDuUserCache.cpp
 
-HEADERS  += MainWindow.hpp
+HEADERS  += MainWindow.hpp \
+    BaiDuUserCache.hpp
 
 DEFINES+= THIS_TEST_DIR=$$PWD/login_info
 
@@ -31,7 +33,7 @@ FORMS += \
     MainWindow.ui
 
 DISTFILES += \
-    login_info/login_info.lua
+    $$PWD/login_info/login_info.lua
 
 
 

@@ -16,8 +16,10 @@ int default_lua_error_function(lua::State*L) {
 
     if (ans&&length) {
         std::cout.write(ans,length)<<std::endl;
+        lua::pop(L,1);
     } else{
         std::cout<<"lua:unknow error\n" ;
+        lua::pop(L,1);
     }
 
     return 0;

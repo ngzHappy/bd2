@@ -1,5 +1,5 @@
-﻿#ifndef _lm_PRINT_TABLE_HPP
-#define _lm_PRINT_TABLE_HPP
+﻿#ifndef _lm_PRINT_TABLE_1HPP
+#define _lm_PRINT_TABLE_1HPP
 
 #include "../lua.hpp"
 

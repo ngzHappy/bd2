@@ -1,5 +1,5 @@
-﻿#ifndef _lm_DEEP_COPY_TABLE_HPP
-#define _lm_DEEP_COPY_TABLE_HPP
+﻿#ifndef _lm3_DEEP_COPY_TABLE_HPP
+#define _lm3_DEEP_COPY_TABLE_HPP
 
 #include "../lua.hpp"
 

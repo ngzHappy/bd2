@@ -1,5 +1,5 @@
-﻿#ifndef __CPP_LUA_HXX_HPP_0x00
-#define __CPP_LUA_HXX_HPP_0x00
+﻿#ifndef __1CPP_LUA_HXX_HPP_0x00
+#define __1CPP_LUA_HXX_HPP_0x00
 
 /*
 为lua函数、编译期常量重命名
@@ -517,4 +517,11 @@ inline auto prepbuffer(Buffer *B) ->char * { return prepbuffsize(B,LUAL_BUFFERSI
 
 }/*luaL*/
 
+#include "src/print_table.hpp"
+#include "src/default_error_function.hpp"
+#include "src/deep_copy_table.hpp"
+
 #endif
+
+
+
