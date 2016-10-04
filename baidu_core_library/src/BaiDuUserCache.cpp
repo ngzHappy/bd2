@@ -249,9 +249,10 @@ QString BaiDuUserCache::userNameToFilePath(const QString&arg) {
 }
 
 QString BaiDuUserCache::filePathToUserName(const QString&arg) {
+    const static QByteArray _psd_lua{".lua",4};
     QFileInfo varFileInfo(arg);
     QByteArray varPathNameToFileName=varFileInfo.completeBaseName().toUtf8();
-    if (varPathNameToFileName.endsWith(".lua")) {
+    if (varPathNameToFileName.endsWith(_psd_lua)) {
         varPathNameToFileName.chop(4);
     }
     varPathNameToFileName=QByteArray::fromPercentEncoding(varPathNameToFileName);
