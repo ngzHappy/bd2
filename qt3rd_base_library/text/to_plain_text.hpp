@@ -8,15 +8,17 @@
 namespace text {
 
 class ToPlainTextAns {
-    bool _m_is_old_data;
     union __Data {
         QByteArray new_data;
-        const char * old_data_begin;
-        const char * old_data_end;
+        struct {
+            const char * old_data_begin;
+            const char * old_data_end;
+        };
         __Data() {}
         ~__Data() {}
     };
     __Data _m_Data;
+    bool _m_is_old_data;
     using __rit=std::reverse_iterator<const char*>;
 public:
     ToPlainTextAns();
