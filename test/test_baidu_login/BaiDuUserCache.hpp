@@ -15,9 +15,18 @@ class BaiDuUserCache {
 public:
     BaiDuUserCache(const QString& argFileName=QString{}):_m_FileName(argFileName) {}
     ~BaiDuUserCache();
+ 
 public:
     void read();
     void write();
+
+    QString getUserName()const;
+    QString getPassWord()const;
+
+    void open();
+    void setUserName(const QString&);
+    void setPassWord(const QString&);
+
 public:
     void setFileName(const QString& /*fileName*/);
     void setFileName(QString&& /*fileName*/);

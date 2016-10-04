@@ -10,6 +10,63 @@ BaiDuUserCache::~BaiDuUserCache(){
 
 }
 
+void BaiDuUserCache::open() {
+       
+    if (_m_L) { return; }
+
+    if(_m_FileName.isEmpty()){
+        _m_L.reset();
+        return;
+    }
+
+    /*try read*/
+    read();
+
+    if (_m_L) { return; }
+
+    {
+        QFile varFile(_m_FileName);
+        if(varFile.open(QIODevice::WriteOnly)==false){
+            _m_L.reset();
+            return;
+        }
+        varFile.write(u8R"_(
+return {username="",password=""}
+)_");
+    }
+
+    /*try read again*/
+    read();
+
+}
+
+void BaiDuUserCache::setUserName(const QString&arg) {
+    auto L=_m_L.get();
+    if (L) {
+        luaL::StateLock _lock_{ L };
+        if (lua::TTABLE==lua::rawgetp(L,LUA_REGISTRYINDEX,this)) {
+            lua::pushlstring(L,"username");
+            const auto var=arg.toUtf8();
+            lua::pushlstring(L,var.data(),var.size());
+            lua::rawset(L,-3);
+        }
+    }
+}
+
+void BaiDuUserCache::setPassWord(const QString&arg) {
+    auto L=_m_L.get();
+    if (L) {
+        luaL::StateLock _lock_{ L };
+        if (lua::TTABLE==lua::rawgetp(L,LUA_REGISTRYINDEX,this)) {
+            lua::pushlstring(L,"password");
+            const auto var=arg.toUtf8();
+            lua::pushlstring(L,var.data(),var.size());
+            lua::rawset(L,-3);
+        }
+    }
+}
+
+
 void BaiDuUserCache::read(){
 
     if(_m_FileName.isEmpty()){
@@ -55,12 +112,16 @@ void BaiDuUserCache::read(){
         const char * varData=varFileDataWithOutBom.data();
         auto varSize=varFileDataWithOutBom.size();
         const auto varU8FileName=_m_FileName.toUtf8();
+
         if (lua::OK==luaL::loadbuffer(
             L,varData,varSize,
             varU8FileName.data())) {
+
             if(lua::OK==lua::pcall(L,0,lua::MULTRET,0)){
                 if (lua::istable(L,-1)) {
+                    lua::pushvalue(L,-1);
                     lua::setglobal(L,"cache");
+                    lua::rawsetp(L,LUA_REGISTRYINDEX,this);
                 }
                 else {
                     lua::pushlstring(L,"there must be a table");
@@ -135,6 +196,41 @@ void BaiDuUserCache::write(){
 
 }
 
+QString BaiDuUserCache::getUserName()const {
+    auto L=_m_L.get();
+    if (L) {
+        luaL::StateLock _lock_{ L };
+        if (lua::TTABLE==lua::rawgetp(L,LUA_REGISTRYINDEX,this)) {
+            lua::pushlstring(L,"username");
+            if (lua::TSTRING==lua::rawget(L,-2)) {
+                std::size_t varLen;
+                auto varAns=lua::tolstring(L,-1,&varLen);
+                if (varLen>0) {
+                    return QString::fromUtf8(varAns,static_cast<int>(varLen));
+                }
+            }
+        }
+    }
+    return{};
+}
+
+QString BaiDuUserCache::getPassWord()const {
+    auto L=_m_L.get();
+    if (L) {
+        luaL::StateLock _lock_{ L };
+        if (lua::TTABLE==lua::rawgetp(L,LUA_REGISTRYINDEX,this)) {
+            lua::pushlstring(L,"password");
+            if (lua::TSTRING==lua::rawget(L,-2)) {
+                std::size_t varLen;
+                auto varAns=lua::tolstring(L,-1,&varLen);
+                if (varLen>0) {
+                    return QString::fromUtf8(varAns,static_cast<int>(varLen));
+                }
+            }
+        }
+    }
+    return{};
+}
 
 }/**/
 
