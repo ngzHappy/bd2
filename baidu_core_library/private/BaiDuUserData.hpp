@@ -22,6 +22,7 @@ public:
     NetworkAccessManager _m_NetworkAccessManager;
     NetworkCookieJar * _m_NetworkCookieJar=nullptr;
     bool _m_IsLogin=false;
+    QByteArray _m_GID;
 private:
     MEMORY_CLASS_NEW_DELETE
 };

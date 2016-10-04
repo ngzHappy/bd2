@@ -10,6 +10,7 @@
 #include <memory/MemoryLibrary.hpp>
 #include "BaiduCoreLibrary.hpp"
 #include "BaiDuUserCache.hpp"
+#include "NetworkAccessManager.hpp"
 #include <QtCore/qstring.h>
 #include <QtCore/qbytearray.h>
 #include <QtCore/qobject.h>
@@ -39,6 +40,8 @@ protected:
     const zone_data::BaiDuUserData * thisData() const;
 public:
     static QByteArray gid();
+    static QByteArray currentTime();
+    static QByteArray userAgent();
 public:
     class StepNext {
     protected:
@@ -67,6 +70,8 @@ public:
     QString getPassword()const;
     bool isLogin()const;
     void login()/**/;
+public:
+    NetworkAccessManager * getNetworkAccessManager()const;
 public:
     Q_SIGNAL void loginFinished(bool,QString);
 
