@@ -1,7 +1,9 @@
-QT += core
 QT += gui
+QT += core
+QT += script
 QT += network
 QT += concurrent
+CONFIG   += crypto # qca if you have it
 
 TARGET = baidu_core_library
 TEMPLATE = lib

@@ -4,6 +4,8 @@
 #include "../private/BaiDuUserPrivateFunction.hpp"
 #include <QtCore/qdatetime.h>
 #include <QtCore/qurl.h>
+#include <QtScript>
+#include <QtCrypto>
 #include <QtNetwork>
 
 namespace baidu {
@@ -163,7 +165,7 @@ public:
 
         zone_this_data(varBaiDuUser.get());
 
-
+        /*varLockThis=this->shared_from_this(),*/
 
     }
 
@@ -233,7 +235,7 @@ public:
 
         /*cookie 已经写入 cookiejar*/
         varReply->connect(varReply,&QNetworkReply::finished,
-            [varReply,this]() {
+            [varLockThis=this->shared_from_this(),varReply,this]() {
 
                 {
                     /*这些数据无用*/
