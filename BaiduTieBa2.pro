@@ -31,6 +31,9 @@ tool_setgetutility.file=$$PWD/tool/setgetutility/setgetutility.pro
 #index_class_maker
 tool_indexclassmaker.file=$$PWD/tool/indexclassmaker/indexclassmaker.pro
 
+#class_maker
+tool_class_maker.file=$$PWD/tool/classmaker/classmaker.pro
+
 SUBDIRS += \
     tool_boost_change_name \
     library_cplusplus_base_library \
@@ -39,7 +42,8 @@ SUBDIRS += \
     tool_setgetutility \
     tool_indexclassmaker \
     tool/deleteclassmaker \
-    tool/stringsplit
+    tool/stringsplit \
+    tool_class_maker
 
 
 

@@ -1,4 +1,4 @@
-﻿#include "BaiDuUserCache.hpp"
+﻿#include "../BaiDuUserCache.hpp"
 #include <QtCore/qfile.h>
 #include <lua/lua.hpp>
 #include <text/to_plain_text.hpp>

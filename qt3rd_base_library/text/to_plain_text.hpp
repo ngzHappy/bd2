@@ -53,30 +53,30 @@ public:
 */
 EXPORT_QT3RD_BASE_LIBRARY ToPlainTextAns to_plain_text(const char *,const char *);
 
-ToPlainTextAns::ToPlainTextAns():_m_is_old_data(true) {
+inline ToPlainTextAns::ToPlainTextAns():_m_is_old_data(true) {
     _m_Data.old_data_begin=nullptr;
     _m_Data.old_data_end=nullptr;
 }
 
-ToPlainTextAns::ToPlainTextAns(const char*argB,const char*argE):_m_is_old_data(true) {
+inline ToPlainTextAns::ToPlainTextAns(const char*argB,const char*argE):_m_is_old_data(true) {
     _m_Data.old_data_begin=argB;
     _m_Data.old_data_end=argE;
 }
 
-ToPlainTextAns::ToPlainTextAns(const QByteArray&arg):_m_is_old_data(false) {
+inline ToPlainTextAns::ToPlainTextAns(const QByteArray&arg):_m_is_old_data(false) {
     ::new (&_m_Data.new_data) QByteArray(arg);
 }
 
-ToPlainTextAns::ToPlainTextAns(QByteArray&&arg):_m_is_old_data(false) {
+inline ToPlainTextAns::ToPlainTextAns(QByteArray&&arg):_m_is_old_data(false) {
     ::new (&_m_Data.new_data) QByteArray(std::move(arg));
 }
 
-ToPlainTextAns::~ToPlainTextAns() {
+inline ToPlainTextAns::~ToPlainTextAns() {
     if (_m_is_old_data) { return; }
     _m_Data.new_data.~QByteArray();
 }
 
-ToPlainTextAns::ToPlainTextAns(const ToPlainTextAns&arg):_m_is_old_data(arg._m_is_old_data) {
+inline ToPlainTextAns::ToPlainTextAns(const ToPlainTextAns&arg):_m_is_old_data(arg._m_is_old_data) {
     if (_m_is_old_data==false) {
         ::new (&_m_Data.new_data) QByteArray(arg._m_Data.new_data);
     }
@@ -86,7 +86,7 @@ ToPlainTextAns::ToPlainTextAns(const ToPlainTextAns&arg):_m_is_old_data(arg._m_i
     }
 }
 
-ToPlainTextAns::ToPlainTextAns(ToPlainTextAns&&arg):_m_is_old_data(arg._m_is_old_data) {
+inline ToPlainTextAns::ToPlainTextAns(ToPlainTextAns&&arg):_m_is_old_data(arg._m_is_old_data) {
     if (_m_is_old_data==false) {
         ::new (&_m_Data.new_data) QByteArray(std::move(arg._m_Data.new_data));
     }
@@ -96,7 +96,7 @@ ToPlainTextAns::ToPlainTextAns(ToPlainTextAns&&arg):_m_is_old_data(arg._m_is_old
     }
 }
 
-ToPlainTextAns&ToPlainTextAns::operator=(const ToPlainTextAns&arg) {
+inline ToPlainTextAns&ToPlainTextAns::operator=(const ToPlainTextAns&arg) {
     if (this==&arg) { return *this; }
     if (arg._m_is_old_data) {
         if (this->_m_is_old_data) {
@@ -122,7 +122,7 @@ ToPlainTextAns&ToPlainTextAns::operator=(const ToPlainTextAns&arg) {
     return *this;
 }
 
-ToPlainTextAns&ToPlainTextAns::operator=(ToPlainTextAns&&arg) {
+inline ToPlainTextAns&ToPlainTextAns::operator=(ToPlainTextAns&&arg) {
     if (this==&arg) { return *this; }
     if (arg._m_is_old_data) {
         if (this->_m_is_old_data) {
@@ -148,14 +148,14 @@ ToPlainTextAns&ToPlainTextAns::operator=(ToPlainTextAns&&arg) {
     return *this;
 }
 
-const char * ToPlainTextAns::data()const {
+inline const char * ToPlainTextAns::data()const {
     if (this->_m_is_old_data) { return this->_m_Data.old_data_begin; }
     else {
         return static_cast<const QByteArray&>(_m_Data.new_data).data();
     }
 }
 
-int ToPlainTextAns::size()const {
+inline int ToPlainTextAns::size()const {
     if (this->_m_is_old_data) {
         return static_cast<int>(_m_Data.old_data_end-_m_Data.old_data_begin);
     }
@@ -164,13 +164,13 @@ int ToPlainTextAns::size()const {
     }
 }
 
-QByteArray ToPlainTextAns::toQByteArray()const {
+inline QByteArray ToPlainTextAns::toQByteArray()const {
     if (isQByteArray()) { return _m_Data.new_data; }
     return QByteArray(data(),
        static_cast<int>(_m_Data.old_data_end-_m_Data.old_data_begin));
 }
 
-ToPlainTextAns::operator bool()const {
+inline ToPlainTextAns::operator bool()const {
     if (_m_is_old_data) {
         return _m_Data.old_data_end>_m_Data.old_data_begin;
     }
@@ -179,11 +179,11 @@ ToPlainTextAns::operator bool()const {
     }
 }
 
-const char *ToPlainTextAns::begin() const {
+inline const char *ToPlainTextAns::begin() const {
     return _m_is_old_data?_m_Data.old_data_begin:_m_Data.new_data.cbegin();
 }
 
-const char *ToPlainTextAns::end() const {
+inline const char *ToPlainTextAns::end() const {
     return _m_is_old_data?_m_Data.old_data_end:_m_Data.new_data.cend();
 }
 

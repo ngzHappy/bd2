@@ -9,11 +9,9 @@ TEMPLATE = app
 DEFINES += THIS_PROJECT_SOURCE_DIR=u8R\\\"_($$PWD)_\\\"
 
 SOURCES += main.cpp\
-        MainWindow.cpp \
-    BaiDuUserCache.cpp
+        MainWindow.cpp
 
-HEADERS  += MainWindow.hpp \
-    BaiDuUserCache.hpp
+HEADERS  += MainWindow.hpp
 
 DEFINES+= THIS_TEST_DIR=$$PWD/login_info
 

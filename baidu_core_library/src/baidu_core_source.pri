@@ -3,4 +3,6 @@ SOURCES += \
     $$PWD/DownLoadThread.cpp \
     $$PWD/RunInMainThread.cpp \
     $$PWD/NetworkAccessManager.cpp \
-    $$PWD/NetworkCookieJar.cpp
+    $$PWD/NetworkCookieJar.cpp \
+    $$PWD/BaiDuUser.cpp \
+    $$PWD/BaiDuUserCache.cpp

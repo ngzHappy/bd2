@@ -14,7 +14,9 @@ HEADERS += BaiduCoreLibrary.hpp\
     private/PrivateDownLoadThread.hpp \
     RunInMainThread.hpp \
     NetworkAccessManager.hpp \
-    NetworkCookieJar.hpp
+    NetworkCookieJar.hpp \
+    BaiDuUser.hpp \
+    BaiDuUserCache.hpp
 
 include($$PWD/src/baidu_core_source.pri)
 

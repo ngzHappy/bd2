@@ -1,5 +1,4 @@
 CONFIG += c++14
-CONFIG += console
 
 !win32-msvc*{
 QMAKE_CFLAGS*=-std=c11
@@ -9,6 +8,7 @@ DEFINES *=_CRT_SECURE_NO_DEPRECATE
 
 CONFIG(debug,debug|release){
     DEFINES*=_DEBUG
+    CONFIG += console
 }else{
     DEFINES*=NDEBUG
     DEFINES*=QT_NO_DEBUG
