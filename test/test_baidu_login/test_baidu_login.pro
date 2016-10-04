@@ -6,6 +6,7 @@ QT += network
 TARGET = test_baidu_login
 TEMPLATE = app
 
+DEFINES += THIS_PROJECT_SOURCE_DIR=$$PWD
 
 SOURCES += main.cpp\
         MainWindow.cpp
