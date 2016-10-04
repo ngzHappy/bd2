@@ -510,7 +510,7 @@ inline auto addvalue(luaL_Buffer *B)->void { return luaL_addvalue(B); }
 inline auto pushresult(luaL_Buffer *B)->void { return luaL_pushresult(B); }
 inline auto pushresultsize(luaL_Buffer *B,size_t sz)->void { return luaL_pushresultsize(B,sz); }
 inline auto buffinitsize(lua_State *L,luaL_Buffer *B,size_t sz)->char * { return luaL_buffinitsize(L,B,sz); }
-inline auto addchar(Buffer *B,char c)->void { return luaL_addchar(B,c); }
+inline auto addchar(Buffer *B,char c)->void { luaL_addchar(B,c); }
 inline auto addsize(Buffer *B,std::size_t s)->void { ((B)->n+=(s)); }
 inline auto prepbuffer(Buffer *B) ->char * { return prepbuffsize(B,LUAL_BUFFERSIZE); }
 }/*_import_luaxlib_h*/
