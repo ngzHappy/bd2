@@ -3,7 +3,7 @@
 
 #include <exception>
 #include <stdexcept>
-#include "../cplusplus_base_library_global.hpp"
+#include "../cplusplus_base_library.hpp"
 
 #ifndef HANDLE_EXCEPTION_EXPORT
 #define HANDLE_EXCEPTION_EXPORT CPLUSPLUS_BASE_LIBRARYSHARED_EXPORT
@@ -23,7 +23,7 @@ HANDLE_EXCEPTION_EXPORT void exception_handle(
 
 #ifndef exception_catched
 #define exception_catched() exception::exception_handle(__LINE__,__func__,__FILE__)
-#endif 
+#endif
 
 #endif
 

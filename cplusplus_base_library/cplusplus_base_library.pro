@@ -7,6 +7,8 @@ TEMPLATE = lib
 
 DEFINES += CPLUSPLUS_BASE_LIBRARY_LIBRARY
 
+include($$PWD/lua/lua_build.pri)
+include($$PWD/exception/exception.pri)
 include($$PWD/cplusplus_base_library.pri )
 include($$PWD/gumbo/gumbo.pri)
 include($$PWD/../BaiduTieBaBase.pri)

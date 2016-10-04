@@ -1,3 +1,4 @@
+INCLUDEPATH += $$PWD
 include($$PWD/lua_base.pri)
 include($$PWD/src/3rd/double-conversion/double-conversion.pri)
 
