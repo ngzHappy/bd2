@@ -64,14 +64,33 @@ auto BaiDuUser::thisData() const->const zone_data::BaiDuUserData *{
 
 void BaiDuUser::open(const QString&arg){
     zone_this_data(this);
+    varThisData->_m_BaiDuUserCache.setFileName(arg);
+    varThisData->_m_BaiDuUserCache.open();
 }
 
 void BaiDuUser::setUserName(const QString&arg){
     zone_this_data(this);
+    varThisData->_m_BaiDuUserCache.setUserName(arg);
 }
 
 void BaiDuUser::setPassWord(const QString&arg){
     zone_this_data(this);
+    varThisData->_m_BaiDuUserCache.setPassWord(arg);
+}
+
+QString BaiDuUser::getUsername()const {
+    zone_const_this_data(this);
+    return varThisData->_m_BaiDuUserCache.getUserName();
+}
+
+QString BaiDuUser::getPassword()const {
+    zone_const_this_data(this);
+    return varThisData->_m_BaiDuUserCache.getPassWord();
+}
+
+bool BaiDuUser::isOpen() const {
+    zone_this_data(this);
+    return varThisData->_m_BaiDuUserCache.isOpen();
 }
 
 }/*namespace baidu*/

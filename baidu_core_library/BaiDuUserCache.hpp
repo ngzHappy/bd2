@@ -29,6 +29,9 @@ public:
     void setUserName(const QString&);
     void setPassWord(const QString&);
 
+    bool isOpen() const { return bool(_m_L); }
+    static QString userNameToFilePath(const QString&);
+    static QString filePathToUserName(const QString&);
 public:
     void setFileName(const QString& /*fileName*/arg){ _p_setFileName(arg); }
     void setFileName(QString&& /*fileName*/arg){ _p_setFileName(std::move(arg)); }

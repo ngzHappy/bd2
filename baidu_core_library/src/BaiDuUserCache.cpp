@@ -1,8 +1,11 @@
 ﻿#include "../BaiDuUserCache.hpp"
 #include <QtCore/qfile.h>
 #include <lua/lua.hpp>
+#include <text/gzip.hpp>
 #include <text/to_plain_text.hpp>
 #include <memory/MemoryLibrary.hpp>
+#include <QtCore/qcoreapplication.h>
+#include <QtCore/qfileinfo.h>
 
 namespace baidu {
 
@@ -173,13 +176,8 @@ void BaiDuUserCache::write(){
                     lua::pop(L,1);
                     return;
                 }
-
-                constexpr const static char varUtf8Bom[]{
-                    char(0x00EF),char(0x00BB),char(0x00BF)
-                };
-
-                file_.write(varUtf8Bom,3);
-                file_.write(varStr,varLen);
+                
+                file_.write(text::gzip(varStr,varStr+varLen));
                 lua::pop(L,1);
 
             }
@@ -230,6 +228,26 @@ QString BaiDuUserCache::getPassWord()const {
         }
     }
     return{};
+}
+
+QString userNameToFilePath(const QString&arg) {
+    static QString varAppDir=QCoreApplication::applicationDirPath();
+    auto varFileNameToPathName=arg
+        .toUtf8()
+        .toBase64(QByteArray::Base64UrlEncoding)
+        .toPercentEncoding();
+    return varAppDir
+        +QLatin1Literal("/cache/",7)
+        +QString::fromUtf8(varFileNameToPathName)
+        +QLatin1Literal(".gz",3);
+}
+
+QString filePathToUserName(const QString&arg) {
+    QFileInfo varFileInfo(arg);
+    QByteArray varPathNameToFileName=varFileInfo.completeBaseName().toUtf8();
+    varPathNameToFileName=QByteArray::fromPercentEncoding(varPathNameToFileName);
+    varPathNameToFileName=QByteArray::fromBase64(varPathNameToFileName,QByteArray::Base64UrlEncoding);
+    return QString::fromUtf8(varPathNameToFileName);
 }
 
 }/**/

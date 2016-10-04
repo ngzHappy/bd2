@@ -37,13 +37,16 @@ protected:
     zone_data::BaiDuUserData * thisData();
     const zone_data::BaiDuUserData * thisData() const;
 public:
-    explicit BaiDuUser(decltype(nullptr)=nullptr) {}
+    explicit BaiDuUser(decltype(nullptr)) {}
     BaiDuUser();
     ~BaiDuUser();
 public:
-    void open(const QString&);
-    void setUserName(const QString&);
-    void setPassWord(const QString&);
+    void open(const QString&/*cache file name*/);
+    void setUserName(const QString&/*username*/);
+    void setPassWord(const QString&/*password*/);
+    bool isOpen()const;
+    QString getUsername()const;
+    QString getPassword()const;
 private:
     MEMORY_CLASS_NEW_DELETE
 };
