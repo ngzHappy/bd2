@@ -2,13 +2,39 @@
 #include "../BaiDuUser.hpp"
 #include "../private/BaiDuUserData.hpp"
 #include "../private/BaiDuUserPrivateFunction.hpp"
+#include <text/gzip.hpp>
 #include <QtCore>
 #include <QtScript>
 #include <QtCrypto>
 #include <QtNetwork>
 #include <string>
 #include <regex>
-#include <text/gzip.hpp>
+#include <ctime>
+#include <cstdlib>
+
+namespace {
+namespace __private {
+namespace __baidu {
+
+class Static_init_on_qcoreapplication_create {
+    QCA::Initializer _qca_init;
+public:
+    Static_init_on_qcoreapplication_create() {
+        std::srand(int(std::time(nullptr)));
+    }
+    ~Static_init_on_qcoreapplication_create() {}
+};
+static char _psd_[sizeof(Static_init_on_qcoreapplication_create)];
+static void init_on_qcoreapplication_create() {
+    static memory::StaticPoionter<Static_init_on_qcoreapplication_create> 
+        _(_psd_);
+}
+
+Q_COREAPP_STARTUP_FUNCTION(init_on_qcoreapplication_create)
+
+}/*__baidu*/
+}/*__private*/
+}/*namespace*/
 
 namespace baidu {
 
