@@ -2,8 +2,7 @@
 #include "../BaiDuUser.hpp"
 #include "../private/BaiDuUserData.hpp"
 #include "../private/BaiDuUserPrivateFunction.hpp"
-#include <QtCore/qdatetime.h>
-#include <QtCore/qurl.h>
+#include <QtCore>
 #include <QtScript>
 #include <QtCrypto>
 #include <QtNetwork>
@@ -39,7 +38,7 @@ template<>
 class StringRef<QByteArray> {
     const QByteArray & _m_Data;
 public:
-    constexpr StringRef(const QByteArray&arg) :_m_Data(arg){}
+    constexpr StringRef(const QByteArray&arg):_m_Data(arg) {}
     const char *data() const { return _m_Data.data(); }
     int size() { return _m_Data.size(); }
 };
@@ -48,7 +47,7 @@ template<>
 class StringRef<string> {
     const string & _m_Data;
 public:
-    constexpr StringRef(const string&arg) :_m_Data(arg){}
+    constexpr StringRef(const string&arg):_m_Data(arg) {}
     const char *data() const { return _m_Data.data(); }
     int size() { return _m_Data.size(); }
 };
@@ -1225,7 +1224,7 @@ void BaiDuUser::open(const QString&arg) {
 }
 
 void BaiDuUser::close() {
-    zone_this_data(this); 
+    zone_this_data(this);
     varThisData->_m_BaiDuUserCache.write();
     varThisData->_m_BaiDuUserCache={};
 }
@@ -1490,4 +1489,5 @@ QByteArray BaiDuUser::gid() {
 
 }/*namespace baidu*/
 
+#undef zone_this_data
 
