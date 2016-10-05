@@ -28,6 +28,7 @@ public:
     virtual bool insertCookie(const QNetworkCookie &cookie) override;
     virtual bool updateCookie(const QNetworkCookie &cookie) override;
     virtual bool deleteCookie(const QNetworkCookie &cookie) override;
+    using QNetworkCookieJar::allCookies;
 private:
     CPLUSPLUS_CLASS_META
 };

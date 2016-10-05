@@ -21,6 +21,6 @@ void MainWindow::on_loginButton_clicked(){
     baiduUser->setPassWord( ui->passWord->text() );
     qDebug()<<
     baidu::BaiDuUserCache::filePathToUserName( baiduUser->getLocalCacheFilePath() );
-    
+    baiduUser->login();
 
 }

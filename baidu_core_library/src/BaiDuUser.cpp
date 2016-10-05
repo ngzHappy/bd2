@@ -7,6 +7,8 @@
 #include <QtCrypto>
 #include <QtNetwork>
 #include <string>
+#include <regex>
+#include <text/gzip.hpp>
 
 namespace baidu {
 
@@ -193,6 +195,9 @@ public:
         s_error,
         s_start,s_getbaidu_cookie=s_start,
         s_get_baidu_token,
+        s_get_RSAKey,
+        s_encryptRSA,
+        s_postLogin,
         s_finished
     };
 
@@ -201,6 +206,9 @@ public:
             case s_error:return "error"_qsl; break;
             case s_start:return "get baidu cookie"_qsl; break;
             case s_get_baidu_token:return "getBaiduToken"_qsl; break;
+            case s_get_RSAKey:return "getRSAKey"_qsl; break;
+            case s_encryptRSA:return "encryptRSA"_qsl; break;
+            case s_postLogin:return "postLogin"_qsl; break;
             case s_finished:return "finished"_qsl; break;
             default:break;
         }
@@ -212,16 +220,185 @@ public:
     QString errorString{ "unknow error"_qsl };
     bool logInFinishedCalled=false;
     QByteArray baiduTooken;
+    QByteArray rasKey/*key id*/;
+    QByteArray publicKey;
+    QByteArray passWord;
+
+    void postLogin() {
+
+    }
+
+    void encryptRSA() {
+
+        loginStep=s_encryptRSA;
+        loginStepNext=s_postLogin;
+
+        auto varBaiDuUser=baiDuUser.lock();
+        if (false==varBaiDuUser) { return; }
+
+        const QByteArray & varPublicKey=this->publicKey;
+        const QByteArray varPassWord=varBaiDuUser->getPassword().toUtf8();
+        QByteArray & varAns=this->passWord;             
+
+        do {
+            try {
+
+                if (varPassWord.isEmpty()||varPublicKey.isEmpty()) {
+                    loginStepNext=s_error;
+                    break;
+                }
+
+                QCA::ConvertResult varIsPublicKeyOk;
+
+                QCA::PublicKey pubkey_=
+                    QCA::RSAPublicKey::fromPEM(varPublicKey,&varIsPublicKeyOk);
+
+                if ((!(QCA::ConvertGood==varIsPublicKeyOk))
+                    ||(pubkey_.canEncrypt()==false)) {
+                    loginStepNext=s_error;
+                    break;
+                }
+
+                /* reset password */
+                QCA::SecureArray result_=pubkey_.encrypt(
+                    varPassWord,QCA::EME_PKCS1v15_SSL);
+
+                {/*deep copy data*/
+                    QByteArray result(result_.constData(),result_.size());
+                    result=result.toBase64();
+                    varAns=result.toPercentEncoding();
+                }
+
+            }
+            catch (...) {
+                loginStepNext=s_error;
+            }
+        } while (false);
+
+        this->next_step();
+
+    }
+
+    class StaticData_getRSAKey {
+    public:
+        const QByteArray url;
+        const QByteArray keyUserAgent;
+        const QByteArray keyAcceptEncoding;
+        const QByteArray valueAcceptEncoding;
+        const QString zero;
+        StaticData_getRSAKey()
+            :url("https://passport.baidu.com/v2/getpublickey?token="_qb)
+            ,keyUserAgent("User-Agent"_qb)
+            ,keyAcceptEncoding("Accept-Encoding"_qb)
+            ,valueAcceptEncoding("gzip, deflate"_qb)
+            ,zero("0"_qb) {
+        }
+    };
+    static char _psd_getRSAKey[sizeof(StaticData_getRSAKey)];
+    void getRSAKey() {
+        loginStep=s_get_RSAKey;
+        static memory::StaticPoionter<StaticData_getRSAKey> varPSD(_psd_getRSAKey);
+
+        auto varBaiDuUser=baiDuUser.lock();
+        if (false==varBaiDuUser) { return; }
+
+        zone_this_data(varBaiDuUser.get());
+
+        QUrl varURL;
+        {
+            const auto && gid=varBaiDuUser->gid();
+            const auto && tt=BaiDuUser::currentTime();
+
+            auto urlData=cat_to_url(
+                "tpl","mn",
+                "apiver","v3",
+                "tt",tt,
+                "class","login",
+                "gid",gid,
+                "callback","bd__cbs__dmwxux");
+
+            QByteArray varTmpUrl;
+            varTmpUrl.reserve(4
+                +varPSD->url.size()
+                +this->baiduTooken.size()
+                +static_cast<int>(urlData.size()));
+            varTmpUrl.append(varPSD->url);
+            varTmpUrl.append(this->baiduTooken);
+            varTmpUrl.append(urlData.c_str(),static_cast<int>(urlData.size()));
+            varURL.setUrl(varTmpUrl);
+        }
+
+        QNetworkRequest req(varURL);
+        req.setRawHeader(varPSD->keyUserAgent,varBaiDuUser->userAgent());
+        req.setRawHeader(varPSD->keyAcceptEncoding,varPSD->valueAcceptEncoding);
+
+        auto varReply=varThisData->_m_NetworkAccessManager.get(req);
+
+        varReply->connect(varReply,&QNetworkReply::finished,
+            [varLockThis=this->shared_from_this(),varReply,this]() {
+            this->loginStepNext=s_encryptRSA;
+            do {
+                varReply->deleteLater();
+
+                auto varBaiDuUser=baiDuUser.lock();
+                if (false==varBaiDuUser) { return; }
+
+                {
+                    QString varPublicKey;
+                    auto json=varReply->readAll();
+                    varReply->close();
+
+                    if (json.isEmpty()) {
+                        this->loginStepNext=s_error;
+                        errorString="can not get json"_qsl;
+                        break;
+                    }
+
+                    if (json[0]==char(0x001F)) {
+                        json=text::ungzip(json.cbegin(),json.cend());
+                    }
+
+                    /*去除括号*/
+                    json=json.mid(json.indexOf("(")+1);
+                    json.resize(json.size()-1);
+
+                    QScriptEngine eng;
+                    eng.evaluate("var bd__cbs__dmwxux = "_qsl+json);
+                    const auto error=eng.evaluate(u8R"(bd__cbs__dmwxux["errno"])"_qsl).toString();
+                    varPublicKey=eng.evaluate(u8R"(bd__cbs__dmwxux["pubkey"])"_qsl).toString();
+                    const auto key=eng.evaluate(u8R"(bd__cbs__dmwxux["key"])"_qsl).toString();
+
+                    if ((varPSD->zero!=error)||varPublicKey.isEmpty()||key.isEmpty()) {
+                        this->loginStepNext=s_error;
+                        errorString="can not get json  "_qsl+std::move(error);
+                        break;
+                    }
+
+                    this->rasKey=key.toUtf8();
+                    this->publicKey=varPublicKey.toUtf8();
+
+                }
+
+            } while (false);
+
+            this->next_step();
+
+        });
+
+    }
 
     class StaticData_getBaiduToken {
     public:
         const QByteArray url;
         const QByteArray userAgent;
         const QString zero;
-        StaticData_getBaiduToken() 
+        const std::regex tokenCheck;
+        StaticData_getBaiduToken()
             :url(u8R"(https://passport.baidu.com/v2/api/?getapi)"_qb)
             ,userAgent("User-Agent"_qb)
-            ,zero("0"_qsl){}
+            ,zero("0"_qsl)
+            ,tokenCheck(u8R"([0-9a-zA-Z]+)") {
+        }
     };
     static char _psd_getBaiduToken[sizeof(StaticData_getBaiduToken)];
     void getBaiduToken() {
@@ -229,18 +406,18 @@ public:
         loginStep=s_get_baidu_token;
 
         /*静态数据*/
-        static memory::StaticPoionter<StaticData_getBaiduToken> 
+        static memory::StaticPoionter<StaticData_getBaiduToken>
             _psd_(_psd_getBaiduToken);
 
         auto varBaiDuUser=baiDuUser.lock();
         if (false==varBaiDuUser) { return; }
 
         zone_this_data(varBaiDuUser.get());
-        
+
         QUrl varUrl;
         {/*set url*/
-            const auto tt=BaiDuUser::currentTime();
-            const auto gid=varBaiDuUser->gid();
+            const auto && tt=BaiDuUser::currentTime();
+            const auto && gid=varBaiDuUser->gid();
             const auto url_=cat_to_url(
                 "tpl","mn",
                 "apiver","v3",
@@ -248,7 +425,7 @@ public:
                 "class","login",
                 "gid",gid,
                 "logintype","dialogLogin",
-                "callback","bd__cbs__89tioq"
+                "callback","bd__cbs__akwyzc"
             );
             QByteArray varTmpUrl;
             varTmpUrl.reserve(4
@@ -261,13 +438,16 @@ public:
 
         QNetworkRequest varRequest(varUrl);
         varRequest.setRawHeader(_psd_->userAgent,BaiDuUser::userAgent());
-        
+        varRequest.setHeader(QNetworkRequest::CookieHeader,
+           QVariant::fromValue<QList<QNetworkCookie>>(varThisData->_m_NetworkCookieJar->allCookies()));
+
         auto varReply=varThisData->_m_NetworkAccessManager.get(varRequest);
         varReply->connect(varReply,&QNetworkReply::finished,
             [varLockThis=this->shared_from_this(),varReply,this]() {
 
                 {
                     varReply->deleteLater();
+
                     auto varBaiDuUser=baiDuUser.lock();
                     if (false==varBaiDuUser) { return; }
 
@@ -285,15 +465,23 @@ public:
                     auto token=eng.evaluate(u8R"(bd__cbs__89tioq["data"]["token"])"_qsl).toString();
 
                     if (error==_psd_->zero) {
+                        loginStepNext=s_get_RSAKey;
                         this->baiduTooken=token.toUtf8();
+                        /*进一步检查token是否正确*/
+                        if (false==std::regex_match(this->baiduTooken.cbegin(),
+                            this->baiduTooken.cend(),
+                            _psd_->tokenCheck)) {
+                            goto label_error;
+                        }
                     }
                     else {
+                    label_error:
                         loginStepNext=s_error;
-                        errorString="can not find baidu token"_qsl;
+                        errorString="can not find baidu token : "_qsl+token;
                     }
 
                 }
-                
+
                 this->next_step();
 
         });
@@ -304,6 +492,9 @@ public:
             case s_error:login_error(); break;
             case s_start:getBaiDuCookie(); break;
             case s_get_baidu_token:getBaiduToken(); break;
+            case s_get_RSAKey:getRSAKey(); break;
+            case s_encryptRSA:encryptRSA(); break;
+            case s_postLogin:postLogin(); break;
             case s_finished:login_finished(); break;
         }
     }
@@ -339,7 +530,7 @@ public:
         QUrl baidu_url;
         QByteArray key_user_agent;
         StaticData_getBaiDuCookie():
-            baidu_url(QString("http://www.baidu.com")),
+            baidu_url(QString("https://www.baidu.com/cache/user/html/login-1.2.html")),
             key_user_agent("User-Agent"_qb) {
         }
     };
@@ -404,6 +595,7 @@ private:
 
 char Login::_psd_getBaiDuCookie[sizeof(StaticData_getBaiDuCookie)];
 char Login::_psd_getBaiduToken[sizeof(StaticData_getBaiduToken)];
+char Login::_psd_getRSAKey[sizeof(StaticData_getRSAKey)];
 
 }/*namespace*/
 }/*namespace __login*/
@@ -441,7 +633,7 @@ QByteArray BaiDuUser::currentTime() {
 static char _p_userAgent_[sizeof(QByteArray)];
 QByteArray BaiDuUser::userAgent() {
     static memory::StaticPoionter<QByteArray> varAns{ _p_userAgent_,
-            "Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko"_qb
+            "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:49.0) Gecko/20100101 Firefox/49.0"_qb
     };
     return *varAns;
 }
