@@ -1,4 +1,4 @@
-there is a bug @ crypto.pri
+there is a bug @ crypto.prf
 
 change windows to win32
 
