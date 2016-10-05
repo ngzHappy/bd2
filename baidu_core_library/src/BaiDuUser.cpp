@@ -1290,6 +1290,7 @@ public:
     LogInSteps loginStepNext=s_start;
     QString errorString{ "unknow error"_qsl };
     bool logInFinishedCalled=false;
+    QByteArray baiduTooken;
 
     class StaticData_getBaiduToken {
     public:
@@ -1361,11 +1362,11 @@ public:
                     auto token=eng.evaluate(u8R"(bd__cbs__89tioq["data"]["token"])"_qsl).toString();
 
                     if (error==_psd_->zero) {
-
+                        this->baiduTooken=token.toUtf8();
                     }
                     else {
                         loginStepNext=s_error;
-                        errorString="can not find token"_qsl;
+                        errorString="can not find baidu token"_qsl;
                     }
 
                 }
