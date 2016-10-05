@@ -4,7 +4,7 @@
 int main(int argc, char *argv[]){
 
     std::ofstream ofs("cat_to_url.txt");
-    for(int i=1;i<17;++i){
+    for(int i=1;i<72;++i){
         ofs<<"template<\n";
 
         ofs<<"typename _t_0_0,typename _t_0_1";
@@ -33,11 +33,10 @@ int main(int argc, char *argv[]){
         ofs<<"string _ans;\n_ans.reserve(_size);\n";
 
         for(int j=0;j<i;++j){
-            ofs<<u8R"(_ans.append("&",1);)"<<std::endl;
-            ofs<<"_ans.append(_v_"<<j<<"_0.data(),_v_"<<j<<"_0.size());"<<std::endl;
-            ofs<<u8R"(_ans.append("=",1);)"<<std::endl;
+            ofs<<u8R"(_ans.append("&",1);)";
+            ofs<<"_ans.append(_v_"<<j<<"_0.data(),_v_"<<j<<"_0.size());";
+            ofs<<u8R"(_ans.append("=",1);)";
             ofs<<"_ans.append(_v_"<<j<<"_1.data(),_v_"<<j<<"_1.size());"<<std::endl;
-
         }
 
         ofs<<"return std::move(_ans);\n}\n";
