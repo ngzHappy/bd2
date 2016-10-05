@@ -20,7 +20,8 @@ SOURCES += \
 
 HEADERS += \
     $$PWD/cplusplus_base_library.hpp \
-    $$PWD/argument/argument.hpp
+    $$PWD/argument/argument.hpp \
+    class/class.hpp
 
 
 

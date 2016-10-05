@@ -4,7 +4,7 @@
 
 #include <memory>
 #include <type_traits>
-#include <memory/MemoryLibrary.hpp>
+#include <class/class.hpp>
 #include "../BaiDuUserCache.hpp"
 #include "../NetworkAccessManager.hpp"
 #include "../NetworkCookieJar.hpp"
@@ -24,7 +24,7 @@ public:
     bool _m_IsLogin=false;
     QByteArray _m_GID;
 private:
-    MEMORY_CLASS_NEW_DELETE
+    CPLUSPLUS_CLASS_META
 };
 
 }

@@ -6,6 +6,7 @@
 #include <QtNetwork/qnetworkcookie.h>
 #include <QtNetwork/qnetworkcookiejar.h>
 #include <QtCore/qbytearray.h>
+#include <class/class.hpp>
 
 namespace baidu {
 
@@ -28,7 +29,7 @@ public:
     virtual bool updateCookie(const QNetworkCookie &cookie) override;
     virtual bool deleteCookie(const QNetworkCookie &cookie) override;
 private:
-    MEMORY_CLASS_NEW_DELETE
+    CPLUSPLUS_CLASS_META
 };
 
 }

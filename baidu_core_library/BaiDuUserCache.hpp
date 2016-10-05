@@ -5,7 +5,7 @@ struct lua_State;
 #include <memory>
 #include <QtCore/qstring.h>
 #include <QtCore/qbytearray.h>
-#include <memory/MemoryLibrary.hpp>
+#include <class/class.hpp>
 #include "BaiduCoreLibrary.hpp"
 
 namespace baidu {
@@ -42,7 +42,7 @@ public:
 private: template<typename _t_FILENAME_t__>
     void _p_setFileName(_t_FILENAME_t__ && /*fileName*/);
 private:
-    MEMORY_CLASS_NEW_DELETE
+    CPLUSPLUS_CLASS_META
 };
 
 template<typename _t_FILENAME_t__>

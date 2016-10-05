@@ -7,9 +7,9 @@
 #include <QtCore/qthread.h>
 #include <QtNetwork/qnetworkaccessmanager.h>
 #include "../DownLoadThread.hpp"
+#include <class/class.hpp>
 
 namespace baidu {
-
 
 
 class BAIDU_CORE_LIBRARYSHARED_EXPORT PrivateDownLoadThread : public QObject{
@@ -26,7 +26,7 @@ public:
     protected:
         virtual void run()override;
     private:
-        MEMORY_CLASS_NEW_DELETE
+        CPLUSPLUS_CLASS_META
     };
     ThreadPrivateDownLoadThread * _m_Thread;
 public:
@@ -37,7 +37,7 @@ private:
     PrivateDownLoadThread(const PrivateDownLoadThread&)=delete;
     PrivateDownLoadThread&operator=(const PrivateDownLoadThread&)=delete;
 private:
-    MEMORY_CLASS_NEW_DELETE
+    CPLUSPLUS_CLASS_META
 };
 
 }

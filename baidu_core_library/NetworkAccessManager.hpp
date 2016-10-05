@@ -5,7 +5,7 @@
 #include <atomic>
 #include <cinttypes>
 #include <QtNetwork/qnetworkaccessmanager.h>
-#include <memory/MemoryLibrary.hpp>
+#include <class/class.hpp>
 
 namespace baidu {
 
@@ -26,7 +26,7 @@ protected:
     void _p_wait_for_all_reply_deleted();
     bool _is_wait_finished()const;
 private:
-    MEMORY_CLASS_NEW_DELETE
+    CPLUSPLUS_CLASS_META
 };
 
 }/*baidu*/

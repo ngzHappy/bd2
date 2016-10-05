@@ -364,7 +364,7 @@ public:
             static_cast<int>(_m_String.size()));
     }
 private:
-    MEMORY_CLASS_NEW_DELETE
+    CPLUSPLUS_CLASS_META
 };
 
 template<typename _C_>
@@ -412,7 +412,7 @@ public:
     }
 
 private:
-    MEMORY_CLASS_NEW_DELETE
+    CPLUSPLUS_CLASS_META
 };
 
 template<typename _C_>
@@ -446,7 +446,7 @@ public:
         _m_DataPrintTable->tablePath.pop_back();
     }
 private:
-    MEMORY_CLASS_NEW_DELETE
+    CPLUSPLUS_CLASS_META
 };
 
 template<typename _C_>
@@ -599,7 +599,7 @@ public:
 #undef function_return
     }
 private:
-    MEMORY_CLASS_NEW_DELETE
+    CPLUSPLUS_CLASS_META
 };
 
 template<typename _T_>

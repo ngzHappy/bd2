@@ -20,7 +20,7 @@ inline QByteArray operator""_qb(const char *arg,std::size_t n) {
     return QByteArray(arg,int(n));
 }
 
-}
+}/*namespace*/
 
 template<>
 inline auto getThisData<zone_data::BaiDuUserData *,0>(const BaiDuUser * arg) ->zone_data::BaiDuUserData * {
@@ -218,6 +218,8 @@ public:
         static memory::StaticPoionter<StaticData_getBaiDuCookie> varStaticData{
             _psd_getBaiDuCookie };
 
+        loginStep=s_start;
+
         /*初始化请求*/
         QNetworkRequest varRequest;
         varRequest.setUrl(varStaticData->baidu_url);
@@ -267,7 +269,7 @@ public:
         }
     }
 private:
-    MEMORY_CLASS_NEW_DELETE
+    CPLUSPLUS_CLASS_META
 };
 
 char Login::_psd_getBaiDuCookie[sizeof(StaticData_getBaiDuCookie)];

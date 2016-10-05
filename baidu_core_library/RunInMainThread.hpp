@@ -3,6 +3,7 @@
 
 #include <functional>
 #include "BaiduCoreLibrary.hpp"
+#include <class/class.hpp>
 
 namespace baidu {
 

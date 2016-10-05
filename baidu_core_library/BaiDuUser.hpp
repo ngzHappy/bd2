@@ -7,7 +7,7 @@
 #include <cstdint>
 #include <utility>
 #include <type_traits>
-#include <memory/MemoryLibrary.hpp>
+#include <class/class.hpp>
 #include "BaiduCoreLibrary.hpp"
 #include "BaiDuUserCache.hpp"
 #include "NetworkAccessManager.hpp"
@@ -25,7 +25,7 @@ class BaiDuUser;
 template<typename _TYPE_TAG_,unsigned int _N_>
 auto getThisData(const BaiDuUser *)->_TYPE_TAG_ ;
 
-class BAIDU_CORE_LIBRARYSHARED_EXPORT BaiDuUser 
+class BAIDU_CORE_LIBRARYSHARED_EXPORT BaiDuUser
     :public QObject
     ,public std::enable_shared_from_this<BaiDuUser>{
     Q_OBJECT
@@ -53,7 +53,7 @@ public:
 
     explicit BaiDuUser(decltype(nullptr)) {}
     BaiDuUser();
-    
+
     static auto instance() {
         return std::shared_ptr<BaiDuUser>(
             new BaiDuUser,[](BaiDuUser*u) {delete u; },
@@ -89,7 +89,7 @@ private:
 protected:
     ~BaiDuUser();
 private:
-    MEMORY_CLASS_NEW_DELETE
+    CPLUSPLUS_CLASS_META
 };
 
 }/*namespace baidu*/

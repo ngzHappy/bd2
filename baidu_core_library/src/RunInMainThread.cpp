@@ -17,7 +17,7 @@ public:
     virtual ~FunctionEvent()=default;
     FunctionEvent() :QEvent(event_id){}
 private:
-    MEMORY_CLASS_NEW_DELETE
+    CPLUSPLUS_CLASS_META
 };
 
 class PlainFunctionEvent :public FunctionEvent{
@@ -29,7 +29,7 @@ public:
         catch (...) {}
     }
 private:
-    MEMORY_CLASS_NEW_DELETE
+    CPLUSPLUS_CLASS_META
 };
 
 class StdFunctionEvent :public FunctionEvent{
@@ -41,7 +41,7 @@ public:
         catch (...) {}
     }
 private:
-    MEMORY_CLASS_NEW_DELETE
+    CPLUSPLUS_CLASS_META
 };
 
 class DoEvent :public QObject {
@@ -62,7 +62,7 @@ protected:
         return QObject::event(arg);
     }
 private:
-    MEMORY_CLASS_NEW_DELETE
+    CPLUSPLUS_CLASS_META
 };
 
 static void _on_qt_start_() {

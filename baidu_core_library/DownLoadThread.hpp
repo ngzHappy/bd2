@@ -5,7 +5,7 @@
 #include <atomic>
 #include <QtCore/qurl.h>
 #include <QtCore/qobject.h>
-#include <memory/MemoryLibrary.hpp>
+#include <class/class.hpp>
 
 namespace baidu {
 
@@ -47,7 +47,7 @@ public:
 public:
     virtual ~CallBackDownLoadThread() {}
 private:
-    MEMORY_CLASS_NEW_DELETE
+    CPLUSPLUS_CLASS_META
 };
 
 /*每个实例启动一个新线程用于下载*/
@@ -67,7 +67,7 @@ private:
     DownLoadThread&operator=(const DownLoadThread&)=delete;
     DownLoadThread&operator=(DownLoadThread&&)=delete;
 private:
-    MEMORY_CLASS_NEW_DELETE
+    CPLUSPLUS_CLASS_META
 };
 
 }/*baidu*/
