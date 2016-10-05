@@ -30,6 +30,7 @@ void getAllJavaScript(
     _Gumbo varParser{varBegin,int(varEnd-varBegin)};
     _GumboNodes varNodes;
 
+    if (nullptr==varParser->root) { return; }
     varNodes.push_front(varParser->root);
 
     while (varNodes.empty()==false) {
@@ -54,6 +55,7 @@ void getAllJavaScript(
                 auto & varChildren=varElement.children;
                 for(decltype(varChildren.length) i=0;i<varChildren.length;++i){
                     GumboNode* varNode=reinterpret_cast<GumboNode*>(varChildren.data[i]);
+                    if (varNode==nullptr) { continue; }
                     varNodes.push_back(varNode);
                 }
             }
