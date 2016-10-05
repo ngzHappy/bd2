@@ -195,7 +195,7 @@ inline std::size_t find_string_op(const char * begin,const char *end) {
 
 inline bool is_simple_char(char i) {
     if ((i>='a')&&(i<='z')) { return true; }
-    if ((i>='A')&&(i<='X')) { return true; }
+    if ((i>='A')&&(i<='Z')) { return true; }
     /*0-9 :;<=>*/
     if ((i>='0')&&(i<='>')) { return true; }
     return i=='_';
