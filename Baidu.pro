@@ -25,7 +25,8 @@ test_baidu_login.depends+=library_baidu_core_library
 SUBDIRS += \
     library_baidu_core_library \
     test_baidu_core \
-    test_baidu_login
+    test_baidu_login \
+    tool/cat_to_url
 
 
 

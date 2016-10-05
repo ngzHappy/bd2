@@ -7,10 +7,13 @@
 #include <QtScript>
 #include <QtCrypto>
 #include <QtNetwork>
+#include <string>
 
 namespace baidu {
 
 namespace {
+
+using string=std::basic_string<char,std::char_traits<char>,memory::Allocator<char>>;
 
 inline Q_DECL_CONSTEXPR QLatin1Literal operator""_qsl(const char *arg,std::size_t n) {
     return QLatin1Literal(arg,int(n));
@@ -18,6 +21,1137 @@ inline Q_DECL_CONSTEXPR QLatin1Literal operator""_qsl(const char *arg,std::size_
 
 inline QByteArray operator""_qb(const char *arg,std::size_t n) {
     return QByteArray(arg,int(n));
+}
+
+template<typename _T_>
+class StringRef;
+
+template<typename T,std::size_t N>
+class StringRef<T[N]> {
+    const T(&_m_Data)[N];
+public:
+    constexpr StringRef(const T(&argData)[N]):_m_Data(argData) {}
+    const char * data() const { return _m_Data; }
+    int size() const { return int(N-1); }
+};
+
+template<>
+class StringRef<QByteArray> {
+    const QByteArray & _m_Data;
+public:
+    constexpr StringRef(const QByteArray&arg) :_m_Data(arg){}
+    const char *data() const { return _m_Data.data(); }
+    int size() { return _m_Data.size(); }
+};
+
+template<>
+class StringRef<string> {
+    const string & _m_Data;
+public:
+    constexpr StringRef(const string&arg) :_m_Data(arg){}
+    const char *data() const { return _m_Data.data(); }
+    int size() { return _m_Data.size(); }
+};
+
+template<typename _T_>
+constexpr auto make_string_ref(const _T_&arg) {
+    return StringRef<_T_>(arg);
+}
+
+template<std::size_t N>
+constexpr auto make_string_ref(const char(&arg)[N]) {
+    return StringRef<char[N]>(arg);
+}
+
+/******************************************************************/
+namespace utility_cpp14 {/*此函数最好在c++17重写*/
+template<
+    typename _t_0_0,typename _t_0_1
+>
+string __cat_to_url(const _t_0_0&_v_0_0,const _t_0_1&_v_0_1) {
+    constexpr int _n=1*(2/*&=*/)+4;
+    const int _size=_n
+        +_v_0_0.size()+_v_0_1.size();
+    string _ans;
+    _ans.reserve(_size);
+    _ans.append("&",1);
+    _ans.append(_v_0_0.data(),_v_0_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_0_1.data(),_v_0_1.size());
+    return std::move(_ans);
+}
+template<
+    typename _t_0_0,typename _t_0_1,
+    typename _t_1_0,typename _t_1_1
+>
+string __cat_to_url(const _t_0_0&_v_0_0,const _t_0_1&_v_0_1,
+    const _t_1_0&_v_1_0,const _t_1_1&_v_1_1) {
+    constexpr int _n=2*(2/*&=*/)+4;
+    const int _size=_n
+        +_v_0_0.size()+_v_0_1.size()
+        +_v_1_0.size()+_v_1_1.size();
+    string _ans;
+    _ans.reserve(_size);
+    _ans.append("&",1);
+    _ans.append(_v_0_0.data(),_v_0_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_0_1.data(),_v_0_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_1_0.data(),_v_1_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_1_1.data(),_v_1_1.size());
+    return std::move(_ans);
+}
+template<
+    typename _t_0_0,typename _t_0_1,
+    typename _t_1_0,typename _t_1_1,
+    typename _t_2_0,typename _t_2_1
+>
+string __cat_to_url(const _t_0_0&_v_0_0,const _t_0_1&_v_0_1,
+    const _t_1_0&_v_1_0,const _t_1_1&_v_1_1,
+    const _t_2_0&_v_2_0,const _t_2_1&_v_2_1) {
+    constexpr int _n=3*(2/*&=*/)+4;
+    const int _size=_n
+        +_v_0_0.size()+_v_0_1.size()
+        +_v_1_0.size()+_v_1_1.size()
+        +_v_2_0.size()+_v_2_1.size();
+    string _ans;
+    _ans.reserve(_size);
+    _ans.append("&",1);
+    _ans.append(_v_0_0.data(),_v_0_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_0_1.data(),_v_0_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_1_0.data(),_v_1_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_1_1.data(),_v_1_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_2_0.data(),_v_2_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_2_1.data(),_v_2_1.size());
+    return std::move(_ans);
+}
+template<
+    typename _t_0_0,typename _t_0_1,
+    typename _t_1_0,typename _t_1_1,
+    typename _t_2_0,typename _t_2_1,
+    typename _t_3_0,typename _t_3_1
+>
+string __cat_to_url(const _t_0_0&_v_0_0,const _t_0_1&_v_0_1,
+    const _t_1_0&_v_1_0,const _t_1_1&_v_1_1,
+    const _t_2_0&_v_2_0,const _t_2_1&_v_2_1,
+    const _t_3_0&_v_3_0,const _t_3_1&_v_3_1) {
+    constexpr int _n=4*(2/*&=*/)+4;
+    const int _size=_n
+        +_v_0_0.size()+_v_0_1.size()
+        +_v_1_0.size()+_v_1_1.size()
+        +_v_2_0.size()+_v_2_1.size()
+        +_v_3_0.size()+_v_3_1.size();
+    string _ans;
+    _ans.reserve(_size);
+    _ans.append("&",1);
+    _ans.append(_v_0_0.data(),_v_0_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_0_1.data(),_v_0_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_1_0.data(),_v_1_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_1_1.data(),_v_1_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_2_0.data(),_v_2_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_2_1.data(),_v_2_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_3_0.data(),_v_3_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_3_1.data(),_v_3_1.size());
+    return std::move(_ans);
+}
+template<
+    typename _t_0_0,typename _t_0_1,
+    typename _t_1_0,typename _t_1_1,
+    typename _t_2_0,typename _t_2_1,
+    typename _t_3_0,typename _t_3_1,
+    typename _t_4_0,typename _t_4_1
+>
+string __cat_to_url(const _t_0_0&_v_0_0,const _t_0_1&_v_0_1,
+    const _t_1_0&_v_1_0,const _t_1_1&_v_1_1,
+    const _t_2_0&_v_2_0,const _t_2_1&_v_2_1,
+    const _t_3_0&_v_3_0,const _t_3_1&_v_3_1,
+    const _t_4_0&_v_4_0,const _t_4_1&_v_4_1) {
+    constexpr int _n=5*(2/*&=*/)+4;
+    const int _size=_n
+        +_v_0_0.size()+_v_0_1.size()
+        +_v_1_0.size()+_v_1_1.size()
+        +_v_2_0.size()+_v_2_1.size()
+        +_v_3_0.size()+_v_3_1.size()
+        +_v_4_0.size()+_v_4_1.size();
+    string _ans;
+    _ans.reserve(_size);
+    _ans.append("&",1);
+    _ans.append(_v_0_0.data(),_v_0_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_0_1.data(),_v_0_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_1_0.data(),_v_1_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_1_1.data(),_v_1_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_2_0.data(),_v_2_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_2_1.data(),_v_2_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_3_0.data(),_v_3_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_3_1.data(),_v_3_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_4_0.data(),_v_4_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_4_1.data(),_v_4_1.size());
+    return std::move(_ans);
+}
+template<
+    typename _t_0_0,typename _t_0_1,
+    typename _t_1_0,typename _t_1_1,
+    typename _t_2_0,typename _t_2_1,
+    typename _t_3_0,typename _t_3_1,
+    typename _t_4_0,typename _t_4_1,
+    typename _t_5_0,typename _t_5_1
+>
+string __cat_to_url(const _t_0_0&_v_0_0,const _t_0_1&_v_0_1,
+    const _t_1_0&_v_1_0,const _t_1_1&_v_1_1,
+    const _t_2_0&_v_2_0,const _t_2_1&_v_2_1,
+    const _t_3_0&_v_3_0,const _t_3_1&_v_3_1,
+    const _t_4_0&_v_4_0,const _t_4_1&_v_4_1,
+    const _t_5_0&_v_5_0,const _t_5_1&_v_5_1) {
+    constexpr int _n=6*(2/*&=*/)+4;
+    const int _size=_n
+        +_v_0_0.size()+_v_0_1.size()
+        +_v_1_0.size()+_v_1_1.size()
+        +_v_2_0.size()+_v_2_1.size()
+        +_v_3_0.size()+_v_3_1.size()
+        +_v_4_0.size()+_v_4_1.size()
+        +_v_5_0.size()+_v_5_1.size();
+    string _ans;
+    _ans.reserve(_size);
+    _ans.append("&",1);
+    _ans.append(_v_0_0.data(),_v_0_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_0_1.data(),_v_0_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_1_0.data(),_v_1_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_1_1.data(),_v_1_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_2_0.data(),_v_2_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_2_1.data(),_v_2_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_3_0.data(),_v_3_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_3_1.data(),_v_3_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_4_0.data(),_v_4_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_4_1.data(),_v_4_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_5_0.data(),_v_5_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_5_1.data(),_v_5_1.size());
+    return std::move(_ans);
+}
+template<
+    typename _t_0_0,typename _t_0_1,
+    typename _t_1_0,typename _t_1_1,
+    typename _t_2_0,typename _t_2_1,
+    typename _t_3_0,typename _t_3_1,
+    typename _t_4_0,typename _t_4_1,
+    typename _t_5_0,typename _t_5_1,
+    typename _t_6_0,typename _t_6_1
+>
+string __cat_to_url(const _t_0_0&_v_0_0,const _t_0_1&_v_0_1,
+    const _t_1_0&_v_1_0,const _t_1_1&_v_1_1,
+    const _t_2_0&_v_2_0,const _t_2_1&_v_2_1,
+    const _t_3_0&_v_3_0,const _t_3_1&_v_3_1,
+    const _t_4_0&_v_4_0,const _t_4_1&_v_4_1,
+    const _t_5_0&_v_5_0,const _t_5_1&_v_5_1,
+    const _t_6_0&_v_6_0,const _t_6_1&_v_6_1) {
+    constexpr int _n=7*(2/*&=*/)+4;
+    const int _size=_n
+        +_v_0_0.size()+_v_0_1.size()
+        +_v_1_0.size()+_v_1_1.size()
+        +_v_2_0.size()+_v_2_1.size()
+        +_v_3_0.size()+_v_3_1.size()
+        +_v_4_0.size()+_v_4_1.size()
+        +_v_5_0.size()+_v_5_1.size()
+        +_v_6_0.size()+_v_6_1.size();
+    string _ans;
+    _ans.reserve(_size);
+    _ans.append("&",1);
+    _ans.append(_v_0_0.data(),_v_0_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_0_1.data(),_v_0_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_1_0.data(),_v_1_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_1_1.data(),_v_1_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_2_0.data(),_v_2_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_2_1.data(),_v_2_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_3_0.data(),_v_3_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_3_1.data(),_v_3_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_4_0.data(),_v_4_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_4_1.data(),_v_4_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_5_0.data(),_v_5_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_5_1.data(),_v_5_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_6_0.data(),_v_6_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_6_1.data(),_v_6_1.size());
+    return std::move(_ans);
+}
+template<
+    typename _t_0_0,typename _t_0_1,
+    typename _t_1_0,typename _t_1_1,
+    typename _t_2_0,typename _t_2_1,
+    typename _t_3_0,typename _t_3_1,
+    typename _t_4_0,typename _t_4_1,
+    typename _t_5_0,typename _t_5_1,
+    typename _t_6_0,typename _t_6_1,
+    typename _t_7_0,typename _t_7_1
+>
+string __cat_to_url(const _t_0_0&_v_0_0,const _t_0_1&_v_0_1,
+    const _t_1_0&_v_1_0,const _t_1_1&_v_1_1,
+    const _t_2_0&_v_2_0,const _t_2_1&_v_2_1,
+    const _t_3_0&_v_3_0,const _t_3_1&_v_3_1,
+    const _t_4_0&_v_4_0,const _t_4_1&_v_4_1,
+    const _t_5_0&_v_5_0,const _t_5_1&_v_5_1,
+    const _t_6_0&_v_6_0,const _t_6_1&_v_6_1,
+    const _t_7_0&_v_7_0,const _t_7_1&_v_7_1) {
+    constexpr int _n=8*(2/*&=*/)+4;
+    const int _size=_n
+        +_v_0_0.size()+_v_0_1.size()
+        +_v_1_0.size()+_v_1_1.size()
+        +_v_2_0.size()+_v_2_1.size()
+        +_v_3_0.size()+_v_3_1.size()
+        +_v_4_0.size()+_v_4_1.size()
+        +_v_5_0.size()+_v_5_1.size()
+        +_v_6_0.size()+_v_6_1.size()
+        +_v_7_0.size()+_v_7_1.size();
+    string _ans;
+    _ans.reserve(_size);
+    _ans.append("&",1);
+    _ans.append(_v_0_0.data(),_v_0_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_0_1.data(),_v_0_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_1_0.data(),_v_1_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_1_1.data(),_v_1_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_2_0.data(),_v_2_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_2_1.data(),_v_2_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_3_0.data(),_v_3_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_3_1.data(),_v_3_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_4_0.data(),_v_4_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_4_1.data(),_v_4_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_5_0.data(),_v_5_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_5_1.data(),_v_5_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_6_0.data(),_v_6_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_6_1.data(),_v_6_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_7_0.data(),_v_7_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_7_1.data(),_v_7_1.size());
+    return std::move(_ans);
+}
+template<
+    typename _t_0_0,typename _t_0_1,
+    typename _t_1_0,typename _t_1_1,
+    typename _t_2_0,typename _t_2_1,
+    typename _t_3_0,typename _t_3_1,
+    typename _t_4_0,typename _t_4_1,
+    typename _t_5_0,typename _t_5_1,
+    typename _t_6_0,typename _t_6_1,
+    typename _t_7_0,typename _t_7_1,
+    typename _t_8_0,typename _t_8_1
+>
+string __cat_to_url(const _t_0_0&_v_0_0,const _t_0_1&_v_0_1,
+    const _t_1_0&_v_1_0,const _t_1_1&_v_1_1,
+    const _t_2_0&_v_2_0,const _t_2_1&_v_2_1,
+    const _t_3_0&_v_3_0,const _t_3_1&_v_3_1,
+    const _t_4_0&_v_4_0,const _t_4_1&_v_4_1,
+    const _t_5_0&_v_5_0,const _t_5_1&_v_5_1,
+    const _t_6_0&_v_6_0,const _t_6_1&_v_6_1,
+    const _t_7_0&_v_7_0,const _t_7_1&_v_7_1,
+    const _t_8_0&_v_8_0,const _t_8_1&_v_8_1) {
+    constexpr int _n=9*(2/*&=*/)+4;
+    const int _size=_n
+        +_v_0_0.size()+_v_0_1.size()
+        +_v_1_0.size()+_v_1_1.size()
+        +_v_2_0.size()+_v_2_1.size()
+        +_v_3_0.size()+_v_3_1.size()
+        +_v_4_0.size()+_v_4_1.size()
+        +_v_5_0.size()+_v_5_1.size()
+        +_v_6_0.size()+_v_6_1.size()
+        +_v_7_0.size()+_v_7_1.size()
+        +_v_8_0.size()+_v_8_1.size();
+    string _ans;
+    _ans.reserve(_size);
+    _ans.append("&",1);
+    _ans.append(_v_0_0.data(),_v_0_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_0_1.data(),_v_0_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_1_0.data(),_v_1_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_1_1.data(),_v_1_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_2_0.data(),_v_2_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_2_1.data(),_v_2_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_3_0.data(),_v_3_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_3_1.data(),_v_3_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_4_0.data(),_v_4_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_4_1.data(),_v_4_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_5_0.data(),_v_5_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_5_1.data(),_v_5_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_6_0.data(),_v_6_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_6_1.data(),_v_6_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_7_0.data(),_v_7_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_7_1.data(),_v_7_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_8_0.data(),_v_8_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_8_1.data(),_v_8_1.size());
+    return std::move(_ans);
+}
+template<
+    typename _t_0_0,typename _t_0_1,
+    typename _t_1_0,typename _t_1_1,
+    typename _t_2_0,typename _t_2_1,
+    typename _t_3_0,typename _t_3_1,
+    typename _t_4_0,typename _t_4_1,
+    typename _t_5_0,typename _t_5_1,
+    typename _t_6_0,typename _t_6_1,
+    typename _t_7_0,typename _t_7_1,
+    typename _t_8_0,typename _t_8_1,
+    typename _t_9_0,typename _t_9_1
+>
+string __cat_to_url(const _t_0_0&_v_0_0,const _t_0_1&_v_0_1,
+    const _t_1_0&_v_1_0,const _t_1_1&_v_1_1,
+    const _t_2_0&_v_2_0,const _t_2_1&_v_2_1,
+    const _t_3_0&_v_3_0,const _t_3_1&_v_3_1,
+    const _t_4_0&_v_4_0,const _t_4_1&_v_4_1,
+    const _t_5_0&_v_5_0,const _t_5_1&_v_5_1,
+    const _t_6_0&_v_6_0,const _t_6_1&_v_6_1,
+    const _t_7_0&_v_7_0,const _t_7_1&_v_7_1,
+    const _t_8_0&_v_8_0,const _t_8_1&_v_8_1,
+    const _t_9_0&_v_9_0,const _t_9_1&_v_9_1) {
+    constexpr int _n=10*(2/*&=*/)+4;
+    const int _size=_n
+        +_v_0_0.size()+_v_0_1.size()
+        +_v_1_0.size()+_v_1_1.size()
+        +_v_2_0.size()+_v_2_1.size()
+        +_v_3_0.size()+_v_3_1.size()
+        +_v_4_0.size()+_v_4_1.size()
+        +_v_5_0.size()+_v_5_1.size()
+        +_v_6_0.size()+_v_6_1.size()
+        +_v_7_0.size()+_v_7_1.size()
+        +_v_8_0.size()+_v_8_1.size()
+        +_v_9_0.size()+_v_9_1.size();
+    string _ans;
+    _ans.reserve(_size);
+    _ans.append("&",1);
+    _ans.append(_v_0_0.data(),_v_0_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_0_1.data(),_v_0_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_1_0.data(),_v_1_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_1_1.data(),_v_1_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_2_0.data(),_v_2_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_2_1.data(),_v_2_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_3_0.data(),_v_3_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_3_1.data(),_v_3_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_4_0.data(),_v_4_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_4_1.data(),_v_4_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_5_0.data(),_v_5_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_5_1.data(),_v_5_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_6_0.data(),_v_6_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_6_1.data(),_v_6_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_7_0.data(),_v_7_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_7_1.data(),_v_7_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_8_0.data(),_v_8_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_8_1.data(),_v_8_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_9_0.data(),_v_9_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_9_1.data(),_v_9_1.size());
+    return std::move(_ans);
+}
+template<
+    typename _t_0_0,typename _t_0_1,
+    typename _t_1_0,typename _t_1_1,
+    typename _t_2_0,typename _t_2_1,
+    typename _t_3_0,typename _t_3_1,
+    typename _t_4_0,typename _t_4_1,
+    typename _t_5_0,typename _t_5_1,
+    typename _t_6_0,typename _t_6_1,
+    typename _t_7_0,typename _t_7_1,
+    typename _t_8_0,typename _t_8_1,
+    typename _t_9_0,typename _t_9_1,
+    typename _t_10_0,typename _t_10_1
+>
+string __cat_to_url(const _t_0_0&_v_0_0,const _t_0_1&_v_0_1,
+    const _t_1_0&_v_1_0,const _t_1_1&_v_1_1,
+    const _t_2_0&_v_2_0,const _t_2_1&_v_2_1,
+    const _t_3_0&_v_3_0,const _t_3_1&_v_3_1,
+    const _t_4_0&_v_4_0,const _t_4_1&_v_4_1,
+    const _t_5_0&_v_5_0,const _t_5_1&_v_5_1,
+    const _t_6_0&_v_6_0,const _t_6_1&_v_6_1,
+    const _t_7_0&_v_7_0,const _t_7_1&_v_7_1,
+    const _t_8_0&_v_8_0,const _t_8_1&_v_8_1,
+    const _t_9_0&_v_9_0,const _t_9_1&_v_9_1,
+    const _t_10_0&_v_10_0,const _t_10_1&_v_10_1) {
+    constexpr int _n=11*(2/*&=*/)+4;
+    const int _size=_n
+        +_v_0_0.size()+_v_0_1.size()
+        +_v_1_0.size()+_v_1_1.size()
+        +_v_2_0.size()+_v_2_1.size()
+        +_v_3_0.size()+_v_3_1.size()
+        +_v_4_0.size()+_v_4_1.size()
+        +_v_5_0.size()+_v_5_1.size()
+        +_v_6_0.size()+_v_6_1.size()
+        +_v_7_0.size()+_v_7_1.size()
+        +_v_8_0.size()+_v_8_1.size()
+        +_v_9_0.size()+_v_9_1.size()
+        +_v_10_0.size()+_v_10_1.size();
+    string _ans;
+    _ans.reserve(_size);
+    _ans.append("&",1);
+    _ans.append(_v_0_0.data(),_v_0_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_0_1.data(),_v_0_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_1_0.data(),_v_1_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_1_1.data(),_v_1_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_2_0.data(),_v_2_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_2_1.data(),_v_2_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_3_0.data(),_v_3_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_3_1.data(),_v_3_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_4_0.data(),_v_4_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_4_1.data(),_v_4_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_5_0.data(),_v_5_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_5_1.data(),_v_5_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_6_0.data(),_v_6_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_6_1.data(),_v_6_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_7_0.data(),_v_7_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_7_1.data(),_v_7_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_8_0.data(),_v_8_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_8_1.data(),_v_8_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_9_0.data(),_v_9_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_9_1.data(),_v_9_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_10_0.data(),_v_10_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_10_1.data(),_v_10_1.size());
+    return std::move(_ans);
+}
+template<
+    typename _t_0_0,typename _t_0_1,
+    typename _t_1_0,typename _t_1_1,
+    typename _t_2_0,typename _t_2_1,
+    typename _t_3_0,typename _t_3_1,
+    typename _t_4_0,typename _t_4_1,
+    typename _t_5_0,typename _t_5_1,
+    typename _t_6_0,typename _t_6_1,
+    typename _t_7_0,typename _t_7_1,
+    typename _t_8_0,typename _t_8_1,
+    typename _t_9_0,typename _t_9_1,
+    typename _t_10_0,typename _t_10_1,
+    typename _t_11_0,typename _t_11_1
+>
+string __cat_to_url(const _t_0_0&_v_0_0,const _t_0_1&_v_0_1,
+    const _t_1_0&_v_1_0,const _t_1_1&_v_1_1,
+    const _t_2_0&_v_2_0,const _t_2_1&_v_2_1,
+    const _t_3_0&_v_3_0,const _t_3_1&_v_3_1,
+    const _t_4_0&_v_4_0,const _t_4_1&_v_4_1,
+    const _t_5_0&_v_5_0,const _t_5_1&_v_5_1,
+    const _t_6_0&_v_6_0,const _t_6_1&_v_6_1,
+    const _t_7_0&_v_7_0,const _t_7_1&_v_7_1,
+    const _t_8_0&_v_8_0,const _t_8_1&_v_8_1,
+    const _t_9_0&_v_9_0,const _t_9_1&_v_9_1,
+    const _t_10_0&_v_10_0,const _t_10_1&_v_10_1,
+    const _t_11_0&_v_11_0,const _t_11_1&_v_11_1) {
+    constexpr int _n=12*(2/*&=*/)+4;
+    const int _size=_n
+        +_v_0_0.size()+_v_0_1.size()
+        +_v_1_0.size()+_v_1_1.size()
+        +_v_2_0.size()+_v_2_1.size()
+        +_v_3_0.size()+_v_3_1.size()
+        +_v_4_0.size()+_v_4_1.size()
+        +_v_5_0.size()+_v_5_1.size()
+        +_v_6_0.size()+_v_6_1.size()
+        +_v_7_0.size()+_v_7_1.size()
+        +_v_8_0.size()+_v_8_1.size()
+        +_v_9_0.size()+_v_9_1.size()
+        +_v_10_0.size()+_v_10_1.size()
+        +_v_11_0.size()+_v_11_1.size();
+    string _ans;
+    _ans.reserve(_size);
+    _ans.append("&",1);
+    _ans.append(_v_0_0.data(),_v_0_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_0_1.data(),_v_0_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_1_0.data(),_v_1_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_1_1.data(),_v_1_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_2_0.data(),_v_2_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_2_1.data(),_v_2_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_3_0.data(),_v_3_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_3_1.data(),_v_3_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_4_0.data(),_v_4_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_4_1.data(),_v_4_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_5_0.data(),_v_5_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_5_1.data(),_v_5_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_6_0.data(),_v_6_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_6_1.data(),_v_6_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_7_0.data(),_v_7_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_7_1.data(),_v_7_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_8_0.data(),_v_8_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_8_1.data(),_v_8_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_9_0.data(),_v_9_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_9_1.data(),_v_9_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_10_0.data(),_v_10_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_10_1.data(),_v_10_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_11_0.data(),_v_11_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_11_1.data(),_v_11_1.size());
+    return std::move(_ans);
+}
+template<
+    typename _t_0_0,typename _t_0_1,
+    typename _t_1_0,typename _t_1_1,
+    typename _t_2_0,typename _t_2_1,
+    typename _t_3_0,typename _t_3_1,
+    typename _t_4_0,typename _t_4_1,
+    typename _t_5_0,typename _t_5_1,
+    typename _t_6_0,typename _t_6_1,
+    typename _t_7_0,typename _t_7_1,
+    typename _t_8_0,typename _t_8_1,
+    typename _t_9_0,typename _t_9_1,
+    typename _t_10_0,typename _t_10_1,
+    typename _t_11_0,typename _t_11_1,
+    typename _t_12_0,typename _t_12_1
+>
+string __cat_to_url(const _t_0_0&_v_0_0,const _t_0_1&_v_0_1,
+    const _t_1_0&_v_1_0,const _t_1_1&_v_1_1,
+    const _t_2_0&_v_2_0,const _t_2_1&_v_2_1,
+    const _t_3_0&_v_3_0,const _t_3_1&_v_3_1,
+    const _t_4_0&_v_4_0,const _t_4_1&_v_4_1,
+    const _t_5_0&_v_5_0,const _t_5_1&_v_5_1,
+    const _t_6_0&_v_6_0,const _t_6_1&_v_6_1,
+    const _t_7_0&_v_7_0,const _t_7_1&_v_7_1,
+    const _t_8_0&_v_8_0,const _t_8_1&_v_8_1,
+    const _t_9_0&_v_9_0,const _t_9_1&_v_9_1,
+    const _t_10_0&_v_10_0,const _t_10_1&_v_10_1,
+    const _t_11_0&_v_11_0,const _t_11_1&_v_11_1,
+    const _t_12_0&_v_12_0,const _t_12_1&_v_12_1) {
+    constexpr int _n=13*(2/*&=*/)+4;
+    const int _size=_n
+        +_v_0_0.size()+_v_0_1.size()
+        +_v_1_0.size()+_v_1_1.size()
+        +_v_2_0.size()+_v_2_1.size()
+        +_v_3_0.size()+_v_3_1.size()
+        +_v_4_0.size()+_v_4_1.size()
+        +_v_5_0.size()+_v_5_1.size()
+        +_v_6_0.size()+_v_6_1.size()
+        +_v_7_0.size()+_v_7_1.size()
+        +_v_8_0.size()+_v_8_1.size()
+        +_v_9_0.size()+_v_9_1.size()
+        +_v_10_0.size()+_v_10_1.size()
+        +_v_11_0.size()+_v_11_1.size()
+        +_v_12_0.size()+_v_12_1.size();
+    string _ans;
+    _ans.reserve(_size);
+    _ans.append("&",1);
+    _ans.append(_v_0_0.data(),_v_0_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_0_1.data(),_v_0_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_1_0.data(),_v_1_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_1_1.data(),_v_1_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_2_0.data(),_v_2_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_2_1.data(),_v_2_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_3_0.data(),_v_3_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_3_1.data(),_v_3_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_4_0.data(),_v_4_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_4_1.data(),_v_4_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_5_0.data(),_v_5_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_5_1.data(),_v_5_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_6_0.data(),_v_6_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_6_1.data(),_v_6_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_7_0.data(),_v_7_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_7_1.data(),_v_7_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_8_0.data(),_v_8_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_8_1.data(),_v_8_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_9_0.data(),_v_9_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_9_1.data(),_v_9_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_10_0.data(),_v_10_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_10_1.data(),_v_10_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_11_0.data(),_v_11_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_11_1.data(),_v_11_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_12_0.data(),_v_12_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_12_1.data(),_v_12_1.size());
+    return std::move(_ans);
+}
+template<
+    typename _t_0_0,typename _t_0_1,
+    typename _t_1_0,typename _t_1_1,
+    typename _t_2_0,typename _t_2_1,
+    typename _t_3_0,typename _t_3_1,
+    typename _t_4_0,typename _t_4_1,
+    typename _t_5_0,typename _t_5_1,
+    typename _t_6_0,typename _t_6_1,
+    typename _t_7_0,typename _t_7_1,
+    typename _t_8_0,typename _t_8_1,
+    typename _t_9_0,typename _t_9_1,
+    typename _t_10_0,typename _t_10_1,
+    typename _t_11_0,typename _t_11_1,
+    typename _t_12_0,typename _t_12_1,
+    typename _t_13_0,typename _t_13_1
+>
+string __cat_to_url(const _t_0_0&_v_0_0,const _t_0_1&_v_0_1,
+    const _t_1_0&_v_1_0,const _t_1_1&_v_1_1,
+    const _t_2_0&_v_2_0,const _t_2_1&_v_2_1,
+    const _t_3_0&_v_3_0,const _t_3_1&_v_3_1,
+    const _t_4_0&_v_4_0,const _t_4_1&_v_4_1,
+    const _t_5_0&_v_5_0,const _t_5_1&_v_5_1,
+    const _t_6_0&_v_6_0,const _t_6_1&_v_6_1,
+    const _t_7_0&_v_7_0,const _t_7_1&_v_7_1,
+    const _t_8_0&_v_8_0,const _t_8_1&_v_8_1,
+    const _t_9_0&_v_9_0,const _t_9_1&_v_9_1,
+    const _t_10_0&_v_10_0,const _t_10_1&_v_10_1,
+    const _t_11_0&_v_11_0,const _t_11_1&_v_11_1,
+    const _t_12_0&_v_12_0,const _t_12_1&_v_12_1,
+    const _t_13_0&_v_13_0,const _t_13_1&_v_13_1) {
+    constexpr int _n=14*(2/*&=*/)+4;
+    const int _size=_n
+        +_v_0_0.size()+_v_0_1.size()
+        +_v_1_0.size()+_v_1_1.size()
+        +_v_2_0.size()+_v_2_1.size()
+        +_v_3_0.size()+_v_3_1.size()
+        +_v_4_0.size()+_v_4_1.size()
+        +_v_5_0.size()+_v_5_1.size()
+        +_v_6_0.size()+_v_6_1.size()
+        +_v_7_0.size()+_v_7_1.size()
+        +_v_8_0.size()+_v_8_1.size()
+        +_v_9_0.size()+_v_9_1.size()
+        +_v_10_0.size()+_v_10_1.size()
+        +_v_11_0.size()+_v_11_1.size()
+        +_v_12_0.size()+_v_12_1.size()
+        +_v_13_0.size()+_v_13_1.size();
+    string _ans;
+    _ans.reserve(_size);
+    _ans.append("&",1);
+    _ans.append(_v_0_0.data(),_v_0_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_0_1.data(),_v_0_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_1_0.data(),_v_1_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_1_1.data(),_v_1_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_2_0.data(),_v_2_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_2_1.data(),_v_2_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_3_0.data(),_v_3_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_3_1.data(),_v_3_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_4_0.data(),_v_4_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_4_1.data(),_v_4_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_5_0.data(),_v_5_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_5_1.data(),_v_5_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_6_0.data(),_v_6_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_6_1.data(),_v_6_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_7_0.data(),_v_7_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_7_1.data(),_v_7_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_8_0.data(),_v_8_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_8_1.data(),_v_8_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_9_0.data(),_v_9_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_9_1.data(),_v_9_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_10_0.data(),_v_10_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_10_1.data(),_v_10_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_11_0.data(),_v_11_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_11_1.data(),_v_11_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_12_0.data(),_v_12_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_12_1.data(),_v_12_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_13_0.data(),_v_13_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_13_1.data(),_v_13_1.size());
+    return std::move(_ans);
+}
+template<
+    typename _t_0_0,typename _t_0_1,
+    typename _t_1_0,typename _t_1_1,
+    typename _t_2_0,typename _t_2_1,
+    typename _t_3_0,typename _t_3_1,
+    typename _t_4_0,typename _t_4_1,
+    typename _t_5_0,typename _t_5_1,
+    typename _t_6_0,typename _t_6_1,
+    typename _t_7_0,typename _t_7_1,
+    typename _t_8_0,typename _t_8_1,
+    typename _t_9_0,typename _t_9_1,
+    typename _t_10_0,typename _t_10_1,
+    typename _t_11_0,typename _t_11_1,
+    typename _t_12_0,typename _t_12_1,
+    typename _t_13_0,typename _t_13_1,
+    typename _t_14_0,typename _t_14_1
+>
+string __cat_to_url(const _t_0_0&_v_0_0,const _t_0_1&_v_0_1,
+    const _t_1_0&_v_1_0,const _t_1_1&_v_1_1,
+    const _t_2_0&_v_2_0,const _t_2_1&_v_2_1,
+    const _t_3_0&_v_3_0,const _t_3_1&_v_3_1,
+    const _t_4_0&_v_4_0,const _t_4_1&_v_4_1,
+    const _t_5_0&_v_5_0,const _t_5_1&_v_5_1,
+    const _t_6_0&_v_6_0,const _t_6_1&_v_6_1,
+    const _t_7_0&_v_7_0,const _t_7_1&_v_7_1,
+    const _t_8_0&_v_8_0,const _t_8_1&_v_8_1,
+    const _t_9_0&_v_9_0,const _t_9_1&_v_9_1,
+    const _t_10_0&_v_10_0,const _t_10_1&_v_10_1,
+    const _t_11_0&_v_11_0,const _t_11_1&_v_11_1,
+    const _t_12_0&_v_12_0,const _t_12_1&_v_12_1,
+    const _t_13_0&_v_13_0,const _t_13_1&_v_13_1,
+    const _t_14_0&_v_14_0,const _t_14_1&_v_14_1) {
+    constexpr int _n=15*(2/*&=*/)+4;
+    const int _size=_n
+        +_v_0_0.size()+_v_0_1.size()
+        +_v_1_0.size()+_v_1_1.size()
+        +_v_2_0.size()+_v_2_1.size()
+        +_v_3_0.size()+_v_3_1.size()
+        +_v_4_0.size()+_v_4_1.size()
+        +_v_5_0.size()+_v_5_1.size()
+        +_v_6_0.size()+_v_6_1.size()
+        +_v_7_0.size()+_v_7_1.size()
+        +_v_8_0.size()+_v_8_1.size()
+        +_v_9_0.size()+_v_9_1.size()
+        +_v_10_0.size()+_v_10_1.size()
+        +_v_11_0.size()+_v_11_1.size()
+        +_v_12_0.size()+_v_12_1.size()
+        +_v_13_0.size()+_v_13_1.size()
+        +_v_14_0.size()+_v_14_1.size();
+    string _ans;
+    _ans.reserve(_size);
+    _ans.append("&",1);
+    _ans.append(_v_0_0.data(),_v_0_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_0_1.data(),_v_0_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_1_0.data(),_v_1_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_1_1.data(),_v_1_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_2_0.data(),_v_2_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_2_1.data(),_v_2_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_3_0.data(),_v_3_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_3_1.data(),_v_3_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_4_0.data(),_v_4_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_4_1.data(),_v_4_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_5_0.data(),_v_5_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_5_1.data(),_v_5_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_6_0.data(),_v_6_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_6_1.data(),_v_6_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_7_0.data(),_v_7_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_7_1.data(),_v_7_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_8_0.data(),_v_8_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_8_1.data(),_v_8_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_9_0.data(),_v_9_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_9_1.data(),_v_9_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_10_0.data(),_v_10_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_10_1.data(),_v_10_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_11_0.data(),_v_11_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_11_1.data(),_v_11_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_12_0.data(),_v_12_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_12_1.data(),_v_12_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_13_0.data(),_v_13_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_13_1.data(),_v_13_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_14_0.data(),_v_14_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_14_1.data(),_v_14_1.size());
+    return std::move(_ans);
+}
+template<
+    typename _t_0_0,typename _t_0_1,
+    typename _t_1_0,typename _t_1_1,
+    typename _t_2_0,typename _t_2_1,
+    typename _t_3_0,typename _t_3_1,
+    typename _t_4_0,typename _t_4_1,
+    typename _t_5_0,typename _t_5_1,
+    typename _t_6_0,typename _t_6_1,
+    typename _t_7_0,typename _t_7_1,
+    typename _t_8_0,typename _t_8_1,
+    typename _t_9_0,typename _t_9_1,
+    typename _t_10_0,typename _t_10_1,
+    typename _t_11_0,typename _t_11_1,
+    typename _t_12_0,typename _t_12_1,
+    typename _t_13_0,typename _t_13_1,
+    typename _t_14_0,typename _t_14_1,
+    typename _t_15_0,typename _t_15_1
+>
+string __cat_to_url(const _t_0_0&_v_0_0,const _t_0_1&_v_0_1,
+    const _t_1_0&_v_1_0,const _t_1_1&_v_1_1,
+    const _t_2_0&_v_2_0,const _t_2_1&_v_2_1,
+    const _t_3_0&_v_3_0,const _t_3_1&_v_3_1,
+    const _t_4_0&_v_4_0,const _t_4_1&_v_4_1,
+    const _t_5_0&_v_5_0,const _t_5_1&_v_5_1,
+    const _t_6_0&_v_6_0,const _t_6_1&_v_6_1,
+    const _t_7_0&_v_7_0,const _t_7_1&_v_7_1,
+    const _t_8_0&_v_8_0,const _t_8_1&_v_8_1,
+    const _t_9_0&_v_9_0,const _t_9_1&_v_9_1,
+    const _t_10_0&_v_10_0,const _t_10_1&_v_10_1,
+    const _t_11_0&_v_11_0,const _t_11_1&_v_11_1,
+    const _t_12_0&_v_12_0,const _t_12_1&_v_12_1,
+    const _t_13_0&_v_13_0,const _t_13_1&_v_13_1,
+    const _t_14_0&_v_14_0,const _t_14_1&_v_14_1,
+    const _t_15_0&_v_15_0,const _t_15_1&_v_15_1) {
+    constexpr int _n=16*(2/*&=*/)+4;
+    const int _size=_n
+        +_v_0_0.size()+_v_0_1.size()
+        +_v_1_0.size()+_v_1_1.size()
+        +_v_2_0.size()+_v_2_1.size()
+        +_v_3_0.size()+_v_3_1.size()
+        +_v_4_0.size()+_v_4_1.size()
+        +_v_5_0.size()+_v_5_1.size()
+        +_v_6_0.size()+_v_6_1.size()
+        +_v_7_0.size()+_v_7_1.size()
+        +_v_8_0.size()+_v_8_1.size()
+        +_v_9_0.size()+_v_9_1.size()
+        +_v_10_0.size()+_v_10_1.size()
+        +_v_11_0.size()+_v_11_1.size()
+        +_v_12_0.size()+_v_12_1.size()
+        +_v_13_0.size()+_v_13_1.size()
+        +_v_14_0.size()+_v_14_1.size()
+        +_v_15_0.size()+_v_15_1.size();
+    string _ans;
+    _ans.reserve(_size);
+    _ans.append("&",1);
+    _ans.append(_v_0_0.data(),_v_0_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_0_1.data(),_v_0_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_1_0.data(),_v_1_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_1_1.data(),_v_1_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_2_0.data(),_v_2_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_2_1.data(),_v_2_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_3_0.data(),_v_3_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_3_1.data(),_v_3_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_4_0.data(),_v_4_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_4_1.data(),_v_4_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_5_0.data(),_v_5_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_5_1.data(),_v_5_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_6_0.data(),_v_6_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_6_1.data(),_v_6_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_7_0.data(),_v_7_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_7_1.data(),_v_7_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_8_0.data(),_v_8_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_8_1.data(),_v_8_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_9_0.data(),_v_9_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_9_1.data(),_v_9_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_10_0.data(),_v_10_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_10_1.data(),_v_10_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_11_0.data(),_v_11_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_11_1.data(),_v_11_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_12_0.data(),_v_12_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_12_1.data(),_v_12_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_13_0.data(),_v_13_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_13_1.data(),_v_13_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_14_0.data(),_v_14_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_14_1.data(),_v_14_1.size());
+    _ans.append("&",1);
+    _ans.append(_v_15_0.data(),_v_15_0.size());
+    _ans.append("=",1);
+    _ans.append(_v_15_1.data(),_v_15_1.size());
+    return std::move(_ans);
+}
+}/*namespace utility_cpp14*/
+/******************************************************************/
+
+/* &a=b */
+template<typename ..._T_>
+string cat_to_url(const _T_&...arg) {
+    return utility_cpp14::__cat_to_url(make_string_ref(arg)...);
 }
 
 }/*namespace*/
@@ -91,7 +1225,7 @@ void BaiDuUser::open(const QString&arg) {
 }
 
 void BaiDuUser::close() {
-    zone_this_data(this);
+    zone_this_data(this); 
     varThisData->_m_BaiDuUserCache.write();
     varThisData->_m_BaiDuUserCache={};
 }
@@ -159,6 +1293,8 @@ public:
     bool logInFinishedCalled=false;
 
     void getBaiduToken() {
+
+        loginStep=s_get_baidu_token;
 
         auto varBaiDuUser=baiDuUser.lock();
         if (false==varBaiDuUser) { return; }
