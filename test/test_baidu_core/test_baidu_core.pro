@@ -5,6 +5,8 @@ QT += network
 QT += concurrent
 CONFIG   += crypto # qca if you have it
 
+QT += widgets
+
 TARGET = test_baidu_core
 TEMPLATE = app
 

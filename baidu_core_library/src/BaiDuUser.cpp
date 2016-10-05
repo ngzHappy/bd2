@@ -239,12 +239,14 @@ public:
         
         QUrl varUrl;
         {/*set url*/
+            const auto tt=BaiDuUser::currentTime();
+            const auto gid=varBaiDuUser->gid();
             const auto url_=cat_to_url(
                 "tpl","mn",
                 "apiver","v3",
-                "tt",BaiDuUser::currentTime(),
+                "tt",tt,
                 "class","login",
-                "gid",varBaiDuUser->gid(),
+                "gid",gid,
                 "logintype","dialogLogin",
                 "callback","bd__cbs__89tioq"
             );
