@@ -40,7 +40,7 @@ class StringRef<QByteArray> {
 public:
     constexpr StringRef(const QByteArray&arg):_m_Data(arg) {}
     const char *data() const { return _m_Data.data(); }
-    int size() { return _m_Data.size(); }
+    int size() const { return _m_Data.size(); }
 };
 
 template<>
@@ -1291,17 +1291,88 @@ public:
     QString errorString{ "unknow error"_qsl };
     bool logInFinishedCalled=false;
 
+    class StaticData_getBaiduToken {
+    public:
+        const QByteArray url;
+        const QByteArray userAgent;
+        const QString zero;
+        StaticData_getBaiduToken() 
+            :url(u8R"(https://passport.baidu.com/v2/api/?getapi)"_qb)
+            ,userAgent("User-Agent"_qb)
+            ,zero("0"_qsl){}
+    };
+    static char _psd_getBaiduToken[sizeof(StaticData_getBaiduToken)];
     void getBaiduToken() {
 
         loginStep=s_get_baidu_token;
+
+        /*静态数据*/
+        static memory::StaticPoionter<StaticData_getBaiduToken> 
+            _psd_(_psd_getBaiduToken);
 
         auto varBaiDuUser=baiDuUser.lock();
         if (false==varBaiDuUser) { return; }
 
         zone_this_data(varBaiDuUser.get());
+        
+        QUrl varUrl;
+        {/*set url*/
+            const auto url_=cat_to_url(
+                "tpl","mn",
+                "apiver","v3",
+                "tt",BaiDuUser::currentTime(),
+                "class","login",
+                "gid",varBaiDuUser->gid(),
+                "logintype","dialogLogin",
+                "callback","bd__cbs__89tioq"
+            );
+            QByteArray varTmpUrl;
+            varTmpUrl.reserve(4
+                +_psd_->url.size()
+                +static_cast<int>(url_.size()));
+            varTmpUrl.append(_psd_->url);
+            varTmpUrl.append(url_.c_str(),static_cast<int>(url_.size()));
+            varUrl.setUrl(varTmpUrl);
+        }
 
-        /*varLockThis=this->shared_from_this(),*/
+        QNetworkRequest varRequest(varUrl);
+        varRequest.setRawHeader(_psd_->userAgent,BaiDuUser::userAgent());
+        
+        auto varReply=varThisData->_m_NetworkAccessManager.get(varRequest);
+        varReply->connect(varReply,&QNetworkReply::finished,
+            [varLockThis=this->shared_from_this(),varReply,this]() {
 
+                {
+                    varReply->deleteLater();
+                    auto varBaiDuUser=baiDuUser.lock();
+                    if (false==varBaiDuUser) { return; }
+
+                    auto json=varReply->readAll();
+                    varReply->close();
+
+                    /*remove ()*/
+                    json=json.mid(json.indexOf("("_qsl)+1);
+                    json.resize(json.size()-1);
+
+                    /*读取error 和 token*/
+                    QScriptEngine eng;
+                    eng.evaluate("var bd__cbs__89tioq = "_qsl+json);
+                    auto error=eng.evaluate(u8R"(bd__cbs__89tioq["errInfo"]["no"])"_qsl).toString();
+                    auto token=eng.evaluate(u8R"(bd__cbs__89tioq["data"]["token"])"_qsl).toString();
+
+                    if (error==_psd_->zero) {
+
+                    }
+                    else {
+                        loginStepNext=s_error;
+                        errorString="can not find token"_qsl;
+                    }
+
+                }
+                
+                this->next_step();
+
+        });
     }
 
     void next_step() {
@@ -1408,6 +1479,7 @@ private:
 };
 
 char Login::_psd_getBaiDuCookie[sizeof(StaticData_getBaiDuCookie)];
+char Login::_psd_getBaiduToken[sizeof(StaticData_getBaiduToken)];
 
 }/*namespace*/
 }/*namespace __login*/
