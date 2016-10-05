@@ -2,7 +2,7 @@
 #define LUA_LIB
 #endif
 
-#include "../../memory/MemoryLibrary.hpp"
+#include "../../class/class.hpp"
 #include "print_table.hpp"
 #include "default_error_function.hpp"
 #include "3rd/double-conversion/include/double-conversion/double-conversion.h"
