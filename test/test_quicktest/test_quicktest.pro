@@ -13,15 +13,18 @@ SOURCES += main.cpp\
     TestCompiler.cpp \
     TestNetWork.cpp \
     NetworkAccessManager.cpp \
-    TestGzip.cpp
+    TestGzip.cpp \
+    TestGumbo.cpp
 
 HEADERS  += MainWindow.hpp \
     TestStaticPointer.hpp \
     TestCompiler.hpp \
     TestNetWork.hpp \
     NetworkAccessManager.hpp \
-    TestGzip.hpp
+    TestGzip.hpp \
+    TestGumbo.hpp
 
+DEFINES*=THIS_PROJECT_SOURCE_DIR=\\\"$$PWD\\\"
 
 include($$PWD/../../BaiduTieBaBase.pri)
 DESTDIR=$$THIS_PROJECT_DESTDIR

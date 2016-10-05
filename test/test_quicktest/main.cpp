@@ -6,6 +6,7 @@
 #include "TestCompiler.hpp"
 #include "TestNetWork.hpp"
 #include "TestGzip.hpp"
+#include "TestGumbo.hpp"
 
 class Application
         :public QApplication,memory::Application{
@@ -17,6 +18,7 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
+    TestGumbo test_gumbo;
     TestGzip test_gzip;
     TestStaticPointer static_pointer_test;
     TestCompiler testCompiler;

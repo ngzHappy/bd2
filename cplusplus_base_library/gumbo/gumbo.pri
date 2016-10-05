@@ -16,7 +16,8 @@ HEADERS += \
     $$PWD/tokenizer_states.h \
     $$PWD/utf8.h \
     $$PWD/util.h \
-    $$PWD/vector.h
+    $$PWD/vector.h \
+    $$PWD/cplusplus/gumbo.hpp
 
 SOURCES += \
     $$PWD/attribute.c \
@@ -29,4 +30,6 @@ SOURCES += \
     $$PWD/tokenizer.c \
     $$PWD/utf8.c \
     $$PWD/util.c \
-    $$PWD/vector.c
+    $$PWD/vector.c \
+    $$PWD/cplusplus/gumbo_memory.cpp \
+    $$PWD/cplusplus/gumbo.cpp
