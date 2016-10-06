@@ -460,9 +460,19 @@ public:
                                 +varAns->VertifyCodeID;
                             if (std::regex_search(varJS.c_str(),varJS.c_str()+varJS.size(),
                                 code_string,varPSD->vcodetype_regex)) {
-                                varAns->vcodetype=QByteArray(code_string[1].first,
-                                    static_cast<int>(code_string[1].length()))
+                                auto varTmp=QByteArray(code_string[1].first,
+                                    static_cast<int>(code_string[1].length()));
+#ifndef NDEBUG
+                                QScriptEngine test_eng;
+                                auto check_test=test_eng.evaluate(u8R"(")" +varTmp+ u8R"(")").toString();
+#endif
+
+                                varAns->vcodetype=varTmp.replace(u8R"(\/)",2,u8R"(/)",1)
                                     .toPercentEncoding();
+#ifndef NDEBUG
+                                assert(check_test.toUtf8().toPercentEncoding()
+                                    ==varAns->vcodetype);
+#endif
                             }
                             varAns->errorString=u8"请输入验证码"_qutf8;
                             return;
