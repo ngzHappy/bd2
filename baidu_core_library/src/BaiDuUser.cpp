@@ -11,7 +11,9 @@
 #include <regex>
 #include <ctime>
 #include <string>
+#include <thread>
 #include <cstdlib>
+#include <chrono>
 
 namespace baidu {
 
@@ -32,11 +34,25 @@ namespace __baidu {
 
 class Static_init_on_qcoreapplication_create {
     QCA::Initializer _qca_init;
-    QImage _image_init_;
+
+    class Image final:public QImage{
+    public:
+        using QImage::QImage;
+    private:
+        CPLUSPLUS_CLASS_META
+    };
+
 public:
-    Static_init_on_qcoreapplication_create():
-        _image_init_(QString("____________________________.png"_qsl)) {
+    Static_init_on_qcoreapplication_create(){
         std::srand(int(std::time(nullptr)));
+        /*异步加载QImage插件,因为加载QImage插件非常耗费时间*/
+        std::thread([]() {
+            using namespace std::chrono_literals;
+            std::this_thread::sleep_for(50ms);
+            auto * _tmp_=new Image(QString(
+                "____________________________.png"_qsl));
+            delete _tmp_;
+        }).detach();
     }
     ~Static_init_on_qcoreapplication_create() {}
 };
@@ -227,7 +243,8 @@ public:
 
     enum LogInSteps :int {
         s_error,
-        s_start,s_getbaidu_cookie=s_start,
+        s_getbaidu_cookie,
+        s_getlogin_cookie,
         s_get_baidu_token,
         s_get_RSAKey,
         s_encryptRSA,
@@ -238,7 +255,8 @@ public:
     static QString step_to_string(LogInSteps arg) {
         switch (arg) {
             case s_error:return "error"_qsl; break;
-            case s_start:return "get baidu cookie"_qsl; break;
+            case s_getbaidu_cookie:return"get baidu cookie"_qsl; break;
+            case s_getlogin_cookie:return"get login cookie"_qsl; break;
             case s_get_baidu_token:return "getBaiduToken"_qsl; break;
             case s_get_RSAKey:return "getRSAKey"_qsl; break;
             case s_encryptRSA:return "encryptRSA"_qsl; break;
@@ -249,14 +267,15 @@ public:
         return "unknow step"_qsl;
     }
 
-    LogInSteps loginStep=s_start;
-    LogInSteps loginStepNext=s_start;
+    LogInSteps loginStep=s_getbaidu_cookie;
+    LogInSteps loginStepNext=s_getbaidu_cookie;
     QString errorString{ "unknow error"_qsl };
     bool logInFinishedCalled=false;
     QByteArray baiduTooken;
     QByteArray rasKey/*key id*/;
-    QByteArray publicKey;
-    QByteArray passWord;
+    QByteArray publicKey/*rsa public key*/;
+    QByteArray passWord/*加密后的密码*/;
+
 
     void postLogin() {
 
@@ -313,7 +332,7 @@ public:
 
     }
 
-    class StaticData_getRSAKey {
+    class StaticData_getRSAKey final{
     public:
         const QByteArray url;
         const QByteArray keyUserAgent;
@@ -548,7 +567,8 @@ public:
     void do_next_step() {
         switch (loginStepNext) {
             case s_error:login_error(); break;
-            case s_start:getBaiDuCookie(); break;
+            case s_getbaidu_cookie:getBaiDuCookie(); break;
+            case s_getlogin_cookie:break;
             case s_get_baidu_token:getBaiduToken(); break;
             case s_get_RSAKey:getRSAKey(); break;
             case s_encryptRSA:encryptRSA(); break;
@@ -583,21 +603,21 @@ public:
         varBaiDuUser->loginFinished(true,{});
     }
 
-    class StaticData_getBaiDuCookie {
+    class StaticData_getLoginCookie {
     public:
         QUrl baidu_url;
         QByteArray key_user_agent;
-        StaticData_getBaiDuCookie():
+        StaticData_getLoginCookie():
             baidu_url(QString("https://www.baidu.com/cache/user/html/login-1.2.html")),
             key_user_agent("User-Agent"_qb) {
         }
     };
-    static char _psd_getBaiDuCookie[sizeof(StaticData_getBaiDuCookie)];
-    void getBaiDuCookie() {
-        static memory::StaticPoionter<StaticData_getBaiDuCookie> varStaticData{
-            _psd_getBaiDuCookie };
+    static char _psd_getLoginCookie[sizeof(StaticData_getLoginCookie)];
+    void getLoginCookie() {
+        static memory::StaticPoionter<StaticData_getLoginCookie> varStaticData{
+            _psd_getLoginCookie };
 
-        loginStep=s_start;
+        loginStep=s_getlogin_cookie;
 
         /*初始化请求*/
         QNetworkRequest varRequest;
@@ -641,6 +661,64 @@ public:
 
     }
 
+    class StaticData_getBaiDuCookie {
+    public:
+        QUrl baidu_url;
+        QByteArray key_user_agent;
+        StaticData_getBaiDuCookie():
+            baidu_url(QString("http://www.baidu.com"_qsl)),
+            key_user_agent("User-Agent"_qb) {
+        }
+    };
+    static char _psd_getBaiDuCookie[sizeof(StaticData_getBaiDuCookie)];
+    void getBaiDuCookie() {
+        static memory::StaticPoionter<StaticData_getBaiDuCookie> varStaticData{
+            _psd_getBaiDuCookie };
+
+        loginStep=s_getbaidu_cookie;
+
+        /*初始化请求*/
+        QNetworkRequest varRequest;
+        varRequest.setUrl(varStaticData->baidu_url);
+        varRequest.setRawHeader(varStaticData->key_user_agent,BaiDuUser::userAgent());
+
+        /*获得baidu user*/
+        auto varBaiDuUser=baiDuUser.lock();
+        if (false==varBaiDuUser) { return; }
+
+        /*获得networkaccessmanager*/
+        auto varNAM=varBaiDuUser->getNetworkAccessManager();
+
+        /*获得reply*/
+        auto varReply=varNAM->get(varRequest);
+
+        /*cookie 已经写入 cookiejar*/
+        varReply->connect(varReply,&QNetworkReply::finished,
+            [varLockThis=this->shared_from_this(),varReply,this]() {
+
+                {
+                    /*这些数据无用*/
+                    varReply->close();
+                    varReply->deleteLater();
+
+                    auto varBaiDuUser=baiDuUser.lock();
+                    if (false==varBaiDuUser) { return; }
+
+                    if (varReply->error()!=QNetworkReply::NoError) {
+                        loginStepNext=s_error;
+                        errorString=varReply->errorString();
+                    }
+                    else {
+                        loginStepNext=s_getlogin_cookie;
+                    }
+                }
+
+                next_step();
+
+        });
+
+    }
+
     ~Login() {
         if (false==logInFinishedCalled) {
             logInFinishedCalled=true;
@@ -654,7 +732,7 @@ private:
 char Login::_psd_getBaiDuCookie[sizeof(StaticData_getBaiDuCookie)];
 char Login::_psd_getBaiduToken[sizeof(StaticData_getBaiduToken)];
 char Login::_psd_getRSAKey[sizeof(StaticData_getRSAKey)];
-
+char Login::_psd_getLoginCookie[sizeof(StaticData_getLoginCookie)];
 }/*namespace*/
 }/*namespace __login*/
 
