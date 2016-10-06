@@ -11,6 +11,7 @@
 #include <QtNetwork>
 #include <regex>
 #include <ctime>
+#include <map>
 #include <string>
 #include <thread>
 #include <cstdlib>
@@ -24,6 +25,10 @@ using string=std::basic_string<char,std::char_traits<char>,memory::Allocator<cha
 
 inline Q_DECL_CONSTEXPR QLatin1Literal operator""_qsl(const char *arg,std::size_t n) {
     return QLatin1Literal(arg,int(n));
+}
+
+inline auto operator""_qutf8(const char *arg,std::size_t n) {
+    return QString::fromUtf8(arg,n);
 }
 
 inline QByteArray operator""_qb(const char *arg,std::size_t n) {
@@ -302,17 +307,45 @@ public:
     class StaticData_postLogin final {
     public:
         const QUrl url;
-        const QByteArray key_Accept{"Accept"_qb};
-        const QByteArray value_Accept{"text/html, application/xhtml+xml, */*"_qb};
-        const QByteArray key_Referer{"Referer"_qb};
-        const QByteArray value_Referer{"https://www.baidu.com/"_qb};
-        const QByteArray key_Accept_Language{"Accept-Language"_qb};
-        const QByteArray value_Accept_Language{"zh-CN"_qb};
-        const QByteArray key_User_Agent{"User-Agent"_qb};
-        const QByteArray key_Content_Type{"Content-Type"_qb};
-        const QByteArray value_Content_Type{"application/x-www-form-urlencoded"_qb};
-        const QByteArray key_Accept_Encoding{"Accept-Encoding"_qb};
-        const QByteArray value_Accept_Encoding{"gzip, deflate"_qb};
+        const QByteArray key_Accept{ "Accept"_qb };
+        const QByteArray value_Accept{ "text/html, application/xhtml+xml, */*"_qb };
+        const QByteArray key_Referer{ "Referer"_qb };
+        const QByteArray value_Referer{ "https://www.baidu.com/"_qb };
+        const QByteArray key_Accept_Language{ "Accept-Language"_qb };
+        const QByteArray value_Accept_Language{ "zh-CN"_qb };
+        const QByteArray key_User_Agent{ "User-Agent"_qb };
+        const QByteArray key_Content_Type{ "Content-Type"_qb };
+        const QByteArray value_Content_Type{ "application/x-www-form-urlencoded"_qb };
+        const QByteArray key_Accept_Encoding{ "Accept-Encoding"_qb };
+        const QByteArray value_Accept_Encoding{ "gzip, deflate"_qb };
+        const std::map<int,QString,std::less<>,memory::Allocator<int>> error_code=[]() {
+            std::map<int,QString,std::less<>,memory::Allocator<int>> ans{
+                { -1	    ,u8"系统错误,请您稍后再试"_qutf8 }	,
+                { 1	        ,u8"您输入的帐号格式不正确"_qutf8 }	,
+                { 2	        ,u8"您输入的帐号不存在"_qutf8 }	,
+                { 3	        ,u8"验证码不存在或已过期,请重新输入"_qutf8 }	,
+                { 4	        ,u8"您输入的帐号或密码有误"_qutf8 }	,
+                { 5	        ,u8"请在弹出的窗口操作,或重新登录"_qutf8 }	,
+                { 6	        ,u8"您输入的验证码有误"_qutf8 }	,
+                { 7	        ,u8"密码错误"_qutf8 }	,
+                { 16	    ,u8"您的帐号因安全问题已被限制登录"_qutf8 }	,
+                { 257	    ,u8"请输入验证码"_qutf8 }	,
+                { 100027	,u8"百度正在进行系统升级，暂时不能提供服务，敬请谅解"_qutf8 }	,
+                { 400031	,u8"请在弹出的窗口操作,或重新登录"_qutf8 }	,
+                { 401007	,u8"您的手机号关联了其他帐号，请选择登录"_qutf8 }	,
+                { 120021	,u8"登录失败,请在弹出的窗口操作,或重新登录"_qutf8 }	,
+                { 500010	,u8"登录过于频繁,请24小时后再试"_qutf8 }	,
+                { 200010	,u8"验证码不存在或已过期"_qutf8 }	,
+                { 100005	,u8"系统错误,请您稍后再试"_qutf8 }	,
+                { 120019	,u8"请在弹出的窗口操作,或重新登录"_qutf8 }	,
+                { 110024	,u8"此帐号暂未激活"_qutf8 }	,
+                { 100023	,u8"开启Cookie之后才能登录"_qutf8 }	,
+                { 17	    ,u8"您的帐号已锁定"_qutf8 },
+                { 500002    ,u8"您输入的验证码有误"_qutf8},
+                { 500018    ,u8"验证码已失效，请重试"_qutf8}
+            };
+            return ans;
+        }();
     public:
         StaticData_postLogin()
             :url("https://passport.baidu.com/v2/api/?login"_qsl) {}
@@ -443,8 +476,11 @@ public:
                         }
 
                         const auto &varJS=*varTmpJson.begin();
+                        json=QByteArray{ varJS.c_str(),static_cast<int>(varJS.size()) };
 
-                    }           
+                        qDebug()<<json;
+
+                    }
 
                 } while (false);
                 this->next_step();
