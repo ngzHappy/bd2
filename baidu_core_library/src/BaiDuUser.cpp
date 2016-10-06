@@ -35,7 +35,7 @@ namespace __baidu {
 class Static_init_on_qcoreapplication_create {
     QCA::Initializer _qca_init;
 
-    class Image final:public QImage{
+    class Image final :public QImage {
     public:
         using QImage::QImage;
     private:
@@ -43,15 +43,23 @@ class Static_init_on_qcoreapplication_create {
     };
 
 public:
-    Static_init_on_qcoreapplication_create(){
+    Static_init_on_qcoreapplication_create() {
         std::srand(int(std::time(nullptr)));
         /*异步加载QImage插件,因为加载QImage插件非常耗费时间*/
+        /*异步加载QScriptEngine,因为QScriptEngine第一次初始化非常耗时*/
         std::thread([]() {
-            using namespace std::chrono_literals;
-            std::this_thread::sleep_for(50ms);
-            auto * _tmp_=new Image(QString(
-                "____________________________.png"_qsl));
-            delete _tmp_;
+            {/*wait a time*/
+                using namespace std::chrono_literals;
+                std::this_thread::sleep_for(50ms);
+            }
+            {/*load qimage plugin*/
+                auto * _tmp_=new Image(QString(
+                    "____________________________.png"_qsl));
+                delete _tmp_;
+            }
+            {/*load js engine*/
+                QScriptEngine _0_eng;
+            }
         }).detach();
     }
     ~Static_init_on_qcoreapplication_create() {}
@@ -292,23 +300,107 @@ public:
 
     class StaticData_postLogin final {
     public:
+        const QUrl url;
+    public:
+        StaticData_postLogin()
+            :url("https://passport.baidu.com/v2/api/?login"_qsl) {}
     };
     static char _psd_postLogin[sizeof(StaticData_postLogin)];
     void postLogin() {
+
+        const static constexpr char staticPage[]={ "https%3A%2F%2Fwww.baidu.com%2Fcache%2Fuser%2Fhtml%2Fv3Jump.html" };
+        const static constexpr char u[]={ "https%3A%2F%2Fwww.baidu.com%2F" };
+        const static constexpr char splogin[]={ "rate" };
+        const static constexpr char logLoginType[]={ "pc_loginDialog" };
+        const static constexpr char safeflg[]={ "0" };
+        const static constexpr char detect[]={ "1" };
+        const static constexpr char quick_user[]={ "0" };
+        const static constexpr char memberPass[]={ "on" };
+        const static constexpr char loginType[]={ "dialogLogin" };
+        const static constexpr char loginmerge[]={ "true" };
+
         static memory::StaticPoionter<StaticData_postLogin>
-            varPsd{_psd_postLogin};
+            varPsd{ _psd_postLogin };
 
         loginStep=s_postLogin;
         loginStepNext=s_error;
 
         auto varBaiDuUser=baiDuUser.lock();
         if (false==varBaiDuUser) { return; }
-
+        
         do {
+            QByteArray varPostData;
+            {
+                /*当前时间戳*/
+                const auto tt=BaiDuUser::currentTime();
+                /*用户名*/
+                const QByteArray varUserName=varBaiDuUser
+                    ->getUsername()
+                    .toUtf8()
+                    .toPercentEncoding();
+                /*一个随机数*/
+                const auto ppui_logintime=
+                    QByteArray::number(9900+(std::rand()&511));
+                /*构建临时对象缓存数据*/
+                const auto varTmpPostData=cat_to_url(
+                    "staticpage",staticPage,
+                    "charset","utf-8",
+                    "token",this->baiduTooken,
+                    "tpl","mn",
+                    "subpro","",
+                    "apiver","v3",
+                    "tt",tt,
+                    "codestring",""/*验证码id*/,
+                    "safeflg",safeflg,
+                    "u",u,
+                    "isPhone","false",
+                    "detect",detect,
+                    "gid",varBaiDuUser->gid(),
+                    "quick_user",quick_user,
+                    "logintype",loginType,
+                    "logLoginType",logLoginType,
+                    "idc","",
+                    "loginmerge",loginmerge,
+                    "splogin",splogin,
+                    "username",varUserName,
+                    "password",this->passWord,
+                    "verifycode",""/*验证码*/,
+                    "mem_pass",memberPass,
+                    "rsakey",this->rasKey,
+                    "crypttype","12",
+                    "ppui_logintime",ppui_logintime,
+                    "countrycode","",
+                    "callback","parent.bd__pcbs__s09032"
+                );
 
-        } while (false);
+                auto varPostSize=static_cast<int>(varTmpPostData.size())-1;
+                varPostData.reserve(varPostSize+4);
+                /*去掉第一个&*/
+                varPostData.append(varTmpPostData.data()+1,
+                    varPostSize);
+            }
 
-        this->next_step();
+            QNetworkRequest req(varPsd->url);
+            req.setRawHeader("Accept","text/html, application/xhtml+xml, */*");
+            req.setRawHeader("Referer","https://www.baidu.com/");
+            req.setRawHeader("Accept-Language","zh-CN");
+            req.setRawHeader("User-Agent",BaiDuUser::userAgent());
+            req.setRawHeader("Content-Type","application/x-www-form-urlencoded");
+            req.setRawHeader("Accept-Encoding","gzip, deflate");
+
+            zone_this_data(varBaiDuUser.get());
+            auto manager=&(varThisData->_m_NetworkAccessManager);
+
+            /*post data*/
+            auto replyNext=manager->post(req,varPostData);
+
+            replyNext->connect(replyNext,&QNetworkReply::finished,
+                [varLockThis=this->shared_from_this(),
+                varReply=replyNext,this]() {
+                this->next_step();
+            });
+
+        } while (false);    
 
     }
 
@@ -363,7 +455,7 @@ public:
 
     }
 
-    class StaticData_getRSAKey final{
+    class StaticData_getRSAKey final {
     public:
         const QByteArray url;
         const QByteArray keyUserAgent;
@@ -571,12 +663,13 @@ public:
         });
     }
 
-    class NextStepEvent final:public QEvent{
+    class NextStepEvent final :public QEvent {
         std::shared_ptr<Login> _m_Login;
     public:
-        NextStepEvent(std::shared_ptr<Login>&&arg) :
+        NextStepEvent(std::shared_ptr<Login>&&arg):
             QEvent(QEvent::MaxUser),
-            _m_Login(std::move(arg)){}
+            _m_Login(std::move(arg)) {
+        }
         void next() { _m_Login->do_next_step(); }
     private:
         CPLUSPLUS_CLASS_META
@@ -592,7 +685,7 @@ public:
 
     void next_step() {
         QCoreApplication::postEvent(this,
-            new NextStepEvent{this->shared_from_this()});
+            new NextStepEvent{ this->shared_from_this() });
     }
 
     void next() override {
