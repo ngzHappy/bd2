@@ -354,9 +354,11 @@ public:
     QByteArray passWord/*加密后的密码*/;
     QByteArray _m_codestring/*验证码ID*/;
     QByteArray _m_vertifycode/*验证码内容*/;
+    QByteArray _m_vertifycodeurl/*验证码图像的url*/;
+    QByteArray _m_vcodetype/*vcodetype*/;
 
     virtual QByteArray getVertifyCodeUrl()const override {
-        return _m_vertifycode;
+        return _m_vertifycodeurl;
     }
 
     virtual void loginVertifyCode(const QString&arg) override {
@@ -372,6 +374,7 @@ public:
         const QUrl url;
         const std::regex error_no_regex{ u8R"r(err_no=([0-9]+))r" };
         const std::regex code_string_regex{ u8R"r(codeString=([^&]+))r" };
+        const std::regex vcodetype_regex{ u8R"r(vcodetype=([^&]+))r" };
         const QByteArray code_string_url{ "https://passport.baidu.com/cgi-bin/genimage?"_qb };
         const QByteArray key_Accept{ "Accept"_qb };
         const QByteArray value_Accept{ "text/html, application/xhtml+xml, */*"_qb };
@@ -424,6 +427,7 @@ public:
         QString errorString;
         QByteArray VertifyCodeID;
         QByteArray VertifyCodeUrl;
+        QByteArray vcodetype;
     };
     static void parserPostLoginJS(
         const gumbo::string&varJS,
@@ -450,6 +454,12 @@ public:
                                 static_cast<int>(code_string[1].length()));
                             varAns->VertifyCodeUrl=varPSD->code_string_url
                                 +varAns->VertifyCodeID;
+                            if (std::regex_search(varJS.c_str(),varJS.c_str()+varJS.size(),
+                                code_string,varPSD->vcodetype_regex)) {
+                                varAns->vcodetype=QByteArray(code_string[1].first,
+                                    static_cast<int>(code_string[1].length()))
+                                    .toPercentEncoding();
+                            }
                             varAns->errorString=u8"请输入验证码"_qutf8;
                             return;
                         }
@@ -619,8 +629,9 @@ public:
                             parserPostLoginJS(varJS,varPsd.pointer(),&varAns);
 
                             if (varAns.VertifyCodeUrl.isEmpty()==false) {
-                                this->_m_vertifycode=std::move(varAns.VertifyCodeUrl);
+                                this->_m_vertifycodeurl=std::move(varAns.VertifyCodeUrl);
                                 this->_m_codestring=std::move(varAns.VertifyCodeID);
+                                this->_m_vcodetype=std::move(varAns.vcodetype);
                                 this->loginStepNext=s_error;
                                 errorString=std::move(varAns.errorString);
                                 break;
@@ -1431,3 +1442,14 @@ QByteArray BaiDuUser::gid() {
 
 #undef zone_this_data
 
+/*
+TODO:更新验证码
+https://passport.baidu.com/v2/?reggetcodestr
+&token=7274a7d8dd4a4e775a3afa3eacfc5b02
+&tpl=tb
+&apiver=v3
+&tt=1475750266993
+&fr=login
+&vcodetype=4a3d7TKn4HQKOySv/GE3V7HE8Lfzk5yyZ3nb2lNOMXxmY207Gl35q7HmS1lgQcG7iSm+xzgYr6MJFSvd0LHqxLTgpMQ7ZSz8QqWZ
+&callback=bd__cbs__n59tlc
+*/
