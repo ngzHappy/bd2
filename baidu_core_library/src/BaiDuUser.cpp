@@ -17,7 +17,6 @@
 #include <cstdlib>
 #include <chrono>
 #ifndef NDEBUG
-#include <fstream>
 /*debug*/
 #include <cassert>
 #ifndef _debug_info_
@@ -349,7 +348,7 @@ public:
     LogInSteps loginStepNext=s_getbaidu_cookie;
     QString errorString{ "unknow error"_qsl };
     bool logInFinishedCalled=false;
-    QByteArray baiduTooken;
+    QByteArray baiduToken;
     QByteArray rasKey/*key id*/;
     QByteArray publicKey/*rsa public key*/;
     QByteArray passWord/*加密后的密码*/;
@@ -522,7 +521,7 @@ public:
                 const auto varTmpPostData=cat_to_url(
                     "staticpage",staticPage,
                     "charset","utf-8",
-                    "token",this->baiduTooken,
+                    "token",this->baiduToken,
                     "tpl","mn",
                     "subpro","",
                     "apiver","v3",
@@ -758,10 +757,10 @@ public:
             QByteArray varTmpUrl;
             varTmpUrl.reserve(4
                 +varPSD->url.size()
-                +this->baiduTooken.size()
+                +this->baiduToken.size()
                 +static_cast<int>(urlData.size()));
             varTmpUrl.append(varPSD->url);
-            varTmpUrl.append(this->baiduTooken);
+            varTmpUrl.append(this->baiduToken);
             varTmpUrl.append(urlData.c_str(),static_cast<int>(urlData.size()));
             varURL.setUrl(varTmpUrl);
         }
@@ -918,10 +917,10 @@ public:
 
                 if (error==_psd_->zero) {
                     loginStepNext=s_get_RSAKey;
-                    this->baiduTooken=token.toUtf8();
+                    this->baiduToken=token.toUtf8();
                     /*进一步检查token是否正确*/
-                    if (false==std::regex_match(this->baiduTooken.cbegin(),
-                        this->baiduTooken.cend(),
+                    if (false==std::regex_match(this->baiduToken.cbegin(),
+                        this->baiduToken.cend(),
                         _psd_->tokenCheck)) {
                         goto label_error;
                     }
@@ -1287,6 +1286,9 @@ public:
     }
 
     ~Login() {
+#ifndef NDEBUG
+        qDebug()<<"debug information"<<__func__<<"destoryed!";
+#endif
         if (false==logInFinishedCalled) {
             logInFinishedCalled=true;
             login_error();
