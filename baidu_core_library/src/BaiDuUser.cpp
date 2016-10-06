@@ -260,13 +260,13 @@ public:
 
     enum LogInSteps :int {
         s_error,
-        s_getbaidu_cookie/**/,
-        s_getlogin_cookie/**/,
-        s_get_baidu_token/**/,
-        s_get_RSAKey/**/,
-        s_encryptRSA/**/,
-        s_postLogin/**/,
-        s_finished,
+        s_getbaidu_cookie/*2*/,
+        s_getlogin_cookie/*2*/,
+        s_get_baidu_token/*2*/,
+        s_get_RSAKey/*2*/,
+        s_encryptRSA/*1*/,
+        s_postLogin/*2*/,
+        s_finished/**/,
         s_state_unknow,
         s_state_wait,
     };
@@ -332,7 +332,7 @@ public:
     }
 
     virtual void loginVertifyCode(const QString&arg) override {
-        this->loginStepNext=s_get_RSAKey;
+        this->loginStepNext=s_getbaidu_cookie;
         _m_vertifycode=arg
             .toUtf8()
             .toPercentEncoding();
@@ -586,7 +586,6 @@ public:
                             if (varAns.VertifyCodeUrl.isEmpty()==false) {
                                 this->_m_vertifycode=std::move(varAns.VertifyCodeUrl);
                                 this->_m_codestring=std::move(varAns.VertifyCodeID);
-                                varBaiDuUser->loginWithVertifyCode(varLockThis);
                                 this->loginStepNext=s_error;
                                 errorString=std::move(varAns.errorString);
                                 break;
@@ -934,6 +933,8 @@ public:
         auto varBaiDuUser=baiDuUser.lock();
         if (false==varBaiDuUser) { return; }
         auto var_step_name=step_to_string(loginStep);
+        zone_this_data(varBaiDuUser.get());
+        varThisData->setIsLoging(false);
         varBaiDuUser->loginFinished(false,
             "login error@"_qsl
             +std::move(var_step_name)
@@ -950,6 +951,8 @@ public:
         if (false==varBaiDuUser) { return; }
         varBaiDuUser->loginFinished(true,{});
         zone_this_data(varBaiDuUser.get());
+        varThisData->_m_IsLogin=true;
+        varThisData->setIsLoging(false);
         varThisData->_m_LoginWithVertifyCode.reset();
     }
 
@@ -1109,25 +1112,56 @@ char Login::_psd_postLogin[sizeof(StaticData_postLogin)];
 
 void BaiDuUser::login() {
     zone_this_data(this);
+
+    {/*if is logining*/
+        std::unique_lock<std::shared_timed_mutex>
+            _(varThisData->_m_mutex_is_loging);
+        if (varThisData->_m_is_loging) { return; }
+        varThisData->_m_is_loging=true;
+        varThisData->_m_IsLogin=false;
+    }
+
     {
         auto varLogin=memory::make_shared<__login::Login>();
         {/*init login data*/
             varLogin->baiDuUser=this->shared_from_this();
             varThisData->_m_GID=gid();
         }
-        varLogin->next_step();
         varThisData->_m_LoginWithVertifyCode=varLogin;
+        varLogin->next_step();
     }
+
 }
 
 void BaiDuUser::login(const QString&arg) {
     zone_this_data(this);
+
     if (varThisData->_m_LoginWithVertifyCode) {
+
+        {/*if is logining*/
+            std::unique_lock<std::shared_timed_mutex>
+                _(varThisData->_m_mutex_is_loging);
+            if (varThisData->_m_is_loging) { return; }
+            varThisData->_m_is_loging=true;
+            varThisData->_m_IsLogin=false;
+        }
+
         varThisData->_m_LoginWithVertifyCode->loginVertifyCode(arg);
     }
     else {
         login();
     }
+}
+
+bool BaiDuUser::isLogining()const {
+    zone_const_this_data(this);
+    return varThisData->isLoging();
+}
+
+QByteArray BaiDuUser::getVertifyCodeUrl()const {
+    zone_const_this_data(this);
+    if (varThisData->_m_LoginWithVertifyCode==false) { return{}; }
+    return varThisData->_m_LoginWithVertifyCode->getVertifyCodeUrl();
 }
 
 NetworkAccessManager * BaiDuUser::getNetworkAccessManager() const {

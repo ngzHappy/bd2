@@ -4,6 +4,7 @@
 
 #include <memory>
 #include <type_traits>
+#include <shared_mutex>
 #include <class/class.hpp>
 #include "../BaiDuUserCache.hpp"
 #include "../NetworkAccessManager.hpp"
@@ -24,6 +25,16 @@ public:
     bool _m_IsLogin=false;
     QByteArray _m_GID;
     std::shared_ptr<BaiDuUser::LoginWithVertifyCode> _m_LoginWithVertifyCode;
+    bool _m_is_loging=false;
+    mutable std::shared_timed_mutex _m_mutex_is_loging;
+    bool isLoging()const { 
+        std::shared_lock<std::shared_timed_mutex> _(_m_mutex_is_loging);
+        return _m_is_loging;
+    }
+    void setIsLoging(bool v) {
+        std::unique_lock<std::shared_timed_mutex> _(_m_mutex_is_loging);
+        _m_is_loging=v;
+    }
 private:
     CPLUSPLUS_CLASS_META
 };

@@ -17,25 +17,25 @@
 
 namespace baidu {
 
-namespace zone_data{
+namespace zone_data {
 class BaiDuUserData;
 }
 class BaiDuUser;
 
 template<typename _TYPE_TAG_,unsigned int _N_>
-auto getThisData(const BaiDuUser *)->_TYPE_TAG_ ;
+auto getThisData(const BaiDuUser *)->_TYPE_TAG_;
 
 class BAIDU_CORE_LIBRARYSHARED_EXPORT BaiDuUser
     :public QObject
-    ,public std::enable_shared_from_this<BaiDuUser>{
+    ,public std::enable_shared_from_this<BaiDuUser> {
     Q_OBJECT
 
 protected:
     using ThisDataType=std::shared_ptr<zone_data::BaiDuUserData>;
-    ThisDataType thisData_{nullptr};
+    ThisDataType thisData_{ nullptr };
     BaiDuUser(ThisDataType && _arg_);
     template<typename _TYPE_TAG_,unsigned int _N_>
-    friend auto getThisData(const BaiDuUser *)->_TYPE_TAG_ ;
+    friend auto getThisData(const BaiDuUser *)->_TYPE_TAG_;
     zone_data::BaiDuUserData * thisData();
     const zone_data::BaiDuUserData * thisData() const;
 public:
@@ -79,11 +79,12 @@ public:
     bool isLogin()const;
     void login()/**/;
     void login(const QString&);
+    QByteArray getVertifyCodeUrl()const;
+    bool isLogining()const;
 public:
     NetworkAccessManager * getNetworkAccessManager()const;
 public:
     Q_SIGNAL void loginFinished(bool,QString);
-    Q_SIGNAL void loginWithVertifyCode(std::shared_ptr<LoginWithVertifyCode>);
 public:
     void openUserName(const QString&argUserName) {
         this->open(BaiDuUserCache::userNameToFilePath(argUserName));
@@ -102,8 +103,7 @@ private:
 
 }/*namespace baidu*/
 
-Q_DECLARE_METATYPE(std::shared_ptr<baidu::BaiDuUser::StepNext>)
-Q_DECLARE_METATYPE(std::shared_ptr<baidu::BaiDuUser::LoginWithVertifyCode>)
+
 
 #endif
 
