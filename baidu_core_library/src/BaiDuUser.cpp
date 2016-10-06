@@ -17,7 +17,16 @@
 #include <cstdlib>
 #include <chrono>
 #ifndef NDEBUG
+/*debug*/
 #include <cassert>
+#ifndef _debug_info_
+#define _debug_info_ /**/,__LINE__,__FILE__,__func__/**/
+#endif
+
+#else
+#ifndef _debug_info_
+#define _debug_info_
+#endif
 #endif
 
 namespace baidu {
@@ -278,10 +287,21 @@ public:
         StateLock&operator=(const StateLock&)=delete;
         StateLock&operator=(StateLock&&)=delete;
         Login * _m_Login;
+        int _m_Line;
+        const char* _m_File;
+        const char* _m_FunctionName;
     public:
-        StateLock(Login*l):_m_Login(l) { l->loginStepNext=s_state_unknow; }
+        StateLock(Login*l,int a,const char*b,const char*c)
+            :_m_Login(l)
+            ,_m_Line(a)
+            ,_m_File(b)
+            ,_m_FunctionName(c){ l->loginStepNext=s_state_unknow; }
         ~StateLock() {
-            assert(_m_Login->loginStepNext!=s_state_unknow);
+            if (_m_Login->baiDuUser.lock()==false) { return; }
+            if (_m_Login->loginStepNext!=s_state_unknow) {
+                qDebug()<<_m_File<<_m_Line<<_m_FunctionName;
+                assert(false);
+            }
         }
     };
 #endif
@@ -447,9 +467,9 @@ public:
         } while (false);
 
     }
-    void postLogin() {
+    void postLogin() try {
 #ifndef NDEBUG
-        StateLock _lock_{ this };
+        StateLock _lock_{ this _debug_info_ };
 #endif
         const static constexpr char staticPage[]={ "https%3A%2F%2Fwww.baidu.com%2Fcache%2Fuser%2Fhtml%2Fv3Jump.html" };
         const static constexpr char u[]={ "https%3A%2F%2Fwww.baidu.com%2F" };
@@ -542,7 +562,7 @@ public:
 
                 varReply->deleteLater();
 #ifndef NDEBUG
-                StateLock _lock_{ this };
+                StateLock _lock_{ this _debug_info_ };
 #endif
 
                 try {
@@ -599,7 +619,7 @@ public:
                             }
 
                             {/*登录成功*/
-
+                                this->loginStepNext=s_finished;
                             }
 
                         }
@@ -619,10 +639,13 @@ public:
         } while (false);
 
     }
+    catch (...) {
+        login_error();
+    }
 
-    void encryptRSA() {
+    void encryptRSA() try {
 #ifndef NDEBUG
-        StateLock _lock_{ this };
+        StateLock _lock_{ this _debug_info_ };
 #endif
         loginStep=s_encryptRSA;
 
@@ -671,6 +694,9 @@ public:
 
         this->next_step();
     }
+    catch (...) {
+        login_error();
+    }
 
     class StaticData_getRSAKey final {
     public:
@@ -688,9 +714,9 @@ public:
         }
     };
     static char _psd_getRSAKey[sizeof(StaticData_getRSAKey)];
-    void getRSAKey() {
+    void getRSAKey() try {
 #ifndef NDEBUG
-        StateLock _lock_{ this };
+        StateLock _lock_{ this _debug_info_ };
 #endif
         loginStep=s_get_RSAKey;
         static memory::StaticPoionter<StaticData_getRSAKey> varPSD(_psd_getRSAKey);
@@ -733,7 +759,7 @@ public:
         varReply->connect(varReply,&QNetworkReply::finished,
             [varLockThis=this->shared_from_this(),varReply,this]() {
 #ifndef NDEBUG
-            StateLock _lock_{ this };
+            StateLock _lock_{ this _debug_info_ };
 #endif
             try {
                 do {
@@ -789,6 +815,9 @@ public:
         });
         this->loginStepNext=s_state_wait;
     }
+    catch (...) {
+        login_error();
+    }
 
     class StaticData_getBaiduToken final {
     public:
@@ -804,9 +833,9 @@ public:
         }
     };
     static char _psd_getBaiduToken[sizeof(StaticData_getBaiduToken)];
-    void getBaiduToken() {
+    void getBaiduToken() try {
 #ifndef NDEBUG
-        StateLock _lock_{ this };
+        StateLock _lock_{ this _debug_info_ };
 #endif
         loginStep=s_get_baidu_token;
 
@@ -850,7 +879,7 @@ public:
         varReply->connect(varReply,&QNetworkReply::finished,
             [varLockThis=this->shared_from_this(),varReply,this]() {
 #ifndef NDEBUG
-            StateLock _lock_{ this };
+            StateLock _lock_{ this _debug_info_ };
 #endif
             try {
                 varReply->deleteLater();
@@ -897,6 +926,9 @@ public:
         });
 
         this->loginStepNext=s_state_wait;
+    }
+    catch (...) {
+        login_error();
     }
 
     class NextStepEvent final :public QEvent {
@@ -966,9 +998,9 @@ public:
         }
     };
     static char _psd_getLoginCookie[sizeof(StaticData_getLoginCookie)];
-    void getLoginCookie() {
+    void getLoginCookie() try {
 #ifndef NDEBUG
-        StateLock _lock_{ this };
+        StateLock _lock_{ this _debug_info_ };
 #endif
         static memory::StaticPoionter<StaticData_getLoginCookie> varStaticData{
             _psd_getLoginCookie };
@@ -995,7 +1027,7 @@ public:
             [varLockThis=this->shared_from_this(),varReply,this]() {
 
 #ifndef NDEBUG
-            StateLock _lock_{ this };
+            StateLock _lock_{ this _debug_info_ };
 #endif
 
             try {
@@ -1024,6 +1056,9 @@ public:
         });
         this->loginStepNext=s_state_wait;
     }
+    catch (...) {
+        login_error();
+    }
 
     class StaticData_getBaiDuCookie final {
     public:
@@ -1035,9 +1070,9 @@ public:
         }
     };
     static char _psd_getBaiDuCookie[sizeof(StaticData_getBaiDuCookie)];
-    void getBaiDuCookie() {
+    void getBaiDuCookie() try {
 #ifndef NDEBUG
-        StateLock _lock_{ this };
+        StateLock _lock_{ this _debug_info_ };
 #endif
         static memory::StaticPoionter<StaticData_getBaiDuCookie> varStaticData{
             _psd_getBaiDuCookie };
@@ -1063,7 +1098,7 @@ public:
         varReply->connect(varReply,&QNetworkReply::finished,
             [varLockThis=this->shared_from_this(),varReply,this]() {
 #ifndef NDEBUG
-            StateLock _lock_{ this };
+            StateLock _lock_{ this _debug_info_ };
 #endif
 
             try {
@@ -1090,6 +1125,9 @@ public:
 
         });
         this->loginStepNext=s_state_wait;
+    }
+    catch (...) {
+        login_error();
     }
 
     ~Login() {
