@@ -17,7 +17,7 @@
 #include <cstdlib>
 #include <chrono>
 #ifndef NDEBUG
-#include <fstream>
+#include <cassert>
 #endif
 
 namespace baidu {
@@ -266,8 +266,25 @@ public:
         s_get_RSAKey/**/,
         s_encryptRSA/**/,
         s_postLogin/**/,
-        s_finished
+        s_finished,
+        s_state_unknow,
+        s_state_wait,
     };
+
+#ifndef NDEBUG
+    class StateLock {
+        StateLock(const StateLock&)=delete;
+        StateLock(StateLock&&)=delete;
+        StateLock&operator=(const StateLock&)=delete;
+        StateLock&operator=(StateLock&&)=delete;
+        Login * _m_Login;
+    public:
+        StateLock(Login*l):_m_Login(l) { l->loginStepNext=s_state_unknow; }
+        ~StateLock() {
+            assert(_m_Login->loginStepNext!=s_state_unknow);
+        }
+    };
+#endif
 
     static QString step_to_string(LogInSteps arg) {
         switch (arg) {
@@ -286,15 +303,16 @@ public:
 
     void do_next_step() {
         switch (loginStepNext) {
-            case s_error:login_error(); break;
-            case s_getbaidu_cookie:getBaiDuCookie(); break;
-            case s_getlogin_cookie:getLoginCookie(); break;
-            case s_get_baidu_token:getBaiduToken(); break;
-            case s_get_RSAKey:getRSAKey(); break;
-            case s_encryptRSA:encryptRSA(); break;
-            case s_postLogin:postLogin(); break;
-            case s_finished:login_finished(); break;
+            case s_error:return login_error(); break;
+            case s_getbaidu_cookie:return getBaiDuCookie(); break;
+            case s_getlogin_cookie:return getLoginCookie(); break;
+            case s_get_baidu_token:return getBaiduToken(); break;
+            case s_get_RSAKey:return getRSAKey(); break;
+            case s_encryptRSA:return encryptRSA(); break;
+            case s_postLogin:return postLogin(); break;
+            case s_finished:return login_finished(); break;
         }
+        return login_error();
     }
 
     /*栈状态*/
@@ -430,7 +448,9 @@ public:
 
     }
     void postLogin() {
-
+#ifndef NDEBUG
+        StateLock _lock_{ this };
+#endif
         const static constexpr char staticPage[]={ "https%3A%2F%2Fwww.baidu.com%2Fcache%2Fuser%2Fhtml%2Fv3Jump.html" };
         const static constexpr char u[]={ "https%3A%2F%2Fwww.baidu.com%2F" };
         const static constexpr char splogin[]={ "rate" };
@@ -446,7 +466,6 @@ public:
             varPsd{ _psd_postLogin };
 
         loginStep=s_postLogin;
-        loginStepNext=s_error;
 
         auto varBaiDuUser=baiDuUser.lock();
         if (false==varBaiDuUser) { return; }
@@ -522,79 +541,91 @@ public:
                 varReply=replyNext,this]() {
 
                 varReply->deleteLater();
+#ifndef NDEBUG
+                StateLock _lock_{ this };
+#endif
 
-                auto varBaiDuUser=baiDuUser.lock();
-                if (false==varBaiDuUser) { return; }
+                try {
+                    auto varBaiDuUser=baiDuUser.lock();
+                    if (false==varBaiDuUser) { return; }
 
-                /*清除验证码*/
-                this->_m_vertifycode.clear();
+                    /*清除验证码*/
+                    this->_m_vertifycode.clear();
 
-                do {
+                    do {
 
-                    {
-                        auto varReplyData=varReply->readAll();
+                        {
+                            auto varReplyData=varReply->readAll();
 
-                        if (varReplyData.isEmpty()) {
-                            loginStepNext=s_error;
-                            break;
-                        }
-
-                        if (varReplyData[0]==char(0x001F)) {
-                            varReplyData=text::ungzip(varReplyData.cbegin(),varReplyData.cend());
                             if (varReplyData.isEmpty()) {
-                                errorString="unzip error"_qsl;
                                 loginStepNext=s_error;
                                 break;
                             }
-                        }
 
-                        auto varTmpJson=
-                            gumbo::getAllJavaScript(varReplyData.cbegin(),varReplyData.cend());
+                            if (varReplyData[0]==char(0x001F)) {
+                                varReplyData=text::ungzip(varReplyData.cbegin(),varReplyData.cend());
+                                if (varReplyData.isEmpty()) {
+                                    errorString="unzip error"_qsl;
+                                    loginStepNext=s_error;
+                                    break;
+                                }
+                            }
 
-                        if (varTmpJson.empty()) {
-                            errorString="can not find js"_qsl;
-                            break;
-                        }
+                            auto varTmpJson=
+                                gumbo::getAllJavaScript(varReplyData.cbegin(),varReplyData.cend());
 
-                        const auto &varJS=*varTmpJson.begin();
-                        PostLoginJSParserAns varAns;
-                        parserPostLoginJS(varJS,varPsd.pointer(),&varAns);
+                            if (varTmpJson.empty()) {
+                                errorString="can not find js"_qsl;
+                                break;
+                            }
 
-                        if (varAns.VertifyCodeUrl.isEmpty()==false) {
-                            this->_m_vertifycode=std::move(varAns.VertifyCodeUrl);
-                            this->_m_codestring=std::move(varAns.VertifyCodeID);
-                            varBaiDuUser->loginWithVertifyCode(varLockThis);
-                            this->loginStepNext=s_error;
-                            errorString=std::move(varAns.errorString);
-                            break;
-                        }
-                        else {
-                            if (varAns.isOk==false) {
+                            const auto &varJS=*varTmpJson.begin();
+                            PostLoginJSParserAns varAns;
+                            parserPostLoginJS(varJS,varPsd.pointer(),&varAns);
+
+                            if (varAns.VertifyCodeUrl.isEmpty()==false) {
+                                this->_m_vertifycode=std::move(varAns.VertifyCodeUrl);
+                                this->_m_codestring=std::move(varAns.VertifyCodeID);
+                                varBaiDuUser->loginWithVertifyCode(varLockThis);
                                 this->loginStepNext=s_error;
                                 errorString=std::move(varAns.errorString);
                                 break;
                             }
+                            else {
+                                if (varAns.isOk==false) {
+                                    this->loginStepNext=s_error;
+                                    errorString=std::move(varAns.errorString);
+                                    break;
+                                }
+                            }
+
+                            {/*登录成功*/
+
+                            }
+
                         }
 
-                        {/*登录成功*/
+                    } while (false);
 
-                        }
+                }
+                catch (...) {
+                    this->loginStepNext=s_error;
+                }
 
-                    }
-
-                } while (false);
                 this->next_step();
 
             });
 
+            this->loginStepNext=s_state_wait;
         } while (false);
 
     }
 
     void encryptRSA() {
-
+#ifndef NDEBUG
+        StateLock _lock_{ this };
+#endif
         loginStep=s_encryptRSA;
-        loginStepNext=s_postLogin;
 
         auto varBaiDuUser=baiDuUser.lock();
         if (false==varBaiDuUser) { return; }
@@ -630,6 +661,7 @@ public:
                     QByteArray result(result_.constData(),result_.size());
                     result=result.toBase64();
                     varAns=result.toPercentEncoding();
+                    loginStepNext=s_postLogin;
                 }
 
             }
@@ -639,7 +671,6 @@ public:
         } while (false);
 
         this->next_step();
-
     }
 
     class StaticData_getRSAKey final {
@@ -659,6 +690,9 @@ public:
     };
     static char _psd_getRSAKey[sizeof(StaticData_getRSAKey)];
     void getRSAKey() {
+#ifndef NDEBUG
+        StateLock _lock_{ this };
+#endif
         loginStep=s_get_RSAKey;
         static memory::StaticPoionter<StaticData_getRSAKey> varPSD(_psd_getRSAKey);
 
@@ -699,55 +733,62 @@ public:
 
         varReply->connect(varReply,&QNetworkReply::finished,
             [varLockThis=this->shared_from_this(),varReply,this]() {
-            this->loginStepNext=s_encryptRSA;
-            do {
-                varReply->deleteLater();
+#ifndef NDEBUG
+            StateLock _lock_{ this };
+#endif
+            try {
+                do {
+                    varReply->deleteLater();
 
-                auto varBaiDuUser=baiDuUser.lock();
-                if (false==varBaiDuUser) { return; }
+                    auto varBaiDuUser=baiDuUser.lock();
+                    if (false==varBaiDuUser) { return; }
 
-                {
-                    QString varPublicKey;
-                    auto json=varReply->readAll();
-                    varReply->close();
+                    {
+                        QString varPublicKey;
+                        auto json=varReply->readAll();
+                        varReply->close();
 
-                    if (json.isEmpty()) {
-                        this->loginStepNext=s_error;
-                        errorString="can not get json"_qsl;
-                        break;
+                        if (json.isEmpty()) {
+                            this->loginStepNext=s_error;
+                            errorString="can not get json"_qsl;
+                            break;
+                        }
+
+                        if (json[0]==char(0x001F)) {
+                            json=text::ungzip(json.cbegin(),json.cend());
+                        }
+
+                        /*去除括号*/
+                        json=json.mid(json.indexOf("(")+1);
+                        json.resize(json.size()-1);
+
+                        QScriptEngine eng;
+                        eng.evaluate("var bd__cbs__dmwxux = "_qsl+json);
+                        const auto error=eng.evaluate(u8R"(bd__cbs__dmwxux["errno"])"_qsl).toString();
+                        varPublicKey=eng.evaluate(u8R"(bd__cbs__dmwxux["pubkey"])"_qsl).toString();
+                        const auto key=eng.evaluate(u8R"(bd__cbs__dmwxux["key"])"_qsl).toString();
+
+                        if ((varPSD->zero!=error)||varPublicKey.isEmpty()||key.isEmpty()) {
+                            this->loginStepNext=s_error;
+                            errorString="can not get json  "_qsl+std::move(error);
+                            break;
+                        }
+
+                        this->rasKey=key.toUtf8();
+                        this->publicKey=varPublicKey.toUtf8();
+                        this->loginStepNext=s_encryptRSA;
                     }
 
-                    if (json[0]==char(0x001F)) {
-                        json=text::ungzip(json.cbegin(),json.cend());
-                    }
-
-                    /*去除括号*/
-                    json=json.mid(json.indexOf("(")+1);
-                    json.resize(json.size()-1);
-
-                    QScriptEngine eng;
-                    eng.evaluate("var bd__cbs__dmwxux = "_qsl+json);
-                    const auto error=eng.evaluate(u8R"(bd__cbs__dmwxux["errno"])"_qsl).toString();
-                    varPublicKey=eng.evaluate(u8R"(bd__cbs__dmwxux["pubkey"])"_qsl).toString();
-                    const auto key=eng.evaluate(u8R"(bd__cbs__dmwxux["key"])"_qsl).toString();
-
-                    if ((varPSD->zero!=error)||varPublicKey.isEmpty()||key.isEmpty()) {
-                        this->loginStepNext=s_error;
-                        errorString="can not get json  "_qsl+std::move(error);
-                        break;
-                    }
-
-                    this->rasKey=key.toUtf8();
-                    this->publicKey=varPublicKey.toUtf8();
-
-                }
-
-            } while (false);
+                } while (false);
+            }
+            catch (...) {
+                loginStepNext=s_error;
+            }
 
             this->next_step();
 
         });
-
+        this->loginStepNext=s_state_wait;
     }
 
     class StaticData_getBaiduToken final {
@@ -765,7 +806,9 @@ public:
     };
     static char _psd_getBaiduToken[sizeof(StaticData_getBaiduToken)];
     void getBaiduToken() {
-
+#ifndef NDEBUG
+        StateLock _lock_{ this };
+#endif
         loginStep=s_get_baidu_token;
 
         /*静态数据*/
@@ -807,47 +850,54 @@ public:
         auto varReply=varThisData->_m_NetworkAccessManager.get(varRequest);
         varReply->connect(varReply,&QNetworkReply::finished,
             [varLockThis=this->shared_from_this(),varReply,this]() {
+#ifndef NDEBUG
+            StateLock _lock_{ this };
+#endif
+            try {
+                varReply->deleteLater();
 
-                {
-                    varReply->deleteLater();
+                auto varBaiDuUser=baiDuUser.lock();
+                if (false==varBaiDuUser) { return; }
 
-                    auto varBaiDuUser=baiDuUser.lock();
-                    if (false==varBaiDuUser) { return; }
+                auto json=varReply->readAll();
+                varReply->close();
 
-                    auto json=varReply->readAll();
-                    varReply->close();
+                /*remove ()*/
+                json=json.mid(json.indexOf("("_qsl)+1);
+                json.resize(json.size()-1);
 
-                    /*remove ()*/
-                    json=json.mid(json.indexOf("("_qsl)+1);
-                    json.resize(json.size()-1);
+                /*读取error 和 token*/
+                QScriptEngine eng;
+                eng.evaluate("var bd__cbs__89tioq = "_qsl+json);
+                auto error=eng.evaluate(u8R"(bd__cbs__89tioq["errInfo"]["no"])"_qsl).toString();
+                auto token=eng.evaluate(u8R"(bd__cbs__89tioq["data"]["token"])"_qsl).toString();
 
-                    /*读取error 和 token*/
-                    QScriptEngine eng;
-                    eng.evaluate("var bd__cbs__89tioq = "_qsl+json);
-                    auto error=eng.evaluate(u8R"(bd__cbs__89tioq["errInfo"]["no"])"_qsl).toString();
-                    auto token=eng.evaluate(u8R"(bd__cbs__89tioq["data"]["token"])"_qsl).toString();
-
-                    if (error==_psd_->zero) {
-                        loginStepNext=s_get_RSAKey;
-                        this->baiduTooken=token.toUtf8();
-                        /*进一步检查token是否正确*/
-                        if (false==std::regex_match(this->baiduTooken.cbegin(),
-                            this->baiduTooken.cend(),
-                            _psd_->tokenCheck)) {
-                            goto label_error;
-                        }
+                if (error==_psd_->zero) {
+                    loginStepNext=s_get_RSAKey;
+                    this->baiduTooken=token.toUtf8();
+                    /*进一步检查token是否正确*/
+                    if (false==std::regex_match(this->baiduTooken.cbegin(),
+                        this->baiduTooken.cend(),
+                        _psd_->tokenCheck)) {
+                        goto label_error;
                     }
-                    else {
-                    label_error:
-                        loginStepNext=s_error;
-                        errorString="can not find baidu token : "_qsl+token;
-                    }
-
+                }
+                else {
+                label_error:
+                    loginStepNext=s_error;
+                    errorString="can not find baidu token : "_qsl+token;
                 }
 
-                this->next_step();
+            }
+            catch (...) {
+                loginStepNext=s_error;
+            }
+
+            this->next_step();
 
         });
+
+        this->loginStepNext=s_state_wait;
     }
 
     class NextStepEvent final :public QEvent {
@@ -881,9 +931,9 @@ public:
 
     void login_error() {
         logInFinishedCalled=true;
-        auto var_step_name=step_to_string(loginStep);
         auto varBaiDuUser=baiDuUser.lock();
         if (false==varBaiDuUser) { return; }
+        auto var_step_name=step_to_string(loginStep);
         varBaiDuUser->loginFinished(false,
             "login error@"_qsl
             +std::move(var_step_name)
@@ -914,6 +964,9 @@ public:
     };
     static char _psd_getLoginCookie[sizeof(StaticData_getLoginCookie)];
     void getLoginCookie() {
+#ifndef NDEBUG
+        StateLock _lock_{ this };
+#endif
         static memory::StaticPoionter<StaticData_getLoginCookie> varStaticData{
             _psd_getLoginCookie };
 
@@ -938,27 +991,35 @@ public:
         varReply->connect(varReply,&QNetworkReply::finished,
             [varLockThis=this->shared_from_this(),varReply,this]() {
 
-                {
-                    /*这些数据无用*/
-                    varReply->close();
-                    varReply->deleteLater();
+#ifndef NDEBUG
+            StateLock _lock_{ this };
+#endif
 
-                    auto varBaiDuUser=baiDuUser.lock();
-                    if (false==varBaiDuUser) { return; }
+            try {
+                /*这些数据无用*/
+                varReply->close();
+                varReply->deleteLater();
 
-                    if (varReply->error()!=QNetworkReply::NoError) {
-                        loginStepNext=s_error;
-                        errorString=varReply->errorString();
-                    }
-                    else {
-                        loginStepNext=s_get_baidu_token;
-                    }
+                auto varBaiDuUser=baiDuUser.lock();
+                if (false==varBaiDuUser) { return; }
+
+                if (varReply->error()!=QNetworkReply::NoError) {
+                    loginStepNext=s_error;
+                    errorString=varReply->errorString();
+                }
+                else {
+                    loginStepNext=s_get_baidu_token;
                 }
 
-                next_step();
+            }
+            catch (...) {
+                loginStepNext=s_error;
+            }
+
+            next_step();
 
         });
-
+        this->loginStepNext=s_state_wait;
     }
 
     class StaticData_getBaiDuCookie final {
@@ -972,6 +1033,9 @@ public:
     };
     static char _psd_getBaiDuCookie[sizeof(StaticData_getBaiDuCookie)];
     void getBaiDuCookie() {
+#ifndef NDEBUG
+        StateLock _lock_{ this };
+#endif
         static memory::StaticPoionter<StaticData_getBaiDuCookie> varStaticData{
             _psd_getBaiDuCookie };
 
@@ -995,28 +1059,34 @@ public:
         /*cookie 已经写入 cookiejar*/
         varReply->connect(varReply,&QNetworkReply::finished,
             [varLockThis=this->shared_from_this(),varReply,this]() {
+#ifndef NDEBUG
+            StateLock _lock_{ this };
+#endif
 
-                {
-                    /*这些数据无用*/
-                    varReply->close();
-                    varReply->deleteLater();
+            try {
+                /*这些数据无用*/
+                varReply->close();
+                varReply->deleteLater();
 
-                    auto varBaiDuUser=baiDuUser.lock();
-                    if (false==varBaiDuUser) { return; }
+                auto varBaiDuUser=baiDuUser.lock();
+                if (false==varBaiDuUser) { return; }
 
-                    if (varReply->error()!=QNetworkReply::NoError) {
-                        loginStepNext=s_error;
-                        errorString=varReply->errorString();
-                    }
-                    else {
-                        loginStepNext=s_getlogin_cookie;
-                    }
+                if (varReply->error()!=QNetworkReply::NoError) {
+                    loginStepNext=s_error;
+                    errorString=varReply->errorString();
                 }
+                else {
+                    loginStepNext=s_getlogin_cookie;
+                }
+            }
+            catch (...) {
+                loginStepNext=s_error;
+            }
 
-                next_step();
+            next_step();
 
         });
-
+        this->loginStepNext=s_state_wait;
     }
 
     ~Login() {
