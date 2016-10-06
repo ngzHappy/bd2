@@ -3,38 +3,15 @@
 #include "../private/BaiDuUserData.hpp"
 #include "../private/BaiDuUserPrivateFunction.hpp"
 #include <text/gzip.hpp>
+#include <QtGui>
 #include <QtCore>
 #include <QtScript>
 #include <QtCrypto>
 #include <QtNetwork>
-#include <string>
 #include <regex>
 #include <ctime>
+#include <string>
 #include <cstdlib>
-
-namespace {
-namespace __private {
-namespace __baidu {
-
-class Static_init_on_qcoreapplication_create {
-    QCA::Initializer _qca_init;
-public:
-    Static_init_on_qcoreapplication_create() {
-        std::srand(int(std::time(nullptr)));
-    }
-    ~Static_init_on_qcoreapplication_create() {}
-};
-static char _psd_[sizeof(Static_init_on_qcoreapplication_create)];
-static void init_on_qcoreapplication_create() {
-    static memory::StaticPoionter<Static_init_on_qcoreapplication_create> 
-        _(_psd_);
-}
-
-Q_COREAPP_STARTUP_FUNCTION(init_on_qcoreapplication_create)
-
-}/*__baidu*/
-}/*__private*/
-}/*namespace*/
 
 namespace baidu {
 
@@ -50,6 +27,36 @@ inline QByteArray operator""_qb(const char *arg,std::size_t n) {
     return QByteArray(arg,int(n));
 }
 
+namespace __private {
+namespace __baidu {
+
+class Static_init_on_qcoreapplication_create {
+    QCA::Initializer _qca_init;
+    QImage _image_init_;
+public:
+    Static_init_on_qcoreapplication_create():
+        _image_init_(QString("____________________________.png"_qsl)) {
+        std::srand(int(std::time(nullptr)));
+    }
+    ~Static_init_on_qcoreapplication_create() {}
+};
+static char _psd_[sizeof(Static_init_on_qcoreapplication_create)];
+static void init_on_qcoreapplication_create() {
+    static memory::StaticPoionter<Static_init_on_qcoreapplication_create>
+        _(_psd_);
+}
+
+Q_COREAPP_STARTUP_FUNCTION(init_on_qcoreapplication_create)
+
+}/*__baidu*/
+}/*__private*/
+}/*namespace*/
+}/*namespace baidu*/
+
+namespace baidu {
+
+namespace {
+
 template<typename _T_>
 class StringRef;
 
@@ -58,8 +65,8 @@ class StringRef<T[N]> {
     const T(&_m_Data)[N];
 public:
     constexpr StringRef(const T(&argData)[N]):_m_Data(argData) {}
-    const char * data() const { return _m_Data; }
-    int size() const { return int(N-1); }
+    constexpr const char * data() const { return _m_Data; }
+    constexpr int size() const { return int(N-1); }
 };
 
 template<>
@@ -76,8 +83,8 @@ class StringRef<string> {
     const string & _m_Data;
 public:
     constexpr StringRef(const string&arg):_m_Data(arg) {}
-    const char *data() const { return _m_Data.data(); }
-    int size() { return _m_Data.size(); }
+    constexpr const char *data() const { return _m_Data.data(); }
+    constexpr int size() const { return _m_Data.size(); }
 };
 
 template<typename _T_>
@@ -207,6 +214,7 @@ namespace __login {
 namespace {
 
 class Login final :
+    public QObject,
     public BaiDuUser::StepNext,
     public std::enable_shared_from_this<Login> {
     Login(const Login&)=delete;
@@ -513,7 +521,31 @@ public:
         });
     }
 
+    class NextStepEvent final:public QEvent{
+        std::shared_ptr<Login> _m_Login;
+    public:
+        NextStepEvent(std::shared_ptr<Login>&&arg) :
+            QEvent(QEvent::MaxUser),
+            _m_Login(std::move(arg)){}
+        void next() { _m_Login->do_next_step(); }
+    private:
+        CPLUSPLUS_CLASS_META
+    };
+
+    bool event(QEvent *e)override {
+        {
+            auto var=dynamic_cast<NextStepEvent*>(e);
+            if (var) { var->next(); return true; }
+        }
+        return false;
+    }
+
     void next_step() {
+        QCoreApplication::postEvent(this,
+            new NextStepEvent{this->shared_from_this()});
+    }
+
+    void do_next_step() {
         switch (loginStepNext) {
             case s_error:login_error(); break;
             case s_start:getBaiDuCookie(); break;
