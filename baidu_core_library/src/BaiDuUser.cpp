@@ -17,6 +17,7 @@
 #include <cstdlib>
 #include <chrono>
 #ifndef NDEBUG
+#include <fstream>
 /*debug*/
 #include <cassert>
 #ifndef _debug_info_
@@ -275,6 +276,8 @@ public:
         s_get_RSAKey/*2*/,
         s_encryptRSA/*1*/,
         s_postLogin/*2*/,
+        s_getbaidu_tieba_cookie/*2 http://tieba.baidu.com/ */,
+        s_getbaidu_image_cookie/*2 http://image.baidu.com/ */,
         s_finished/**/,
         s_state_unknow,
         s_state_wait,
@@ -295,11 +298,13 @@ public:
             :_m_Login(l)
             ,_m_Line(a)
             ,_m_File(b)
-            ,_m_FunctionName(c){ l->loginStepNext=s_state_unknow; }
+            ,_m_FunctionName(c) {
+            l->loginStepNext=s_state_unknow;
+        }
         ~StateLock() {
             if (_m_Login->baiDuUser.lock()==false) { return; }
-            if (_m_Login->loginStepNext!=s_state_unknow) {
-                qDebug()<<_m_File<<_m_Line<<_m_FunctionName;
+            if (_m_Login->loginStepNext==s_state_unknow) {
+                qDebug()<<_m_File<<_m_Line<<_m_FunctionName<<endl;
                 assert(false);
             }
         }
@@ -315,6 +320,8 @@ public:
             case s_get_RSAKey:return "getRSAKey"_qsl; break;
             case s_encryptRSA:return "encryptRSA"_qsl; break;
             case s_postLogin:return "postLogin"_qsl; break;
+            case s_getbaidu_tieba_cookie:return "getbaidu_tieba_cookie"_qsl; break;
+            case s_getbaidu_image_cookie:return "getbaidu_image_cookie"_qsl; break;
             case s_finished:return "finished"_qsl; break;
             default:break;
         }
@@ -330,6 +337,8 @@ public:
             case s_get_RSAKey:return getRSAKey(); break;
             case s_encryptRSA:return encryptRSA(); break;
             case s_postLogin:return postLogin(); break;
+            case s_getbaidu_tieba_cookie:return getBaiDuTieBaCookie(); break;
+            case s_getbaidu_image_cookie:return getBaiDuImageCookie(); break;
             case s_finished:return login_finished(); break;
         }
         return login_error();
@@ -449,6 +458,7 @@ public:
 
                     auto it=varPSD->error_code.find(varErrorNO);
                     if (it==varPSD->error_code.end()) {
+
                     }
                     else {
                         varAns->errorString=it->second;
@@ -596,6 +606,7 @@ public:
 
                             if (varTmpJson.empty()) {
                                 errorString="can not find js"_qsl;
+                                this->loginStepNext=s_error;
                                 break;
                             }
 
@@ -619,7 +630,7 @@ public:
                             }
 
                             {/*登录成功*/
-                                this->loginStepNext=s_finished;
+                                this->loginStepNext=s_getbaidu_tieba_cookie;
                             }
 
                         }
@@ -1130,6 +1141,146 @@ public:
         login_error();
     }
 
+    class StaticData_getBaiDuTieBaCookie final {
+    public:
+        QUrl baidu_url;
+        QByteArray key_user_agent;
+        StaticData_getBaiDuTieBaCookie():
+            baidu_url(QString("http://tieba.baidu.com"_qsl)),
+            key_user_agent("User-Agent"_qb) {
+        }
+    };
+    static char _psd_getBaiDuTieBaCookie[sizeof(StaticData_getBaiDuTieBaCookie)];
+    void getBaiDuTieBaCookie() try {
+#ifndef NDEBUG
+        StateLock _lock_{ this _debug_info_ };
+#endif
+        static memory::StaticPoionter<StaticData_getBaiDuTieBaCookie> varStaticData{
+            _psd_getBaiDuTieBaCookie };
+
+        loginStep=s_getbaidu_tieba_cookie;
+
+        /*初始化请求*/
+        QNetworkRequest varRequest;
+        varRequest.setUrl(varStaticData->baidu_url);
+        varRequest.setRawHeader(varStaticData->key_user_agent,BaiDuUser::userAgent());
+
+        /*获得baidu user*/
+        auto varBaiDuUser=baiDuUser.lock();
+        if (false==varBaiDuUser) { return; }
+
+        /*获得networkaccessmanager*/
+        auto varNAM=varBaiDuUser->getNetworkAccessManager();
+
+        /*获得reply*/
+        auto varReply=varNAM->get(varRequest);
+
+        /*cookie 已经写入 cookiejar*/
+        varReply->connect(varReply,&QNetworkReply::finished,
+            [varLockThis=this->shared_from_this(),varReply,this]() {
+#ifndef NDEBUG
+            StateLock _lock_{ this _debug_info_ };
+#endif
+
+            try {
+                /*这些数据无用*/
+                varReply->close();
+                varReply->deleteLater();
+
+                auto varBaiDuUser=baiDuUser.lock();
+                if (false==varBaiDuUser) { return; }
+
+                if (varReply->error()!=QNetworkReply::NoError) {
+                    loginStepNext=s_error;
+                    errorString=varReply->errorString();
+                }
+                else {
+                    loginStepNext=s_getbaidu_image_cookie;
+                }
+            }
+            catch (...) {
+                loginStepNext=s_error;
+            }
+
+            next_step();
+
+        });
+        this->loginStepNext=s_state_wait;
+    }
+    catch (...) {
+        login_error();
+    }
+
+    class StaticData_getBaiDuImageCookie final {
+    public:
+        QUrl baidu_url;
+        QByteArray key_user_agent;
+        StaticData_getBaiDuImageCookie():
+            baidu_url(QString("http://image.baidu.com"_qsl)),
+            key_user_agent("User-Agent"_qb) {
+        }
+    };
+    static char _psd_getBaiDuImageCookie[sizeof(StaticData_getBaiDuImageCookie)];
+    void getBaiDuImageCookie() try {
+#ifndef NDEBUG
+        StateLock _lock_{ this _debug_info_ };
+#endif
+        static memory::StaticPoionter<StaticData_getBaiDuImageCookie> varStaticData{
+            _psd_getBaiDuImageCookie };
+
+        loginStep=s_getbaidu_image_cookie;
+
+        /*初始化请求*/
+        QNetworkRequest varRequest;
+        varRequest.setUrl(varStaticData->baidu_url);
+        varRequest.setRawHeader(varStaticData->key_user_agent,BaiDuUser::userAgent());
+
+        /*获得baidu user*/
+        auto varBaiDuUser=baiDuUser.lock();
+        if (false==varBaiDuUser) { return; }
+
+        /*获得networkaccessmanager*/
+        auto varNAM=varBaiDuUser->getNetworkAccessManager();
+
+        /*获得reply*/
+        auto varReply=varNAM->get(varRequest);
+
+        /*cookie 已经写入 cookiejar*/
+        varReply->connect(varReply,&QNetworkReply::finished,
+            [varLockThis=this->shared_from_this(),varReply,this]() {
+#ifndef NDEBUG
+            StateLock _lock_{ this _debug_info_ };
+#endif
+
+            try {
+                /*这些数据无用*/
+                varReply->close();
+                varReply->deleteLater();
+
+                auto varBaiDuUser=baiDuUser.lock();
+                if (false==varBaiDuUser) { return; }
+
+                if (varReply->error()!=QNetworkReply::NoError) {
+                    loginStepNext=s_error;
+                    errorString=varReply->errorString();
+                }
+                else {
+                    loginStepNext=s_finished;
+                }
+            }
+            catch (...) {
+                loginStepNext=s_error;
+            }
+
+            next_step();
+
+        });
+        this->loginStepNext=s_state_wait;
+    }
+    catch (...) {
+        login_error();
+    }
+
     ~Login() {
         if (false==logInFinishedCalled) {
             logInFinishedCalled=true;
@@ -1145,6 +1296,8 @@ char Login::_psd_getBaiduToken[sizeof(StaticData_getBaiduToken)];
 char Login::_psd_getRSAKey[sizeof(StaticData_getRSAKey)];
 char Login::_psd_getLoginCookie[sizeof(StaticData_getLoginCookie)];
 char Login::_psd_postLogin[sizeof(StaticData_postLogin)];
+char Login::_psd_getBaiDuTieBaCookie[sizeof(StaticData_getBaiDuTieBaCookie)];
+char Login::_psd_getBaiDuImageCookie[sizeof(StaticData_getBaiDuImageCookie)];
 }/*namespace*/
 }/*namespace __login*/
 
