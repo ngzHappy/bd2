@@ -7,17 +7,22 @@
 #include <QtNetwork>
 #include <BaiDuUserCache.hpp>
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(QWidget *parent):
     QWidget(parent),
-    ui(new Ui::MainWindow){
+    ui(new Ui::MainWindow) {
     ui->setupUi(this);
     baiduUser=baidu::BaiDuUser::instance();
     connect(baiduUser.get(),&baidu::BaiDuUser::loginFinished,
-        [this]() {
+        [this](bool arg,QString) {
+
+        if (arg==true) {
+            ui->vertifyImage->setText(QString::fromUtf8(u8"登陆成功"));
+            return;
+        }
 
         static QNetworkAccessManager manager;
-       
-        do{
+
+        do {
             auto url_=baiduUser->getVertifyCodeUrl();
             if (url_.isEmpty()) { break; }
             auto reply=manager.get(QNetworkRequest(QUrl(url_)));
@@ -36,18 +41,17 @@ MainWindow::MainWindow(QWidget *parent) :
     });
 }
 
-MainWindow::~MainWindow(){
+MainWindow::~MainWindow() {
     delete ui;
 }
 
-void MainWindow::on_loginButton_clicked(){
+void MainWindow::on_loginButton_clicked() {
 
-    baiduUser->openUserName( ui->userName->text() );
-    baiduUser->setPassWord( ui->passWord->text() );
+    baiduUser->openUserName(ui->userName->text());
+    baiduUser->setPassWord(ui->passWord->text());
     qDebug()<<
-        baidu::BaiDuUserCache::filePathToUserName( baiduUser->getLocalCacheFilePath() );
-       
-
-    baiduUser->login( ui->vertifyCode->text() );
+        baidu::BaiDuUserCache::filePathToUserName(baiduUser->getLocalCacheFilePath());
+    
+    baiduUser->login(ui->vertifyCode->text());
 
 }
