@@ -3,6 +3,8 @@ QT += core gui
 QT += widgets
 QT += network
 
+CONFIG += console
+
 TARGET = test_quicktest
 TEMPLATE = app
 

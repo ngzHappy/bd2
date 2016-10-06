@@ -5,6 +5,7 @@ QT += network
 QT += concurrent
 CONFIG   += crypto # qca if you have it
 
+CONFIG += console
 QT += widgets
 
 TARGET = test_baidu_login
