@@ -322,6 +322,8 @@ public:
             case s_getbaidu_tieba_cookie:return "getbaidu_tieba_cookie"_qsl; break;
             case s_getbaidu_image_cookie:return "getbaidu_image_cookie"_qsl; break;
             case s_finished:return "finished"_qsl; break;
+            case s_state_unknow:break;
+            case s_state_wait:break;
             default:break;
         }
         return "unknow step"_qsl;
@@ -339,6 +341,8 @@ public:
             case s_getbaidu_tieba_cookie:return getBaiDuTieBaCookie(); break;
             case s_getbaidu_image_cookie:return getBaiDuImageCookie(); break;
             case s_finished:return login_finished(); break;
+            case s_state_unknow:break;
+            case s_state_wait:break;
         }
         return login_error();
     }
