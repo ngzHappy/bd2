@@ -16,6 +16,9 @@
 #include <thread>
 #include <cstdlib>
 #include <chrono>
+#ifndef NDEBUG
+#include <fstream>
+#endif
 
 namespace baidu {
 
@@ -338,7 +341,7 @@ public:
                 { 500010	,u8"登录过于频繁,请24小时后再试"_qutf8 },
                 { 200010	,u8"验证码不存在或已过期"_qutf8 },
                 { 100005	,u8"系统错误,请您稍后再试"_qutf8 },
-                { 120019	,u8"请在弹出的窗口操作,或重新登录"_qutf8 }	,
+                { 120019	,u8"请在弹出的窗口操作,或重新登录"_qutf8 },
                 { 110024	,u8"此帐号暂未激活"_qutf8 },
                 { 100023	,u8"开启Cookie之后才能登录"_qutf8 },
                 { 17	    ,u8"您的帐号已锁定"_qutf8 },
@@ -355,12 +358,43 @@ public:
     class PostLoginJSParserAns {
     public:
         bool isOk=false;
+        int errorCode=0;
+        QString errorString;
     };
     static void parserPostLoginJS(
         const gumbo::string&varJS,
         const StaticData_postLogin*varPSD,
         PostLoginJSParserAns*varAns
-        ){
+    ) {
+        std::ofstream ofs("test.js.txt");
+        ofs<<varJS<<std::endl;
+
+        int varErrorNO=0;
+        do {
+            std::cmatch error_no;
+            if (std::regex_search(
+                varJS.c_str(),varJS.c_str()+varJS.size(),
+                error_no,varPSD->error_no_regex)) {
+                varErrorNO=std::atoi(error_no[1].first);
+                varAns->errorCode=varErrorNO;
+                if (varErrorNO!=0) {
+                    auto it=varPSD->error_code.find(varErrorNO);
+                    if (it==varPSD->error_code.end()) {
+                    }
+                    else {
+                        varAns->errorString=it->second;
+                        return;
+                    }
+                }
+                else {
+                    varAns->isOk=true;
+                }
+            }
+            else {
+                varAns->errorString="can not find err_no="_qsl;
+                return;
+            }
+        } while (false);
 
     }
     void postLogin() {
@@ -461,7 +495,7 @@ public:
                 if (false==varBaiDuUser) { return; }
 
                 do {
-                    
+
                     {
                         auto varReplyData=varReply->readAll();
 
