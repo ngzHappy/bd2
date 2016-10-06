@@ -99,8 +99,8 @@ class StringRef<string> {
     const string & _m_Data;
 public:
     constexpr StringRef(const string&arg):_m_Data(arg) {}
-    constexpr const char *data() const { return _m_Data.data(); }
-    constexpr int size() const { return _m_Data.size(); }
+    const char *data() const { return _m_Data.data(); }
+    int size() const { return _m_Data.size(); }
 };
 
 template<typename _T_>
@@ -322,7 +322,7 @@ public:
 
         const QByteArray & varPublicKey=this->publicKey;
         const QByteArray varPassWord=varBaiDuUser->getPassword().toUtf8();
-        QByteArray & varAns=this->passWord;             
+        QByteArray & varAns=this->passWord;
 
         do {
             try {
@@ -594,7 +594,7 @@ public:
         QCoreApplication::postEvent(this,
             new NextStepEvent{this->shared_from_this()});
     }
-    
+
     void next() override {
         next_step();
     }
