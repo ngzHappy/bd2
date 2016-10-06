@@ -456,6 +456,11 @@ public:
                         }
                     }
 
+                    if (varErrorNO==18) {
+                        varAns->isOk=true/*要求手机验证码*/;
+                        break;
+                    }
+
                     auto it=varPSD->error_code.find(varErrorNO);
                     if (it==varPSD->error_code.end()) {
 
@@ -992,11 +997,11 @@ public:
         loginStepNext=s_finished;
         auto varBaiDuUser=baiDuUser.lock();
         if (false==varBaiDuUser) { return; }
-        varBaiDuUser->loginFinished(true,{});
         zone_this_data(varBaiDuUser.get());
         varThisData->_m_IsLogin=true;
         varThisData->setIsLoging(false);
         varThisData->_m_LoginWithVertifyCode.reset();
+        varBaiDuUser->loginFinished(true,{});
     }
 
     class StaticData_getLoginCookie final {
