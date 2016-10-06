@@ -3,6 +3,7 @@
 #include "../private/BaiDuUserData.hpp"
 #include "../private/BaiDuUserPrivateFunction.hpp"
 #include <text/gzip.hpp>
+#include <gumbo/gumbo.hpp>
 #include <QtGui>
 #include <QtCore>
 #include <QtScript>
@@ -251,12 +252,12 @@ public:
 
     enum LogInSteps :int {
         s_error,
-        s_getbaidu_cookie,
-        s_getlogin_cookie,
-        s_get_baidu_token,
-        s_get_RSAKey,
-        s_encryptRSA,
-        s_postLogin,
+        s_getbaidu_cookie/**/,
+        s_getlogin_cookie/**/,
+        s_get_baidu_token/**/,
+        s_get_RSAKey/**/,
+        s_encryptRSA/**/,
+        s_postLogin/**/,
         s_finished
     };
 
@@ -301,6 +302,17 @@ public:
     class StaticData_postLogin final {
     public:
         const QUrl url;
+        const QByteArray key_Accept{"Accept"_qb};
+        const QByteArray value_Accept{"text/html, application/xhtml+xml, */*"_qb};
+        const QByteArray key_Referer{"Referer"_qb};
+        const QByteArray value_Referer{"https://www.baidu.com/"_qb};
+        const QByteArray key_Accept_Language{"Accept-Language"_qb};
+        const QByteArray value_Accept_Language{"zh-CN"_qb};
+        const QByteArray key_User_Agent{"User-Agent"_qb};
+        const QByteArray key_Content_Type{"Content-Type"_qb};
+        const QByteArray value_Content_Type{"application/x-www-form-urlencoded"_qb};
+        const QByteArray key_Accept_Encoding{"Accept-Encoding"_qb};
+        const QByteArray value_Accept_Encoding{"gzip, deflate"_qb};
     public:
         StaticData_postLogin()
             :url("https://passport.baidu.com/v2/api/?login"_qsl) {}
@@ -327,7 +339,7 @@ public:
 
         auto varBaiDuUser=baiDuUser.lock();
         if (false==varBaiDuUser) { return; }
-        
+
         do {
             QByteArray varPostData;
             {
@@ -381,12 +393,12 @@ public:
             }
 
             QNetworkRequest req(varPsd->url);
-            req.setRawHeader("Accept","text/html, application/xhtml+xml, */*");
-            req.setRawHeader("Referer","https://www.baidu.com/");
-            req.setRawHeader("Accept-Language","zh-CN");
-            req.setRawHeader("User-Agent",BaiDuUser::userAgent());
-            req.setRawHeader("Content-Type","application/x-www-form-urlencoded");
-            req.setRawHeader("Accept-Encoding","gzip, deflate");
+            req.setRawHeader(varPsd->key_Accept,varPsd->value_Accept);
+            req.setRawHeader(varPsd->key_Referer,varPsd->value_Referer);
+            req.setRawHeader(varPsd->key_Accept_Language,varPsd->value_Accept_Language);
+            req.setRawHeader(varPsd->key_User_Agent,BaiDuUser::userAgent());
+            req.setRawHeader(varPsd->key_Content_Type,varPsd->value_Content_Type);
+            req.setRawHeader(varPsd->key_Accept_Encoding,varPsd->value_Accept_Encoding);
 
             zone_this_data(varBaiDuUser.get());
             auto manager=&(varThisData->_m_NetworkAccessManager);
@@ -397,10 +409,49 @@ public:
             replyNext->connect(replyNext,&QNetworkReply::finished,
                 [varLockThis=this->shared_from_this(),
                 varReply=replyNext,this]() {
+
+                varReply->deleteLater();
+
+                auto varBaiDuUser=baiDuUser.lock();
+                if (false==varBaiDuUser) { return; }
+
+                do {
+                    QByteArray json;
+                    {
+                        auto varReplyData=varReply->readAll();
+
+                        if (varReplyData.isEmpty()) {
+                            loginStepNext=s_error;
+                            break;
+                        }
+
+                        if (varReplyData[0]==char(0x001F)) {
+                            varReplyData=text::ungzip(varReplyData.cbegin(),varReplyData.cend());
+                            if (varReplyData.isEmpty()) {
+                                errorString="unzip error"_qsl;
+                                loginStepNext=s_error;
+                                break;
+                            }
+                        }
+
+                        auto varTmpJson=
+                            gumbo::getAllJavaScript(varReplyData.cbegin(),varReplyData.cend());
+
+                        if (varTmpJson.empty()) {
+                            errorString="can not find js"_qsl;
+                            break;
+                        }
+
+                        const auto &varJS=*varTmpJson.begin();
+
+                    }           
+
+                } while (false);
                 this->next_step();
+
             });
 
-        } while (false);    
+        } while (false);
 
     }
 
@@ -563,7 +614,7 @@ public:
 
     }
 
-    class StaticData_getBaiduToken {
+    class StaticData_getBaiduToken final {
     public:
         const QByteArray url;
         const QByteArray userAgent;
@@ -714,7 +765,7 @@ public:
         varBaiDuUser->loginFinished(true,{});
     }
 
-    class StaticData_getLoginCookie {
+    class StaticData_getLoginCookie final {
     public:
         QUrl baidu_url;
         QByteArray key_user_agent;
@@ -772,7 +823,7 @@ public:
 
     }
 
-    class StaticData_getBaiDuCookie {
+    class StaticData_getBaiDuCookie final {
     public:
         QUrl baidu_url;
         QByteArray key_user_agent;
