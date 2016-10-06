@@ -267,6 +267,20 @@ public:
         return "unknow step"_qsl;
     }
 
+    void do_next_step() {
+        switch (loginStepNext) {
+            case s_error:login_error(); break;
+            case s_getbaidu_cookie:getBaiDuCookie(); break;
+            case s_getlogin_cookie:getLoginCookie(); break;
+            case s_get_baidu_token:getBaiduToken(); break;
+            case s_get_RSAKey:getRSAKey(); break;
+            case s_encryptRSA:encryptRSA(); break;
+            case s_postLogin:postLogin(); break;
+            case s_finished:login_finished(); break;
+        }
+    }
+
+    /*栈状态*/
     LogInSteps loginStep=s_getbaidu_cookie;
     LogInSteps loginStepNext=s_getbaidu_cookie;
     QString errorString{ "unknow error"_qsl };
@@ -276,8 +290,25 @@ public:
     QByteArray publicKey/*rsa public key*/;
     QByteArray passWord/*加密后的密码*/;
 
-
+    class StaticData_postLogin final {
+    public:
+    };
+    static char _psd_postLogin[sizeof(StaticData_postLogin)];
     void postLogin() {
+        static memory::StaticPoionter<StaticData_postLogin>
+            varPsd{_psd_postLogin};
+
+        loginStep=s_postLogin;
+        loginStepNext=s_error;
+
+        auto varBaiDuUser=baiDuUser.lock();
+        if (false==varBaiDuUser) { return; }
+
+        do {
+
+        } while (false);
+
+        this->next_step();
 
     }
 
@@ -563,20 +594,7 @@ public:
         QCoreApplication::postEvent(this,
             new NextStepEvent{this->shared_from_this()});
     }
-
-    void do_next_step() {
-        switch (loginStepNext) {
-            case s_error:login_error(); break;
-            case s_getbaidu_cookie:getBaiDuCookie(); break;
-            case s_getlogin_cookie:break;
-            case s_get_baidu_token:getBaiduToken(); break;
-            case s_get_RSAKey:getRSAKey(); break;
-            case s_encryptRSA:encryptRSA(); break;
-            case s_postLogin:postLogin(); break;
-            case s_finished:login_finished(); break;
-        }
-    }
-
+    
     void next() override {
         next_step();
     }
@@ -733,6 +751,7 @@ char Login::_psd_getBaiDuCookie[sizeof(StaticData_getBaiDuCookie)];
 char Login::_psd_getBaiduToken[sizeof(StaticData_getBaiduToken)];
 char Login::_psd_getRSAKey[sizeof(StaticData_getRSAKey)];
 char Login::_psd_getLoginCookie[sizeof(StaticData_getLoginCookie)];
+char Login::_psd_postLogin[sizeof(StaticData_postLogin)];
 }/*namespace*/
 }/*namespace __login*/
 
