@@ -172,7 +172,6 @@ BaiDuUserData::BaiDuUserData() {
     _m_NetworkAccessManager.setCookieJar(_m_NetworkCookieJar);
 }
 
-
 BaiDuUserData::~BaiDuUserData() {
 }
 /********************************zone_data********************************/
@@ -214,6 +213,7 @@ void BaiDuUser::open(const QString&arg) {
 
 void BaiDuUser::close() {
     zone_this_data(this);
+    varThisData->_m_LoginWithVertifyCode.reset();
     varThisData->_m_BaiDuUserCache.write();
     varThisData->_m_BaiDuUserCache={};
 }
@@ -248,7 +248,7 @@ namespace {
 
 class Login final :
     public QObject,
-    public BaiDuUser::StepNext,
+    public BaiDuUser::LoginWithVertifyCode,
     public std::enable_shared_from_this<Login> {
     Login(const Login&)=delete;
     Login(Login&&)=delete;
@@ -306,11 +306,27 @@ public:
     QByteArray rasKey/*key id*/;
     QByteArray publicKey/*rsa public key*/;
     QByteArray passWord/*加密后的密码*/;
+    QByteArray _m_codestring/*验证码ID*/;
+    QByteArray _m_vertifycode/*验证码内容*/;
+
+    virtual QByteArray getVertifyCodeUrl()const override {
+        return _m_vertifycode;
+    }
+
+    virtual void loginVertifyCode(const QString&arg) override {
+        this->loginStepNext=s_get_RSAKey;
+        _m_vertifycode=arg
+            .toUtf8()
+            .toPercentEncoding();
+        next_step();
+    }
 
     class StaticData_postLogin final {
     public:
         const QUrl url;
         const std::regex error_no_regex{ u8R"r(err_no=([0-9]+))r" };
+        const std::regex code_string_regex{ u8R"r(codeString=([^&]+))r" };
+        const QByteArray code_string_url{ "https://passport.baidu.com/cgi-bin/genimage?"_qb };
         const QByteArray key_Accept{ "Accept"_qb };
         const QByteArray value_Accept{ "text/html, application/xhtml+xml, */*"_qb };
         const QByteArray key_Referer{ "Referer"_qb };
@@ -360,15 +376,14 @@ public:
         bool isOk=false;
         int errorCode=0;
         QString errorString;
+        QByteArray VertifyCodeID;
+        QByteArray VertifyCodeUrl;
     };
     static void parserPostLoginJS(
         const gumbo::string&varJS,
         const StaticData_postLogin*varPSD,
         PostLoginJSParserAns*varAns
     ) {
-        std::ofstream ofs("test.js.txt");
-        ofs<<varJS<<std::endl;
-
         int varErrorNO=0;
         do {
             std::cmatch error_no;
@@ -378,6 +393,22 @@ public:
                 varErrorNO=std::atoi(error_no[1].first);
                 varAns->errorCode=varErrorNO;
                 if (varErrorNO!=0) {
+
+                    if (varErrorNO==257) {
+                        /*https://passport.baidu.com/cgi-bin/genimage?*/
+                        /*codeString=([^&]+)*/
+                        std::cmatch code_string;
+                        if (std::regex_search(varJS.c_str(),varJS.c_str()+varJS.size(),
+                            code_string,varPSD->code_string_regex)) {
+                            varAns->VertifyCodeID=QByteArray(code_string[1].first,
+                                static_cast<int>(code_string[1].length()));
+                            varAns->VertifyCodeUrl=varPSD->code_string_url
+                                +varAns->VertifyCodeID;
+                            varAns->errorString=u8"请输入验证码"_qutf8;
+                            return;
+                        }
+                    }
+
                     auto it=varPSD->error_code.find(varErrorNO);
                     if (it==varPSD->error_code.end()) {
                     }
@@ -385,6 +416,7 @@ public:
                         varAns->errorString=it->second;
                         return;
                     }
+
                 }
                 else {
                     varAns->isOk=true;
@@ -441,7 +473,7 @@ public:
                     "subpro","",
                     "apiver","v3",
                     "tt",tt,
-                    "codestring",""/*验证码id*/,
+                    "codestring",this->_m_codestring/*验证码id*/,
                     "safeflg",safeflg,
                     "u",u,
                     "isPhone","false",
@@ -455,7 +487,7 @@ public:
                     "splogin",splogin,
                     "username",varUserName,
                     "password",this->passWord,
-                    "verifycode",""/*验证码*/,
+                    "verifycode",this->_m_vertifycode/*验证码*/,
                     "mem_pass",memberPass,
                     "rsakey",this->rasKey,
                     "crypttype","12",
@@ -494,6 +526,9 @@ public:
                 auto varBaiDuUser=baiDuUser.lock();
                 if (false==varBaiDuUser) { return; }
 
+                /*清除验证码*/
+                this->_m_vertifycode.clear();
+
                 do {
 
                     {
@@ -524,6 +559,27 @@ public:
                         const auto &varJS=*varTmpJson.begin();
                         PostLoginJSParserAns varAns;
                         parserPostLoginJS(varJS,varPsd.pointer(),&varAns);
+
+                        if (varAns.VertifyCodeUrl.isEmpty()==false) {
+                            this->_m_vertifycode=std::move(varAns.VertifyCodeUrl);
+                            this->_m_codestring=std::move(varAns.VertifyCodeID);
+                            varBaiDuUser->loginWithVertifyCode(varLockThis);
+                            this->loginStepNext=s_error;
+                            errorString=std::move(varAns.errorString);
+                            break;
+                        }
+                        else {
+                            if (varAns.isOk==false) {
+                                this->loginStepNext=s_error;
+                                errorString=std::move(varAns.errorString);
+                                break;
+                            }
+                        }
+
+                        {/*登录成功*/
+
+                        }
+
                     }
 
                 } while (false);
@@ -843,6 +899,8 @@ public:
         auto varBaiDuUser=baiDuUser.lock();
         if (false==varBaiDuUser) { return; }
         varBaiDuUser->loginFinished(true,{});
+        zone_this_data(varBaiDuUser.get());
+        varThisData->_m_LoginWithVertifyCode.reset();
     }
 
     class StaticData_getLoginCookie final {
@@ -980,13 +1038,26 @@ char Login::_psd_postLogin[sizeof(StaticData_postLogin)];
 }/*namespace __login*/
 
 void BaiDuUser::login() {
-    auto varLogin=memory::make_shared<__login::Login>();
-    {/*init login data*/
-        varLogin->baiDuUser=this->shared_from_this();
-        zone_this_data(this);
-        varThisData->_m_GID=gid();
+    zone_this_data(this);
+    {
+        auto varLogin=memory::make_shared<__login::Login>();
+        {/*init login data*/
+            varLogin->baiDuUser=this->shared_from_this();
+            varThisData->_m_GID=gid();
+        }
+        varLogin->next_step();
+        varThisData->_m_LoginWithVertifyCode=varLogin;
     }
-    varLogin->next_step();
+}
+
+void BaiDuUser::login(const QString&arg) {
+    zone_this_data(this);
+    if (varThisData->_m_LoginWithVertifyCode) {
+        varThisData->_m_LoginWithVertifyCode->loginVertifyCode(arg);
+    }
+    else {
+        login();
+    }
 }
 
 NetworkAccessManager * BaiDuUser::getNetworkAccessManager() const {

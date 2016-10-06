@@ -23,6 +23,7 @@ public:
     NetworkCookieJar * _m_NetworkCookieJar=nullptr;
     bool _m_IsLogin=false;
     QByteArray _m_GID;
+    std::shared_ptr<BaiDuUser::LoginWithVertifyCode> _m_LoginWithVertifyCode;
 private:
     CPLUSPLUS_CLASS_META
 };

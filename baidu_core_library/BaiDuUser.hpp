@@ -51,6 +51,13 @@ public:
         virtual void next()=0;
     };
 
+    class LoginWithVertifyCode :public StepNext {
+    public:
+        virtual QByteArray getVertifyCodeUrl()const=0;
+        virtual void loginVertifyCode(const QString&)=0;
+    };
+
+public:
     explicit BaiDuUser(decltype(nullptr)) {}
     BaiDuUser();
 
@@ -71,11 +78,12 @@ public:
     QString getLocalCacheFilePath()const;
     bool isLogin()const;
     void login()/**/;
+    void login(const QString&);
 public:
     NetworkAccessManager * getNetworkAccessManager()const;
 public:
     Q_SIGNAL void loginFinished(bool,QString);
-
+    Q_SIGNAL void loginWithVertifyCode(std::shared_ptr<LoginWithVertifyCode>);
 public:
     void openUserName(const QString&argUserName) {
         this->open(BaiDuUserCache::userNameToFilePath(argUserName));
@@ -95,6 +103,7 @@ private:
 }/*namespace baidu*/
 
 Q_DECLARE_METATYPE(std::shared_ptr<baidu::BaiDuUser::StepNext>)
+Q_DECLARE_METATYPE(std::shared_ptr<baidu::BaiDuUser::LoginWithVertifyCode>)
 
 #endif
 
