@@ -16,7 +16,8 @@ SOURCES += main.cpp\
     TestNetWork.cpp \
     NetworkAccessManager.cpp \
     TestGzip.cpp \
-    TestGumbo.cpp
+    TestGumbo.cpp \
+    BoostICL.cpp
 
 HEADERS  += MainWindow.hpp \
     TestStaticPointer.hpp \
@@ -24,7 +25,8 @@ HEADERS  += MainWindow.hpp \
     TestNetWork.hpp \
     NetworkAccessManager.hpp \
     TestGzip.hpp \
-    TestGumbo.hpp
+    TestGumbo.hpp \
+    BoostICL.hpp
 
 DEFINES*=THIS_PROJECT_SOURCE_DIR=\\\"$$PWD\\\"
 
