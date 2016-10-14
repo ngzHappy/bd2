@@ -2,6 +2,7 @@
 #include <QtCore>
 #include <QtWidgets/QApplication>
 #include <memory/MemoryLibrary.hpp>
+#include <exception/exception.hpp>
 #include "TestStaticPointer.hpp"
 #include "TestCompiler.hpp"
 #include "TestNetWork.hpp"
@@ -18,6 +19,13 @@ public:
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+
+    try {
+        throw std::exception("test exception");
+    }
+    catch (...) {
+        exception_catched();
+    }
 
     TestGumbo test_gumbo;
     TestGzip test_gzip;

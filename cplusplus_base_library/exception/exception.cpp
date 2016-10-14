@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <mutex>
+#include <shared_mutex>
 #include "../lua/lua.hpp"
 #include "../memory/MemoryLibrary.hpp"
 #include "debug_exception.hpp"
@@ -28,12 +29,15 @@ std::recursive_mutex & debug_exception_out_mutex() {
 }/**/
 #endif
 
+
 namespace {
 namespace __private {
 
 class TestInt {};
 
-inline std::ostream& log_stream() { return std::cout; }
+inline std::ostream& log_stream() {
+    return std::cout;
+}
 
 class stringstream final :public std::basic_stringstream<
     char,std::char_traits<char>,
@@ -46,13 +50,14 @@ public:
     ~stringstream() {}
 };
 
+static char static_stringstream_getMutex[sizeof(std::recursive_mutex)];
 inline std::recursive_mutex & stringstream::getMutex() {
-    /*do not need delete*/
-    static std::recursive_mutex * ans=new std::recursive_mutex;
+    static memory::StaticPoionter<std::recursive_mutex>
+        ans(static_stringstream_getMutex);
     return *ans;
 }
 
-class Handle {
+class Handle :public exception::ExceptionHandle {
     int memLine;
     const char * memFunctionName;
     const char * memFileName;
@@ -65,7 +70,7 @@ class Handle {
                 <<"from : "
                 <<"\nline : "<<memLine
                 <<"\nfileName : "<<memFileName
-                <<"\nfunctionName : "<<memFileName
+                <<"\nfunctionName : "<<memFunctionName
                 <<"\n("<<__LINE__<<" , "<<__FILE__<<" , "<<__func__<<")"
                 <<std::endl;
             log_stream()<<out.rdbuf();
@@ -83,7 +88,7 @@ class Handle {
                 <<"from : "
                 <<"\nline : "<<memLine
                 <<"\nfileName : "<<memFileName
-                <<"\nfunctionName : "<<memFileName
+                <<"\nfunctionName : "<<memFunctionName
                 <<"\n("<<__LINE__<<" , "<<__FILE__<<" , "<<__func__<<")"
                 <<std::endl;
             log_stream()<<out.rdbuf();
@@ -109,7 +114,7 @@ class Handle {
                 <<"from : "
                 <<"\nline : "<<memLine
                 <<"\nfileName : "<<memFileName
-                <<"\nfunctionName : "<<memFileName
+                <<"\nfunctionName : "<<memFunctionName
                 <<"\n("<<__LINE__<<" , "<<__FILE__<<" , "<<__func__<<")\n"
                 <<e.what()
                 <<std::endl;
@@ -127,18 +132,77 @@ class Handle {
         }
 
     }
-    
+
+    void std_logic_error_exception_handle(const std::logic_error &e) {
+
+        try {
+            {
+                stringstream out;
+                out<<"get a std::logic_error exception @\n"
+                    <<"from : "
+                    <<"\nline : "<<memLine
+                    <<"\nfileName : "<<memFileName
+                    <<"\nfunctionName : "<<memFunctionName
+                    <<"\n("<<__LINE__<<" , "<<__FILE__<<" , "<<__func__<<")\n"
+                    <<e.what()
+                    <<std::endl;
+                log_stream()<<out.rdbuf();
+            }
+            std::exit(-1);
+        }
+        catch (...) {
+            bad_exception_handle();
+        }
+
+        try {
+            std::rethrow_if_nested(e);
+        }
+        catch (...) {
+            exception_handle();
+        }
+
+    }
+
+    void std_bad_cast_exception_handle(const std::bad_cast &e) {
+
+        try {
+            {
+                stringstream out;
+                out<<"get a std::bad_cast exception @\n"
+                    <<"from : "
+                    <<"\nline : "<<memLine
+                    <<"\nfileName : "<<memFileName
+                    <<"\nfunctionName : "<<memFunctionName
+                    <<"\n("<<__LINE__<<" , "<<__FILE__<<" , "<<__func__<<")\n"
+                    <<e.what()
+                    <<std::endl;
+                log_stream()<<out.rdbuf();
+            }
+        }
+        catch (...) {
+            bad_exception_handle();
+        }
+
+        try {
+            std::rethrow_if_nested(e);
+        }
+        catch (...) {
+            exception_handle();
+        }
+
+    }
+
 public:
 
     Handle(
-        int argLine,
-        const char * argFunctionName,
-        const char * argFileName):memLine(argLine),
+        int argLine=0,
+        const char * argFunctionName=nullptr,
+        const char * argFileName=nullptr):memLine(argLine),
         memFunctionName(argFunctionName),
         memFileName(argFileName) {
     }
 
-    void exception_handle() noexcept(true) {
+    void exception_handle() noexcept(true) override {
 
         ++memExceptionDepth;
         try {
@@ -147,7 +211,13 @@ public:
         catch (const TestInt &e) {
             int_exception_handle(e);
         }
-        catch (std::exception & e) {
+        catch (const std::logic_error & e) {
+            std_logic_error_exception_handle(e);
+        }
+        catch (const std::bad_cast & e) {
+            std_bad_cast_exception_handle(e);
+        }
+        catch (const std::exception & e) {
             std_exception_handle(e);
         }
         catch (...) {
@@ -158,7 +228,7 @@ public:
                     <<"from : "
                     <<"\nline : "<<memLine
                     <<"\nfileName : "<<memFileName
-                    <<"\nfunctionName : "<<memFileName
+                    <<"\nfunctionName : "<<memFunctionName
                     <<"\n("<<__LINE__<<" , "<<__FILE__<<" , "<<__func__<<")"
                     <<std::endl;
                 log_stream()<<out.rdbuf();
@@ -168,11 +238,13 @@ public:
         }
 
     }
-
+private:
+    MEMORY_CLASS_NEW_DELETE
 };
 
 }/*__private*/
 }/*namespace*/
+
 
 namespace exception {
 
@@ -206,11 +278,50 @@ void exception_handle(
         std::exit(-1); (void)e;
     }
     catch (...) {
-        __private::Handle handle{ line,functionName,fileName };
-        handle.exception_handle();
+        auto handle=exception::getCreateExceptionHandleFunction()(line,functionName,fileName);
+        handle->exception_handle();
     }
 
 }/**/
 
+namespace _0_private {
+namespace {
+
+static char static_mutex[sizeof(std::shared_timed_mutex)];
+std::shared_timed_mutex & mutex() {
+    static memory::StaticPoionter<std::shared_timed_mutex>
+        ans(static_mutex);
+    return *ans;
+}
+
+CreateExceptionHandleFunction & data() {
+    static CreateExceptionHandleFunction _m_Data=[](
+        int/*line*/a,
+        const char * /*func*/b,
+        const char * /*file*/c)->std::unique_ptr<ExceptionHandle> {
+        return std::make_unique<__private::Handle>(a,b,c);
+    };
+    return _m_Data;
+}
+
+}/*namespace*/
+}/*_0_private*/
+
+CreateExceptionHandleFunction getCreateExceptionHandleFunction() {
+    std::shared_lock<std::shared_timed_mutex> varLock{ _0_private::mutex() };
+    return _0_private::data();
+}
+
+CreateExceptionHandleFunction setCreateExceptionHandleFunction(CreateExceptionHandleFunction arg) {
+    if (arg==nullptr) { return getCreateExceptionHandleFunction(); }
+    std::unique_lock<std::shared_timed_mutex > varLock{ _0_private::mutex() };
+    auto varOld=_0_private::data();
+    _0_private::data()=arg;
+    return varOld;
+}
+
+
 }/**/
 
+/**
+**/
