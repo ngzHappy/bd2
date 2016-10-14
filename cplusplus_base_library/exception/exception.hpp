@@ -10,14 +10,14 @@
 #endif
 
 namespace exception {
-
+ 
 /*
 throw : lua_exception_type
 */
 HANDLE_EXCEPTION_EXPORT void exception_handle(
     int line,
     const char * functionName,
-    const char * fileName) noexcept(false);
+    const char * fileName) noexcept(true);
 
 }
 
