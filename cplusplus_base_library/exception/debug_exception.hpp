@@ -9,6 +9,8 @@
 #include <iostream>
 #include "exception.hpp"
 
+#define __DEBUG_TRY_CATCH() 1
+
 #ifndef DEBUG_TRY
 #define DEBUG_TRY /**/try/**/
 #endif

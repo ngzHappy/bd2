@@ -6,6 +6,9 @@
 #include "../lua/lua.hpp"
 #include "debug_exception.hpp"
  
+#ifndef __DEBUG_TRY_CATCH
+
+#else
 namespace exception {
 
 std::ostream & debug_exception_out(){
@@ -21,6 +24,7 @@ std::recursive_mutex & debug_exception_out_mutex(){
 }
 
 }/**/
+#endif
 
 namespace {
 namespace __private {
