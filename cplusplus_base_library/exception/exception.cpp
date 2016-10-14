@@ -2,7 +2,25 @@
 #include <iostream>
 #include <sstream>
 #include <cstdlib>
+#include <fstream>
 #include "../lua/lua.hpp"
+#include "debug_exception.hpp"
+ 
+namespace exception {
+
+std::ostream & debug_exception_out(){
+/* do not need delete */
+    static auto * ans=new std::ofstream("debug_exception.txt");
+    return *ans;
+}
+
+std::recursive_mutex & debug_exception_out_mutex(){
+/* no not need delete */
+    static auto * ans=new std::recursive_mutex;
+    return *ans;
+}
+
+}/**/
 
 namespace {
 namespace __private {
