@@ -29,9 +29,19 @@ std::recursive_mutex & debug_exception_out_mutex() {
 }/**/
 #endif
 
-
+/****************************************************************/
 namespace {
 namespace __private {
+
+template<typename _Stream,typename _Data,std::size_t _N=0,typename _U=void>
+inline void _write(_Stream && arg,const _Data&argD) {
+    arg<<argD;
+}
+
+template<typename _Stream,typename _Data,std::size_t _N>
+inline void _write(_Stream && arg,_Data(&argD)[_N]) {
+    arg.write(argD,_N-1);
+}
 
 class TestInt {};
 
@@ -66,13 +76,21 @@ class Handle :public exception::ExceptionHandle {
     void bad_exception_handle() {
         try {
             stringstream out;
-            out<<"get a really bad exception @\n"
-                <<"from : "
-                <<"\nline : "<<memLine
-                <<"\nfileName : "<<memFileName
-                <<"\nfunctionName : "<<memFunctionName
-                <<"\n("<<__LINE__<<" , "<<__FILE__<<" , "<<__func__<<")"
-                <<std::endl;
+            _write(out,"get a really bad exception @\n");
+            _write(out,"from : ");
+            _write(out,"\nline : ");
+            _write(out,memLine);
+            _write(out,"\nfileName : ");
+            _write(out,memFileName);
+            _write(out,"\nfunctionName : ");
+            _write(out,memFunctionName);
+            _write(out,"\n(");
+            _write(out,__LINE__);
+            _write(out," , ");
+            _write(out,__FILE__);
+            _write(out," , ");
+            _write(out,__func__);
+            _write(out,")\n");
             log_stream()<<out.rdbuf();
         }
         catch (...) {}
@@ -84,13 +102,21 @@ class Handle :public exception::ExceptionHandle {
 
         try {
             stringstream out;
-            out<<"get a TestInt exception @\n"
-                <<"from : "
-                <<"\nline : "<<memLine
-                <<"\nfileName : "<<memFileName
-                <<"\nfunctionName : "<<memFunctionName
-                <<"\n("<<__LINE__<<" , "<<__FILE__<<" , "<<__func__<<")"
-                <<std::endl;
+            _write(out,"get a TestInt exception @\n");
+            _write(out,"from : ");
+            _write(out,"\nline : ");
+            _write(out,memLine);
+            _write(out,"\nfileName : ");
+            _write(out,memFileName);
+            _write(out,"\nfunctionName : ");
+            _write(out,memFunctionName);
+            _write(out,"\n(");
+            _write(out,__LINE__);
+            _write(out," , ");
+            _write(out,__FILE__);
+            _write(out," , ");
+            _write(out,__func__);
+            _write(out,")\n");
             log_stream()<<out.rdbuf();
         }
         catch (...) {
@@ -110,14 +136,23 @@ class Handle :public exception::ExceptionHandle {
 
         try {
             stringstream out;
-            out<<"get a std::exception exception @\n"
-                <<"from : "
-                <<"\nline : "<<memLine
-                <<"\nfileName : "<<memFileName
-                <<"\nfunctionName : "<<memFunctionName
-                <<"\n("<<__LINE__<<" , "<<__FILE__<<" , "<<__func__<<")\n"
-                <<e.what()
-                <<std::endl;
+            _write(out,"get a std::exception exception @\n");
+            _write(out,"from : ");
+            _write(out,"\nline : ");
+            _write(out,memLine);
+            _write(out,"\nfileName : ");
+            _write(out,memFileName);
+            _write(out,"\nfunctionName : ");
+            _write(out,memFunctionName);
+            _write(out,"\n(");
+            _write(out,__LINE__);
+            _write(out," , ");
+            _write(out,__FILE__);
+            _write(out," , ");
+            _write(out,__func__);
+            _write(out,")");
+            _write(out,e.what());
+            _write(out,"\n");
             log_stream()<<out.rdbuf();
         }
         catch (...) {
@@ -138,14 +173,23 @@ class Handle :public exception::ExceptionHandle {
         try {
             {
                 stringstream out;
-                out<<"get a std::logic_error exception @\n"
-                    <<"from : "
-                    <<"\nline : "<<memLine
-                    <<"\nfileName : "<<memFileName
-                    <<"\nfunctionName : "<<memFunctionName
-                    <<"\n("<<__LINE__<<" , "<<__FILE__<<" , "<<__func__<<")\n"
-                    <<e.what()
-                    <<std::endl;
+                _write(out,"get a std::logic_error exception @\n");
+                _write(out,"from : ");
+                _write(out,"\nline : ");
+                _write(out,memLine);
+                _write(out,"\nfileName : ");
+                _write(out,memFileName);
+                _write(out,"\nfunctionName : ");
+                _write(out,memFunctionName);
+                _write(out,"\n(");
+                _write(out,__LINE__);
+                _write(out," , ");
+                _write(out,__FILE__);
+                _write(out," , ");
+                _write(out,__func__);
+                _write(out,")");
+                _write(out,e.what());
+                _write(out,"\n");
                 log_stream()<<out.rdbuf();
             }
             std::exit(-1);
@@ -168,14 +212,23 @@ class Handle :public exception::ExceptionHandle {
         try {
             {
                 stringstream out;
-                out<<"get a std::bad_cast exception @\n"
-                    <<"from : "
-                    <<"\nline : "<<memLine
-                    <<"\nfileName : "<<memFileName
-                    <<"\nfunctionName : "<<memFunctionName
-                    <<"\n("<<__LINE__<<" , "<<__FILE__<<" , "<<__func__<<")\n"
-                    <<e.what()
-                    <<std::endl;
+                _write(out,"get a std::bad_cast exception @\n");
+                _write(out,"from : ");
+                _write(out,"\nline : ");
+                _write(out,memLine);
+                _write(out,"\nfileName : ");
+                _write(out,memFileName);
+                _write(out,"\nfunctionName : ");
+                _write(out,memFunctionName);
+                _write(out,"\n(");
+                _write(out,__LINE__);
+                _write(out," , ");
+                _write(out,__FILE__);
+                _write(out," , ");
+                _write(out,__func__);
+                _write(out,")");
+                _write(out,e.what());
+                _write(out,"\n");
                 log_stream()<<out.rdbuf();
             }
         }
@@ -224,13 +277,22 @@ public:
             /*unknow exception handle*/
             {
                 stringstream out;
-                out<<"get a unknow exception @\n"
-                    <<"from : "
-                    <<"\nline : "<<memLine
-                    <<"\nfileName : "<<memFileName
-                    <<"\nfunctionName : "<<memFunctionName
-                    <<"\n("<<__LINE__<<" , "<<__FILE__<<" , "<<__func__<<")"
-                    <<std::endl;
+                _write(out,"get a unknow exception @\n");
+                _write(out,"from : ");
+                _write(out,"\nline : ");
+                _write(out,memLine);
+                _write(out,"\nfileName : ");
+                _write(out,memFileName);
+                _write(out,"\nfunctionName : ");
+                _write(out,memFunctionName);
+                _write(out,"\n(");
+                _write(out,__LINE__);
+                _write(out," , ");
+                _write(out,__FILE__);
+                _write(out," , ");
+                _write(out,__func__);
+                _write(out,")");
+                _write(out,"\n");
                 log_stream()<<out.rdbuf();
             }
             /*quit the application*/
@@ -244,7 +306,7 @@ private:
 
 }/*__private*/
 }/*namespace*/
-
+ /****************************************************************/
 
 namespace exception {
 
