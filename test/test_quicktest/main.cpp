@@ -11,19 +11,17 @@
 #include "BoostICL.hpp"
 
 class Application
-        :public QApplication,memory::Application{
+    :public QApplication,memory::Application {
 public:
     using QApplication::QApplication;
 };
 
-int main(int argc, char *argv[])
-{
-    QApplication app(argc, argv);
+int main(int argc,char *argv[]) {
+    QApplication app(argc,argv);
 
     try {
         throw std::exception("test exception");
-    }
-    catch (...) {
+    }not_cplusplus_exception()catch (...) {
         exception_catched();
     }
 

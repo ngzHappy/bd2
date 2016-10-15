@@ -280,7 +280,7 @@ public:
         }
         catch (...) {
             /*unknow exception handle*/
-            {
+            try {
                 stringstream out;
                 _write(out,"get a unknow exception @\n");
                 _write(out,"from : ");
@@ -299,6 +299,9 @@ public:
                 _write(out,")");
                 _write(out,"\n");
                 log_stream()<<out.rdbuf();
+            }
+            catch (...) {
+                bad_exception_handle();
             }
             /*quit the application*/
             std::exit(-7);
@@ -324,23 +327,25 @@ void exception_handle(
         std::rethrow_exception(std::current_exception());
     }/*do not catched exception*/
     catch (const lua_exception_type &e) {
-        {
+        try {
             __private::stringstream out;
             out<<"you should rethrow lua exception yourself:"
-                <<functionName<<":"<<fileName
-                <<":"<<line;
+                <<functionName<<" : "<<fileName
+                <<" : "<<line;
             __private::log_stream()<<out.rdbuf();
         }
+        catch (...) {}
         std::exit(-1); (void)e;
     }
     catch (const std::bad_alloc &e) {
-        {
+        try {
             __private::stringstream out;
             out<<"bad_alloc:"
-                <<functionName<<":"<<fileName
-                <<":"<<line;
+                <<functionName<<" : "<<fileName
+                <<" : "<<line;
             __private::log_stream()<<out.rdbuf();
         }
+        catch (...) {}
         /*std::quick_exit(-1);*/
         std::exit(-1); (void)e;
     }
