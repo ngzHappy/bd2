@@ -50,16 +50,7 @@
 ** C++ code, with _longjmp/_setjmp when asked to use them, and with
 ** longjmp/setjmp otherwise.
 */
-#if !defined(LUAI_THROW)				/* { */
- 
-/* C++ exceptions */
-#define LUAI_THROW(L,c)		throw( reinterpret_cast<lua_exception_type>(c) )
-#define LUAI_TRY(L,c,a) \
-	try { a } catch(...) { if ((c)->status == 0) (c)->status = -1; }
-#define luai_jmpbuf		int  /* dummy variable */
-
-#endif							/* } */
-
+#include "../../__lua_do.hpp"
 
 
 /* chain list of long jump buffers */

@@ -39,7 +39,7 @@ HANDLE_EXCEPTION_EXPORT void exception_handle(
 }/*namspace:exception*/
 
 #ifndef not_cplusplus_exception
-#define not_cplusplus_exception() catch(const lua_exception_type &_lua_e_2376_){throw _lua_e_2376_;}
+#define not_cplusplus_exception() catch( const lua_exception_type & _lua_e_2376_ ) { throw _lua_e_2376_ ; }
 #endif
 
 #ifndef exception_catched
@@ -47,9 +47,8 @@ HANDLE_EXCEPTION_EXPORT void exception_handle(
 #endif
 
 #ifndef cplusplus_catch
-#define cplusplus_catch(...) /**/not_cplusplus_exception()catch (...) { /**/ \
+#define cplusplus_catch() /**/not_cplusplus_exception()catch (...) { /**/ \
 exception_catched(); /**/ \
-__VA_ARGS__ /**/ \
 }/**/
 
 #endif/*cplusplus_catch*/

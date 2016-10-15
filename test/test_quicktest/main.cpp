@@ -16,6 +16,32 @@ public:
     using QApplication::QApplication;
 };
 
+inline int test() {
+    
+    class FunctionState {
+        int xxx=2;
+    public:
+        void f_return() const {}
+        template<typename __T__=int>
+        decltype(auto) f_return(__T__&&_arg_) {
+            xxx=675;
+            return std::forward<__T__>(_arg_);
+        }
+    };
+
+    FunctionState f;
+
+    return f.f_return({});
+
+    try {
+
+    }
+    catch (const int &) {
+    }
+
+    return 7;
+}
+
 int main(int argc,char *argv[]) {
     try {
 
@@ -39,5 +65,12 @@ int main(int argc,char *argv[]) {
 
         return app.exec();
 
-    }cplusplus_catch(return -1;)
+    }not_cplusplus_exception() catch (...) { exception_catched(); }
+
+    return -1;
 }
+
+
+
+
+
