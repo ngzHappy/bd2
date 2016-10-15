@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <mutex>
+#include <cassert>
 #include <shared_mutex>
 #include "../lua/lua.hpp"
 #include "../memory/MemoryLibrary.hpp"
@@ -257,7 +258,11 @@ public:
 
     void exception_handle() noexcept(true) override {
 
-        ++memExceptionDepth;
+        {
+            ++memExceptionDepth;
+            assert(memExceptionDepth<32);
+        }
+
         try {
             std::rethrow_exception(std::current_exception());
         }/*add your own exception functions here*/

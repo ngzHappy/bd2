@@ -163,17 +163,18 @@ enum GCOptions :enum_base_type {
 };
 
 /*创建新的lua虚拟机,并返回主栈区*/
-inline auto newstate(Alloc f,void *ud)->State * { return lua_newstate(f,ud); }
+inline auto newstate(Alloc f,void *ud) noexcept(true) ->State * { return lua_newstate(f,ud); }
 /*关闭lua虚拟机*/
-inline auto close(lua_State *L)->void { return lua_close(L); }
+inline auto close(lua_State *L) noexcept(true) ->void { return lua_close(L); }
 /*创建新的线程（协程）*/
 inline auto newthread(State *L)->State * { return lua_newthread(L); }
 /*内存不足回调函数*/
 inline auto atpanic(State *L,CFunction panicf)->CFunction { return lua_atpanic(L,panicf); }
 /*返回lua版本号*/
 inline auto version(State *L)->const lua_Number *{ return lua_version(L); }
-/*返回栈区绝对路径*/
-inline auto absindex(State *L,int idx)->int { return lua_absindex(L,idx); }
+/* 返回栈区绝对路径 */
+/* [-0, +0, –] int lua_absindex (lua_State *L, int idx); */
+inline auto absindex(State *L,int idx) noexcept(true) ->int { return lua_absindex(L,idx); }
 /*返回栈区大小*/
 inline auto gettop(State *L)->int { return lua_gettop(L); }
 /*调整栈区大小*/
@@ -221,7 +222,8 @@ inline auto tothread(State *L,int idx)->State * { return lua_tothread(L,idx); }
 /*转为指针*/
 inline auto topointer(State *L,int idx)->const void * { return lua_topointer(L,idx); }
 /*执行数字运算*/
-inline auto arith(State *L,ArithmeticFunctionOptions op) ->void { return lua_arith(L,static_cast<int>(op)); }
+/* [-(2|1), +1, e] void lua_arith (lua_State *L, int op); */
+inline auto arith(State *L,ArithmeticFunctionOptions op) noexcept(false) ->void { return lua_arith(L,static_cast<int>(op)); }
 /*比较两个值是否相等*/
 inline auto rawequal(State *L,int idx1,int idx2)->bool { return lua_rawequal(L,idx1,idx2)>0; }
 /*
