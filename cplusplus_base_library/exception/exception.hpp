@@ -46,10 +46,6 @@ HANDLE_EXCEPTION_EXPORT void exception_handle(
 #define exception_catched() exception::exception_handle(__LINE__,__func__,__FILE__)
 #endif
 
-#ifndef cplusplus_try
-#define cplusplus_try /**/try/**/
-#endif/*cplusplus_try*/
-
 #ifndef cplusplus_catch
 #define cplusplus_catch(...) /**/not_cplusplus_exception()catch (...) { /**/ \
 exception_catched(); /**/ \

@@ -17,27 +17,27 @@ public:
 };
 
 int main(int argc,char *argv[]) {
-    cplusplus_try{
+    try {
 
-QApplication app(argc,argv);
+        QApplication app(argc,argv);
 
-TestGumbo test_gumbo;
-TestGzip test_gzip;
-TestStaticPointer static_pointer_test;
-TestCompiler testCompiler;
-BoostICL icl;
-std::unique_ptr<TestNetWork> testNetWork=nullptr;
+        TestGumbo test_gumbo;
+        TestGzip test_gzip;
+        TestStaticPointer static_pointer_test;
+        TestCompiler testCompiler;
+        BoostICL icl;
+        std::unique_ptr<TestNetWork> testNetWork=nullptr;
 
-QTimer::singleShot(0,[&testNetWork]() {
-    testNetWork.reset(new TestNetWork);
-});
+        QTimer::singleShot(0,[&testNetWork]() {
+            testNetWork.reset(new TestNetWork);
+        });
 
-testCompiler.get<0>();
+        testCompiler.get<0>();
 
-MainWindow window;
-window.show();
+        MainWindow window;
+        window.show();
 
-return app.exec();
+        return app.exec();
 
     }cplusplus_catch(return -1;)
 }
