@@ -488,9 +488,9 @@ void luaD_call(lua_State *L,StkId func,int nResults) {
 ** Similar to 'luaD_call', but does not allow yields during the call
 */
 void luaD_callnoyield(lua_State *L,StkId func,int nResults) {
-    L->nny++;
+    ++L->nny;
     luaD_call(L,func,nResults);
-    L->nny--;
+    --L->nny;
 }
 
 
@@ -605,22 +605,28 @@ static void resume(lua_State *L,void *ud) {
     int n=*(cast(int*,ud));  /* number of arguments */
     StkId firstArg=L->top-n;  /* first argument */
     CallInfo *ci=L->ci;
-    if (nCcalls>=LUAI_MAXCCALLS)
+    if (nCcalls>=LUAI_MAXCCALLS) {
         resume_error(L,"C stack overflow",firstArg);
-    if (L->status==LUA_OK) {  /* may be starting a coroutine */
-        if (ci!=&L->base_ci)  /* not in base level? */
-            resume_error(L,"cannot resume non-suspended coroutine",firstArg);
-        /* coroutine is in base level; start running it */
-        if (!luaD_precall(L,firstArg-1,LUA_MULTRET))  /* Lua function? */
-            luaV_execute(L);  /* call it */
     }
-    else if (L->status!=LUA_YIELD)
+
+    if (L->status==LUA_OK) {  /* may be starting a coroutine */
+        if (ci!=&L->base_ci)  /* not in base level? */ {
+            resume_error(L,"cannot resume non-suspended coroutine",firstArg);
+        }
+        /* coroutine is in base level; start running it */
+        if (!luaD_precall(L,firstArg-1,LUA_MULTRET))  /* Lua function? */ {
+            luaV_execute(L);  /* call it */
+        }
+    }
+    else if (L->status!=LUA_YIELD) {
         resume_error(L,"cannot resume dead coroutine",firstArg);
+    }
     else {  /* resuming from previous yield */
         L->status=LUA_OK;  /* mark that it is running (again) */
         ci->func=restorestack(L,ci->extra);
-        if (isLua(ci))  /* yielded inside a hook? */
+        if (isLua(ci))  /* yielded inside a hook? */ {
             luaV_execute(L);  /* just continue running Lua code */
+        }
         else {  /* 'common' yield */
             if (ci->u.c.k!=nullptr) {  /* does it have a continuation function? */
                 lua_unlock(L);
@@ -638,16 +644,23 @@ static void resume(lua_State *L,void *ud) {
 
 
 LUA_API int lua_resume(lua_State *L,lua_State *from,int nargs) {
+    
     int status;
-    unsigned short oldnny=L->nny;  /* save "number of non-yieldable" calls */
+    auto oldnny=L->nny;  /* save "number of non-yieldable" calls */
+    
     lua_lock(L);
     luai_userstateresume(L,nargs);
-    L->nCcalls=(from)?from->nCcalls+1:1;
+
+    L->nCcalls=(from)?(from->nCcalls+1):1;
     L->nny=0;  /* allow yields */
+    
     api_checknelems(L,(L->status==LUA_OK)?nargs+1:nargs);
-    status=luaD_rawrunprotected(L,resume,&nargs);
-    if (status==-1)  /* error calling 'lua_resume'? */
+  
+    status=luaD_rawrunprotected(L,&resume,&nargs);
+
+    if (status==-1)  /* error calling 'lua_resume'? */ {
         status=LUA_ERRRUN;
+    }
     else {  /* continue running after recoverable errors */
         while (errorstatus(status)&&recover(L,status)) {
             /* unroll continuation */
@@ -660,8 +673,10 @@ LUA_API int lua_resume(lua_State *L,lua_State *from,int nargs) {
         }
         else lua_assert(status==L->status);  /* normal end or yield */
     }
+
     L->nny=oldnny;  /* restore 'nny' */
-    L->nCcalls--;
+    --L->nCcalls;
+
     lua_assert(L->nCcalls==((from)?from->nCcalls:0));
     lua_unlock(L);
     return status;
