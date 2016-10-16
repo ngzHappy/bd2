@@ -2,6 +2,7 @@
 #define __57235__FUNCTION__HPP__
 
 #include <type_traits>
+#include "module.hpp"
 #include "../exception/exception.hpp"
 
 namespace function {
@@ -39,8 +40,8 @@ public:
 
 }/*namespace function*/
 
-#define FUNCTION_WITHOUT_EXCEPTION(...) /**/__VA_ARGS__/**/
-#define FUNCTION_WITH_EXCEPTION(...) try/**/FUNCTION_WITHOUT_EXCEPTION(__VA_ARGS__)/**/cplusplus_catch()
+#define FUNCTION_WITHOUT_EXCEPTION(_2_module__,...) { static_assert(_2_module__,"all module must without exceptions");/**/__VA_ARGS__/**/ }
+#define FUNCTION_WITH_EXCEPTION(_1_module__,...) try/**/FUNCTION_WITHOUT_EXCEPTION(((_1_module__)||true),__VA_ARGS__)/**/cplusplus_catch()
 
 #endif
 

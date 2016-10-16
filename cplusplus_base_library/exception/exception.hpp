@@ -49,7 +49,7 @@ HANDLE_EXCEPTION_EXPORT void exception_handle(
 #ifndef cplusplus_catch
 #define cplusplus_catch() /**/not_cplusplus_exception()catch (...) { /**/ \
 exception_catched(); /**/ \
-}/**/
+}static_assert(true,"")/**/
 
 #endif/*cplusplus_catch*/
 
