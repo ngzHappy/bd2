@@ -1,4 +1,4 @@
-/*
+﻿/*
 ** $Id: lgc.c,v 2.212 2016/03/31 19:02:03 roberto Exp $
 ** Garbage Collector
 ** See Copyright Notice in lua.h
@@ -539,7 +539,7 @@ static lu_mem traversethread (global_State *g, lua_State *th) {
     StkId lim = th->stack + th->stacksize;  /* real end of stack */
     for (; o < lim; o++)  /* clear not-marked stack slice */
       setnilvalue(o);
-    /* 'remarkupvals' may have removed thread from 'twups' list */ 
+    /* 'remarkupvals' may have removed thread from 'twups' list */
     if (!isintwups(th) && th->openupval != nullptr) {
       th->twups = g->twups;  /* link it back to the list */
       g->twups = th;

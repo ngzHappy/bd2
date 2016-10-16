@@ -1,4 +1,4 @@
-/*
+﻿/*
 ** $Id: loadlib.c,v 1.127 2015/11/23 11:30:45 roberto Exp $
 ** Dynamic library loader for Lua
 ** See Copyright Notice in lua.h

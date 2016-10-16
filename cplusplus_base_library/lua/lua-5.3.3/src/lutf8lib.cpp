@@ -1,4 +1,4 @@
-/*
+﻿/*
 ** $Id: lutf8lib.c,v 1.15 2015/03/28 19:16:55 roberto Exp $
 ** Standard library for UTF-8 manipulation
 ** See Copyright Notice in lua.h
@@ -194,7 +194,7 @@ static int byteoffset (lua_State *L) {
     lua_pushinteger(L, posi + 1);
   else  /* no such character */
     lua_pushnil(L);
-  return 1;  
+  return 1;
 }
 
 

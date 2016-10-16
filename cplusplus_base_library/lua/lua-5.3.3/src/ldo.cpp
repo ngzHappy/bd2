@@ -1,4 +1,4 @@
-/*
+﻿/*
 ** $Id: ldo.c,v 2.151 2015/12/16 16:40:07 roberto Exp $
 ** Stack and Call structure of Lua
 ** See Copyright Notice in lua.h
@@ -60,7 +60,7 @@ struct lua_longjmp {
     volatile int status;  /* error code */
 };
 
-
+/*设置error string*/
 static void seterrorobj(lua_State *L,int errcode,StkId oldtop) {
     switch (errcode) {
         case LUA_ERRMEM: {  /* memory error? */
@@ -132,13 +132,15 @@ static void correctstack(lua_State *L,TValue *oldstack) {
     CallInfo *ci;
     UpVal *up;
     L->top=(L->top-oldstack)+L->stack;
-    for (up=L->openupval; up!=nullptr; up=up->u.open.next)
+    for (up=L->openupval; up!=nullptr; up=up->u.open.next) {
         up->v=(up->v-oldstack)+L->stack;
+    }
     for (ci=L->ci; ci!=nullptr; ci=ci->previous) {
         ci->top=(ci->top-oldstack)+L->stack;
         ci->func=(ci->func-oldstack)+L->stack;
-        if (isLua(ci))
+        if (isLua(ci)) {
             ci->u.l.base=(ci->u.l.base-oldstack)+L->stack;
+        }
     }
 }
 
@@ -146,15 +148,16 @@ static void correctstack(lua_State *L,TValue *oldstack) {
 /* some space for error handling */
 #define ERRORSTACKSIZE	(LUAI_MAXSTACK + 200)
 
-
+/*调整堆栈大小*/
 void luaD_reallocstack(lua_State *L,int newsize) {
     TValue *oldstack=L->stack;
     int lim=L->stacksize;
     lua_assert(newsize<=LUAI_MAXSTACK||newsize==ERRORSTACKSIZE);
     lua_assert(L->stack_last-L->stack==L->stacksize-EXTRA_STACK);
     luaM_reallocvector(L,L->stack,L->stacksize,newsize,TValue);
-    for (; lim<newsize; lim++)
+    for (; lim<newsize; ++lim) {
         setnilvalue(L->stack+lim); /* erase new segment */
+    }
     L->stacksize=newsize;
     L->stack_last=L->stack+newsize-EXTRA_STACK;
     correctstack(L,oldstack);
@@ -168,14 +171,15 @@ void luaD_growstack(lua_State *L,int n) {
     else {
         int needed=cast_int(L->top-L->stack)+n+EXTRA_STACK;
         int newsize=2*size;
-        if (newsize>LUAI_MAXSTACK) newsize=LUAI_MAXSTACK;
-        if (newsize<needed) newsize=needed;
+        if (newsize>LUAI_MAXSTACK) { newsize=LUAI_MAXSTACK; }
+        if (newsize<needed) { newsize=needed; }
         if (newsize>LUAI_MAXSTACK) {  /* stack overflow? */
             luaD_reallocstack(L,ERRORSTACKSIZE);
             luaG_runerror(L,"stack overflow");
         }
-        else
+        else {
             luaD_reallocstack(L,newsize);
+        }
     }
 }
 
@@ -267,11 +271,11 @@ static StkId adjust_varargs(lua_State *L,Proto *p,int actual) {
     /* move fixed parameters to final position */
     fixed=L->top-actual;  /* first fixed argument */
     base=L->top;  /* final position of first argument */
-    for (i=0; i<nfixargs && i<actual; i++) {
+    for (i=0; i<nfixargs && i<actual; ++i) {
         setobjs2s(L,L->top++,fixed+i);
         setnilvalue(fixed+i);  /* erase original copy (for GC) */
     }
-    for (; i<nfixargs; i++)
+    for (; i<nfixargs; ++i)
         setnilvalue(L->top++);  /* complete missing arguments */
     return base;
 }
@@ -665,27 +669,35 @@ LUA_API int lua_yieldk(
     int nresults,
     lua_KContext ctx,
     lua_KFunction k) {
+
     CallInfo *ci=L->ci;
     luai_userstateyield(L,nresults);
     lua_lock(L);
     api_checknelems(L,nresults);
+
     if (L->nny>0) {
-        if (L!=G(L)->mainthread)
+        if (L!=G(L)->mainthread) {
             luaG_runerror(L,"attempt to yield across a C-call boundary");
-        else
+        }
+        else {
             luaG_runerror(L,"attempt to yield from outside a coroutine");
+        }
     }
+
     L->status=LUA_YIELD;
     ci->extra=savestack(L,ci->func);  /* save current 'func' */
+
     if (isLua(ci)) {  /* inside a hook? */
         api_check(L,k==nullptr,"hooks cannot continue after yielding");
     }
     else {
-        if ((ci->u.c.k=k)!=nullptr)  /* is there a continuation? */
+        if ((ci->u.c.k=k)!=nullptr)  /* is there a continuation? */ {
             ci->u.c.ctx=ctx;  /* save context */
+        }
         ci->func=L->top-nresults-1;  /* protect stack below results */
         luaD_throw(L,LUA_YIELD);
     }
+
     lua_assert(ci->callstatus & CIST_HOOKED);  /* must be inside a hook */
     lua_unlock(L);
     return 0;  /* return to 'luaD_hook' */
@@ -758,7 +770,7 @@ int luaD_protectedparser(lua_State *L,ZIO *z,const char *name,
                                         const char *mode) {
     struct SParser p;
     int status;
-    L->nny++;  /* cannot yield during parsing */
+    ++(L->nny);  /* cannot yield during parsing */
     p.z=z; p.name=name; p.mode=mode;
     p.dyd.actvar.arr=nullptr; p.dyd.actvar.size=0;
     p.dyd.gt.arr=nullptr; p.dyd.gt.size=0;
@@ -769,7 +781,7 @@ int luaD_protectedparser(lua_State *L,ZIO *z,const char *name,
     luaM_freearray(L,p.dyd.actvar.arr,p.dyd.actvar.size);
     luaM_freearray(L,p.dyd.gt.arr,p.dyd.gt.size);
     luaM_freearray(L,p.dyd.label.arr,p.dyd.label.size);
-    L->nny--;
+    --(L->nny);
     return status;
 }
 

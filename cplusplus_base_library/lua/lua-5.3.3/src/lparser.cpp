@@ -1,4 +1,4 @@
-/*
+﻿/*
 ** $Id: lparser.c,v 2.153 2016/05/13 19:10:16 roberto Exp $
 ** Lua Parser
 ** See Copyright Notice in lua.h
@@ -189,7 +189,7 @@ static void new_localvarliteral_ (LexState *ls, const char *name, size_t sz) {
 }
 
 #define new_localvarliteral(ls,v) \
-	new_localvarliteral_(ls, "" v, (sizeof(v)/sizeof(char))-1)
+    new_localvarliteral_(ls, "" v, (sizeof(v)/sizeof(char))-1)
 
 
 static LocVar *getlocvar (FuncState *fs, int i) {

@@ -1,4 +1,4 @@
-/*
+﻿/*
 ** $Id: loslib.c,v 1.64 2016/04/18 13:06:55 roberto Exp $
 ** Standard Operating System library
 ** See Copyright Notice in lua.h
@@ -35,11 +35,11 @@
 
 /* options for ISO C 99 and POSIX */
 #define L_STRFTIMEC99 "aAbBcCdDeFgGhHIjmMnprRStTuUVwWxXyYzZ%" \
-	"||" "EcECExEXEyEY" "OdOeOHOIOmOMOSOuOUOVOwOWOy"
+    "||" "EcECExEXEyEY" "OdOeOHOIOmOMOSOuOUOVOwOWOy"
 
 /* options for Windows */
 #define L_STRFTIMEWIN "aAbBcdHIjmMpSUwWxXyYzZ%" \
-	"||" "#c#x#d#H#I#j#m#M#S#U#w#W#y#Y"
+    "||" "#c#x#d#H#I#j#m#M#S#U#w#W#y#Y"
 
 #if defined(LUA_USE_WINDOWS)
 #define LUA_STRFTIMEOPTIONS	L_STRFTIMEWIN

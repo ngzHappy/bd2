@@ -1,4 +1,4 @@
-/*
+﻿/*
 ** $Id: lobject.c,v 2.111 2016/05/20 14:07:48 roberto Exp $
 ** Some generic functions over Lua objects
 ** See Copyright Notice in lua.h
@@ -394,7 +394,7 @@ static void pushstr (lua_State *L, const char *str, size_t l) {
 
 
 /*
-** this function handles only '%d', '%c', '%f', '%p', and '%s' 
+** this function handles only '%d', '%c', '%f', '%p', and '%s'
    conventional formats, plus Lua-specific '%I' and '%U'
 */
 const char *luaO_pushvfstring (lua_State *L, const char *fmt, va_list argp) {

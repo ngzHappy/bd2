@@ -1,4 +1,4 @@
-/*
+﻿/*
 ** $Id: liolib.c,v 2.149 2016/05/02 14:03:19 roberto Exp $
 ** Standard I/O (and system) library
 ** See Copyright Notice in lua.h
@@ -38,9 +38,9 @@
 
 /* Check whether 'mode' matches '[rwa]%+?[L_MODEEXT]*' */
 #define l_checkmode(mode) \
-	(*mode != '\0' && strchr("rwa", *(mode++)) != nullptr &&	\
-	(*mode != '+' || (++mode, 1)) &&  /* skip if char is '+' */	\
-	(strspn(mode, L_MODEEXT) == strlen(mode)))
+    (*mode != '\0' && strchr("rwa", *(mode++)) != nullptr &&	\
+    (*mode != '+' || (++mode, 1)) &&  /* skip if char is '+' */	\
+    (strspn(mode, L_MODEEXT) == strlen(mode)))
 
 #endif
 
@@ -67,9 +67,9 @@
 
 /* ISO C definitions */
 #define l_popen(L,c,m)  \
-	  ((void)((void)c, m), \
-	  luaL_error(L, "'popen' not supported"), \
-	  (FILE*)0)
+      ((void)((void)c, m), \
+      luaL_error(L, "'popen' not supported"), \
+      (FILE*)0)
 #define l_pclose(L,file)		((void)L, (void)file, -1)
 
 #endif				/* } */

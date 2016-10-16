@@ -1,4 +1,4 @@
-/*
+﻿/*
 ** $Id: ltm.c,v 2.37 2016/02/26 19:20:15 roberto Exp $
 ** Tag methods
 ** See Copyright Notice in lua.h
@@ -15,7 +15,7 @@
 #include "lua.h"
 
 #include "ldebug.h"
-#include "ldo.h" 
+#include "ldo.h"
 #include "lobject.h"
 #include "lstate.h"
 #include "lstring.h"
