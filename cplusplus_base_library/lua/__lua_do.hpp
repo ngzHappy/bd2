@@ -25,7 +25,7 @@ public:
 #if !defined(LUAI_THROW)				/* { */
 
 /* C++ exceptions */
-#define LUAI_THROW(L,c) auto _1_exception_lock_=memory::make_shared<__LUA_Exception>(); throw( _1_exception_lock_ )
+#define LUAI_THROW(L,c) lua_exception_type _1_exception_lock_=memory::make_shared<__LUA_Exception>(); throw( _1_exception_lock_ )
 #define LUAI_TRY(L,c,a) \
 	try { a } catch(...) { if ((c)->status == 0) (c)->status = -1; }
 #define luai_jmpbuf		int  /* dummy variable */
