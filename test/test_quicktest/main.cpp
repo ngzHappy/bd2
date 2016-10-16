@@ -49,12 +49,33 @@ inline int test() {
 
 #include <optional.hpp>
 #include <string>
-
-optional<int> xxx() {
-    return 334;
-}
+#include <lua/lua.hpp>
+#include <iostream>
 
 int main(int argc,char *argv[]) {
+    
+    {
+        auto L=luaL::newstate();
+        lua::openlibs(L);
+
+        lua::status(L);
+
+        lua::pushcfunction(L,[](lua::State *L)->int {
+
+            lua::pushlstring(L,"1234");
+            try {
+                lua::error(L);
+            }
+            catch (...) { 
+                std::cout<<lua::exception_count()<<std::endl;
+                throw;
+            }
+            return 0;
+        });
+
+        lua::pcall(L,0,0,0);
+
+    }
 
     typedef function::BasicFunctionState<int> _FunctionState;
     constexpr _FunctionState varThisFunctionState;
