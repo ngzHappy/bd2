@@ -83,7 +83,7 @@ int main(int argc,char *argv[]) {
         });
 
         lua::pcall(L,0,0,0);
-
+        std::cout<<lua::exception_count()<<std::endl;
     }
 
     typedef function::BasicFunctionState<int> _FunctionState;

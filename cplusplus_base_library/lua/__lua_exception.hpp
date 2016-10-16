@@ -22,7 +22,7 @@ public:
     _e_lua_exception_type()=default;
     virtual ~_e_lua_exception_type()=default; 
 };
-typedef std::shared_ptr<_e_lua_exception_type> lua_exception_type;
+typedef _e_lua_exception_type lua_exception_type;
 
 #endif
 
