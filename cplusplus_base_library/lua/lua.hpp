@@ -309,15 +309,15 @@ inline auto load(State *L,Reader reader,void *dt,const char *chunkname,const cha
 /**/
 inline auto dump(State *L,Writer writer,void *data,int strip)->ThreadStatus { return static_cast<ThreadStatus>(lua_dump(L,writer,data,strip)); }
 /**/
-inline auto yieldk(State *L,int nresults,KContext ctx,KFunction k) ->unknow_return_type { return lua_yieldk(L,nresults,ctx,k); }
+//inline auto yieldk(State *L,int nresults,KContext ctx,KFunction k) ->unknow_return_type { return lua_yieldk(L,nresults,ctx,k); }
 /**/
-inline auto resume(State *L,State *from,int narg)->ThreadStatus { return static_cast<ThreadStatus>(lua_resume(L,from,narg)); }
+//inline auto resume(State *L,State *from,int narg)->ThreadStatus { return static_cast<ThreadStatus>(lua_resume(L,from,narg)); }
 /**/
 inline auto status(State *L) ->ThreadStatus { return static_cast<ThreadStatus>(lua_status(L)); }
 /**/
-inline auto isyieldable(State *L)->bool { return lua_isyieldable(L)>0; }
+//inline auto isyieldable(State *L)->bool { return lua_isyieldable(L)>0; }
 /**/
-inline auto yield(State *L,int n)->decltype(auto) { return yieldk(L,n,0,nullptr); }
+//inline auto yield(State *L,int n)->decltype(auto) { return yieldk(L,n,0,nullptr); }
 /**/
 inline auto gc(State *L,GCOptions what,int data)->unknow_return_type { return lua_gc(L,what,data); }
 /**/

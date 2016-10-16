@@ -113,7 +113,7 @@ int luaD_rawrunprotected(lua_State *L,Pfunc f,void *ud) {
     lj.previous=L->errorJmp;  /* chain new error handler */
     L->errorJmp=&lj;
 
-    try { 
+    try {
         (*f)(L,ud);
     }
     catch (...) {
@@ -342,8 +342,9 @@ int luaD_precall(lua_State *L,StkId func,int nresults) {
             ci->top=L->top+LUA_MINSTACK;
             lua_assert(ci->top<=L->stack_last);
             ci->callstatus=0;
-            if (L->hookmask & LUA_MASKCALL)
+            if (L->hookmask & LUA_MASKCALL) {
                 luaD_hook(L,LUA_HOOKCALL,-1);
+            }
             lua_unlock(L);
             n=(*f)(L);  /* do the actual call */
             lua_lock(L);
@@ -434,7 +435,12 @@ static int moveresults(lua_State *L,const TValue *firstResult,StkId res,
 ** moves current number of results to proper place; returns 0 iff call
 ** wanted multiple (variable number of) results.
 */
-int luaD_poscall(lua_State *L,CallInfo *ci,StkId firstResult,int nres) {
+int luaD_poscall(
+    lua_State *L,
+    CallInfo *ci,
+    StkId firstResult,
+    int nres) {
+
     StkId res;
     int wanted=ci->nresults;
     if (L->hookmask & (LUA_MASKRET|LUA_MASKLINE)) {
@@ -473,7 +479,7 @@ static void stackerror(lua_State *L) {
 ** When returns, all the results are on the stack, starting at the original
 ** function position.
 */
-void luaD_call(lua_State *L,StkId func,int nResults) {
+void luaD_call(lua_State *L,StkId func,int nResults) noexcept(false) {
     if (++L->nCcalls>=LUAI_MAXCCALLS) {
         stackerror(L);
     }
@@ -487,13 +493,16 @@ void luaD_call(lua_State *L,StkId func,int nResults) {
 /*
 ** Similar to 'luaD_call', but does not allow yields during the call
 */
-void luaD_callnoyield(lua_State *L,StkId func,int nResults) {
+void luaD_callnoyield(
+    lua_State *L,
+    StkId func,
+    int nResults) {
     ++L->nny;
     luaD_call(L,func,nResults);
     --L->nny;
 }
 
-
+#if __LUA_COROUTINE_FUNCTIONS
 /*
 ** Completes the execution of an interrupted C function, calling its
 ** continuation function.
@@ -644,28 +653,30 @@ static void resume(lua_State *L,void *ud) {
 
 
 LUA_API int lua_resume(lua_State *L,lua_State *from,int nargs) {
-    
+
     int status;
     auto oldnny=L->nny;  /* save "number of non-yieldable" calls */
-    
+
     lua_lock(L);
     luai_userstateresume(L,nargs);
 
     L->nCcalls=(from)?(from->nCcalls+1):1;
     L->nny=0;  /* allow yields */
-    
+
     api_checknelems(L,(L->status==LUA_OK)?nargs+1:nargs);
-  
+
     status=luaD_rawrunprotected(L,&resume,&nargs);
 
     if (status==-1)  /* error calling 'lua_resume'? */ {
         status=LUA_ERRRUN;
     }
     else {  /* continue running after recoverable errors */
+
         while (errorstatus(status)&&recover(L,status)) {
             /* unroll continuation */
             status=luaD_rawrunprotected(L,unroll,&status);
         }
+
         if (errorstatus(status)) {  /* unrecoverable error? */
             L->status=cast_byte(status);  /* mark thread as 'dead' */
             seterrorobj(L,status,L->top);  /* push error message */
@@ -681,13 +692,15 @@ LUA_API int lua_resume(lua_State *L,lua_State *from,int nargs) {
     lua_unlock(L);
     return status;
 }
+#endif
 
-
+#if __LUA_COROUTINE_FUNCTIONS
 LUA_API int lua_isyieldable(lua_State *L) {
     return (L->nny==0);
 }
+#endif
 
-
+#if __LUA_COROUTINE_FUNCTIONS
 LUA_API int lua_yieldk(
     lua_State *L,
     int nresults,
@@ -726,7 +739,7 @@ LUA_API int lua_yieldk(
     lua_unlock(L);
     return 0;  /* return to 'luaD_hook' */
 }
-
+#endif
 
 int luaD_pcall(
     lua_State *L,

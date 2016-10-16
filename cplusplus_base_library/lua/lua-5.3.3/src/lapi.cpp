@@ -924,7 +924,7 @@ LUA_API void lua_callk(
     /*设置func*/
     auto func=L->top-(nargs+1);
     if ((k!=nullptr) && (L->nny==0)) {  /* need to prepare continuation? */
-        L->ci->u.c.k=k;  /* save continuation */
+        L->ci->u.c.k=k; /* save continuation */
         L->ci->u.c.ctx=ctx;  /* save context */
         luaD_call(L,func,nresults);  /* do the call */
     }
@@ -954,8 +954,14 @@ static void f_call(lua_State *L,void *ud) {
 
 
 
-LUA_API int lua_pcallk(lua_State *L,int nargs,int nresults,int errfunc,
-                        lua_KContext ctx,lua_KFunction k) {
+LUA_API int lua_pcallk(
+    lua_State *L,
+    int nargs,
+    int nresults,
+    int errfunc,
+    lua_KContext ctx,
+    lua_KFunction k) {
+
     struct CallS c;
     int status;
     ptrdiff_t func/*错误函数偏移*/;
@@ -985,7 +991,7 @@ LUA_API int lua_pcallk(lua_State *L,int nargs,int nresults,int errfunc,
 
     if ((k==nullptr)||(L->nny>0)) {  /* no continuation or no yieldable? */
         c.nresults=nresults;  /* do a 'conventional' protected call */
-        status=luaD_pcall(L,&f_call,&c,savestack(L,c.func),func);
+        status=luaD_pcall(L,&f_call,&c,savestack(L,c.func),func)/*noexcept(true)*/;
     }
     else {  /* prepare continuation (call is already protected by 'resume') */
         CallInfo *ci=L->ci;
@@ -997,7 +1003,10 @@ LUA_API int lua_pcallk(lua_State *L,int nargs,int nresults,int errfunc,
         L->errfunc=func;
         setoah(ci->callstatus,L->allowhook);  /* save value of 'allowhook' */
         ci->callstatus|=CIST_YPCALL;  /* function can do error recovery */
+
+        /*可能会抛异常*/
         luaD_call(L,c.func,nresults);  /* do the call */
+
         ci->callstatus&=~CIST_YPCALL;
         L->errfunc=ci->u.c.old_errfunc;
         status=LUA_OK;  /* if it is here, there were no errors */
@@ -1011,8 +1020,13 @@ LUA_API int lua_pcallk(lua_State *L,int nargs,int nresults,int errfunc,
 }
 
 
-LUA_API int lua_load(lua_State *L,lua_Reader reader,void *data,
-                      const char *chunkname,const char *mode) {
+LUA_API int lua_load(
+    lua_State *L,
+    lua_Reader reader,
+    void *data,
+    const char *chunkname,
+    const char *mode) {
+
     ZIO z;
     int status;
     lua_lock(L);
@@ -1048,7 +1062,6 @@ LUA_API int lua_dump(lua_State *L,lua_Writer writer,void *data,int strip) {
     lua_unlock(L);
     return status;
 }
-
 
 LUA_API int lua_status(lua_State *L) {
     return L->status;
