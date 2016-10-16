@@ -16,18 +16,17 @@ public:
     using QApplication::QApplication;
 };
 
+class FunctionState {
+    int xxx=2;
+public:
+    void f_return() const {}
+    template<typename __T__=int>
+    decltype(auto) f_return(__T__&&_arg_) {
+        xxx=675;
+        return std::forward<__T__>(_arg_);
+    }
+};
 inline int test() {
-    
-    class FunctionState {
-        int xxx=2;
-    public:
-        void f_return() const {}
-        template<typename __T__=int>
-        decltype(auto) f_return(__T__&&_arg_) {
-            xxx=675;
-            return std::forward<__T__>(_arg_);
-        }
-    };
 
     FunctionState f;
 
@@ -42,32 +41,54 @@ inline int test() {
     return 7;
 }
 
+#
+#
+#
+#
+
 int main(int argc,char *argv[]) {
-    try {
 
-        QApplication app(argc,argv);
+    class _FunctionState final {
+        _FunctionState(const _FunctionState&)=delete;
+        _FunctionState(_FunctionState&&)=delete;
+        _FunctionState&operator=(const _FunctionState&)=delete;
+        _FunctionState&operator=(_FunctionState&&)=delete;
+    public:
+        typedef int ans_type;
+    public:/*state 0*/
+        constexpr ans_type returnNormal() const  noexcept(true) { return 0; }
+        constexpr decltype(auto) returnNormal(const ans_type &arg) const  noexcept(true) { return arg; }
+        constexpr decltype(auto) returnNormal(ans_type &&arg) const  noexcept(true) { return static_cast<ans_type&&>(arg); }
+        constexpr decltype(auto) returnNormal(const ans_type &&arg) const  noexcept(true) { return static_cast<const ans_type&&>(arg); }
+        constexpr decltype(auto) returnNormal(ans_type&arg) const  noexcept(true) { return static_cast<ans_type&>(arg); }
+        ~_FunctionState()=default;
+        constexpr _FunctionState()=default;
+    }varThisFunctionState;
 
-        TestGumbo test_gumbo;
-        TestGzip test_gzip;
-        TestStaticPointer static_pointer_test;
-        TestCompiler testCompiler;
-        BoostICL icl;
-        std::unique_ptr<TestNetWork> testNetWork=nullptr;
+    FUNCTION_WITH_EXCEPTION({
 
-        QTimer::singleShot(0,[&testNetWork]() {
-            testNetWork.reset(new TestNetWork);
-        });
+       QApplication app(argc,argv);
 
-        testCompiler.get<0>();
+       TestGumbo test_gumbo;
+       TestGzip test_gzip;
+       TestStaticPointer static_pointer_test;
+       TestCompiler testCompiler;
+       BoostICL icl;
+       std::unique_ptr<TestNetWork> testNetWork=nullptr;
 
-        MainWindow window;
-        window.show();
+       QTimer::singleShot(0,[&testNetWork]() {
+           testNetWork.reset(new TestNetWork);
+       });
 
-        return app.exec();
+       testCompiler.get<0>();
 
-    }not_cplusplus_exception() catch (...) { exception_catched(); }
+       MainWindow window;
+       window.show();
 
-    return -1;
+       return varThisFunctionState.returnNormal(app.exec());
+    });
+
+    return varThisFunctionState.returnNormal();
 }
 
 
