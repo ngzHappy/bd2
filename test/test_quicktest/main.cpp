@@ -47,6 +47,13 @@ inline int test() {
 #
 #
 
+#include <optional.hpp>
+#include <string>
+
+optional<int> xxx() {
+    return 334;
+}
+
 int main(int argc,char *argv[]) {
 
     typedef function::BasicFunctionState<int> _FunctionState;
