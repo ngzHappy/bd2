@@ -53,9 +53,6 @@ exception_catched(); /**/ \
 
 #endif/*cplusplus_catch*/
 
-#define FUNCTION_WITHOUT_EXCEPTION(...) /**/__VA_ARGS__/**/
-#define FUNCTION_WITH_EXCEPTION(...) try/**/FUNCTION_WITHOUT_EXCEPTION(__VA_ARGS__)/**/cplusplus_catch()
-
 #endif
 
 
