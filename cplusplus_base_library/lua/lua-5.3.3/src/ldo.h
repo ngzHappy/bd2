@@ -29,7 +29,7 @@
 
 
 
-#define savestack(L,p)		((char *)(p) - (char *)L->stack)
+#define savestack(L,p)		((char *)(p) - (char *)(L->stack))
 #define restorestack(L,n)	((TValue *)((char *)L->stack + (n)))
 
 

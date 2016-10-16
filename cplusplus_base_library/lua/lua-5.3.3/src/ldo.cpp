@@ -112,9 +112,15 @@ int luaD_rawrunprotected(lua_State *L,Pfunc f,void *ud) {
     lj.status=LUA_OK;
     lj.previous=L->errorJmp;  /* chain new error handler */
     L->errorJmp=&lj;
-    LUAI_TRY(L,&lj,
+
+    try { 
         (*f)(L,ud);
-    );
+    }
+    catch (...) {
+        auto c=&lj;
+        if ((c)->status==0) (c)->status=-1;
+    }
+
     L->errorJmp=lj.previous;  /* restore old error handler */
     L->nCcalls=oldnCcalls;
     return lj.status;
@@ -352,8 +358,9 @@ int luaD_precall(lua_State *L,StkId func,int nresults) {
             int fsize=p->maxstacksize;  /* frame size */
             checkstackp(L,fsize,func);
             if (p->is_vararg!=1) {  /* do not use vararg? */
-                for (; n<p->numparams; n++)
+                for (; n<p->numparams; ++n) {
                     setnilvalue(L->top++);  /* complete missing arguments */
+                }
                 base=func+1;
             }
             else
@@ -467,11 +474,13 @@ static void stackerror(lua_State *L) {
 ** function position.
 */
 void luaD_call(lua_State *L,StkId func,int nResults) {
-    if (++L->nCcalls>=LUAI_MAXCCALLS)
+    if (++L->nCcalls>=LUAI_MAXCCALLS) {
         stackerror(L);
-    if (!luaD_precall(L,func,nResults))  /* is a Lua function? */
+    }
+    if (!luaD_precall(L,func,nResults))  /* is a Lua function? */ {
         luaV_execute(L);  /* call it */
-    L->nCcalls--;
+    }
+    --(L->nCcalls);
 }
 
 
@@ -704,15 +713,26 @@ LUA_API int lua_yieldk(
 }
 
 
-int luaD_pcall(lua_State *L,Pfunc func,void *u,
-                ptrdiff_t old_top,ptrdiff_t ef) {
+int luaD_pcall(
+    lua_State *L,
+    Pfunc func,
+    void *u,
+    ptrdiff_t old_top,
+    ptrdiff_t ef) {
+
     int status;
+
+    /*保存状态*/
     CallInfo *old_ci=L->ci;
     lu_byte old_allowhooks=L->allowhook;
     unsigned short old_nny=L->nny;
     ptrdiff_t old_errfunc=L->errfunc;
+
+    /*设置errfunc*/
     L->errfunc=ef;
+
     status=luaD_rawrunprotected(L,func,u);
+
     if (status!=LUA_OK) {  /* an error occurred? */
         StkId oldtop=restorestack(L,old_top);
         luaF_close(L,oldtop);  /* close possible pending closures */
