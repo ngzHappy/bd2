@@ -3,6 +3,7 @@
 #include <QtWidgets/QApplication>
 #include <memory/MemoryLibrary.hpp>
 #include <exception/exception.hpp>
+#include <function/function.hpp>
 #include "TestStaticPointer.hpp"
 #include "TestCompiler.hpp"
 #include "TestNetWork.hpp"
@@ -48,22 +49,8 @@ inline int test() {
 
 int main(int argc,char *argv[]) {
 
-    class _FunctionState final {
-        _FunctionState(const _FunctionState&)=delete;
-        _FunctionState(_FunctionState&&)=delete;
-        _FunctionState&operator=(const _FunctionState&)=delete;
-        _FunctionState&operator=(_FunctionState&&)=delete;
-    public:
-        typedef int ans_type;
-    public:/*state 0*/
-        constexpr ans_type returnNormal() const  noexcept(true) { return 0; }
-        constexpr decltype(auto) returnNormal(const ans_type &arg) const  noexcept(true) { return arg; }
-        constexpr decltype(auto) returnNormal(ans_type &&arg) const  noexcept(true) { return static_cast<ans_type&&>(arg); }
-        constexpr decltype(auto) returnNormal(const ans_type &&arg) const  noexcept(true) { return static_cast<const ans_type&&>(arg); }
-        constexpr decltype(auto) returnNormal(ans_type&arg) const  noexcept(true) { return static_cast<ans_type&>(arg); }
-        ~_FunctionState()=default;
-        constexpr _FunctionState()=default;
-    }varThisFunctionState;
+    typedef function::BasicFunctionState<int> _FunctionState;
+    constexpr _FunctionState varThisFunctionState;
 
     FUNCTION_WITH_EXCEPTION({
 
