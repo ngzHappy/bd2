@@ -12,7 +12,7 @@ inline void lua_remove_exception() { --__lua_exception_count; }
 namespace {
 
 class __LUA_Exception :
-    public lua_exception_type {
+    public _e_lua_exception_type {
     __LUA_Exception(const __LUA_Exception&);
     __LUA_Exception(__LUA_Exception&&);
 public:

@@ -62,12 +62,21 @@ int main(int argc,char *argv[]) {
 
         lua::pushcfunction(L,[](lua::State *L)->int {
 
+            class LockTest {
+            public:
+                LockTest() {}
+                ~LockTest() {
+                    std::cout<<lua::exception_count()<<std::endl;
+                }
+            };
+
+            LockTest test;
             lua::pushlstring(L,"1234");
+
             try {
                 lua::error(L);
             }
             catch (...) { 
-                std::cout<<lua::exception_count()<<std::endl;
                 throw;
             }
             return 0;
