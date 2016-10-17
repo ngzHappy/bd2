@@ -44,10 +44,10 @@ struct lua_longjmp;  /* defined in ldo.c */
 
 
 /* extra stack space to handle TM calls and some other extras */
-#define EXTRA_STACK   5
+#define EXTRA_STACK   (6)
 
 
-#define BASIC_STACK_SIZE        (2*LUA_MINSTACK)
+#define BASIC_STACK_SIZE        (36)
 
 
 /* kinds of Garbage Collection */
@@ -152,7 +152,7 @@ typedef struct global_State {
   TString *strcache[STRCACHE_N][STRCACHE_M];  /* cache for strings in API */
 } global_State;
 
-
+inline constexpr int __lua_before_status() noexcept(true) { return 1; }
 /*
 ** 'per thread' state
 */
@@ -166,6 +166,7 @@ struct lua_State {
   const Instruction *oldpc;  /* last pc traced */
   StkId stack_last;  /* last free slot in the stack */
   StkId stack;  /* stack base */
+  StkId stack_base;  /* stack=stack_base+__lua_before_status() */
   UpVal *openupval;  /* list of open upvalues in this stack */
   GCObject *gclist;
   struct lua_State *twups;  /* list of threads with open upvalues */

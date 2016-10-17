@@ -920,10 +920,10 @@ LUA_API void lua_callk(
     api_checknelems(L,nargs+1);
     api_check(L,L->status==LUA_OK,"cannot do calls on non-normal thread");
     checkresults(L,nargs,nresults);
-   
+
     /*设置func*/
     auto func=L->top-(nargs+1);
-    if ((k!=nullptr) && (L->nny==0)) {  /* need to prepare continuation? */
+    if ((k!=nullptr)&&(L->nny==0)) {  /* need to prepare continuation? */
         L->ci->u.c.k=k; /* save continuation */
         L->ci->u.c.ctx=ctx;  /* save context */
         luaD_call(L,func,nresults);  /* do the call */
@@ -968,7 +968,7 @@ LUA_API int lua_pcallk(
 
     /*多线程锁住*/
     lua_lock(L);
-    
+
     {/*检查参数*/
         api_check(L,k==nullptr||!isLua(L->ci),
           "cannot use continuations inside hooks");
@@ -979,7 +979,7 @@ LUA_API int lua_pcallk(
 
     /*获得error function的偏移*/
     if (errfunc==0)/*没有设置error callback*/ {
-        func=0;
+        func=savestack(L,(L->stack_base));
     }
     else {
         StkId o=index2addr(L,errfunc);
@@ -990,10 +990,12 @@ LUA_API int lua_pcallk(
     c.func=L->top-(nargs+1);  /* function to be called */
 
     if ((k==nullptr)||(L->nny>0)) {  /* no continuation or no yieldable? */
+        lua_checkstack(L,26);
         c.nresults=nresults;  /* do a 'conventional' protected call */
         status=luaD_pcall(L,&f_call,&c,savestack(L,c.func),func)/*noexcept(true)*/;
     }
     else {  /* prepare continuation (call is already protected by 'resume') */
+        lua_checkstack(L,16);
         CallInfo *ci=L->ci;
         ci->u.c.k=k;  /* save continuation */
         ci->u.c.ctx=ctx;  /* save context */

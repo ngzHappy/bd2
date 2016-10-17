@@ -39,7 +39,7 @@
 ** these libs are loaded by lua.c and are readily available to any Lua
 ** program
 */
-static const luaL_Reg loadedlibs[] = {
+static const luaL_Reg loadedlibs[]={
   {"_G", luaopen_base},
   {LUA_LOADLIBNAME, luaopen_package},
   //{LUA_COLIBNAME, luaopen_coroutine},
@@ -57,12 +57,12 @@ static const luaL_Reg loadedlibs[] = {
 };
 
 
-LUALIB_API void luaL_openlibs (lua_State *L) {
-  const luaL_Reg *lib;
-  /* "require" functions from 'loadedlibs' and set results to global table */
-  for (lib = loadedlibs; lib->func; lib++) {
-    luaL_requiref(L, lib->name, lib->func, 1);
-    lua_pop(L, 1);  /* remove lib */
-  }
+LUALIB_API void luaL_openlibs(lua_State *L) {
+    const luaL_Reg *lib;
+    /* "require" functions from 'loadedlibs' and set results to global table */
+    for (lib=loadedlibs; lib->func; lib++) {
+        luaL_requiref(L,lib->name,lib->func,1);
+        lua_pop(L,1);  /* remove lib */
+    }
 }
 
