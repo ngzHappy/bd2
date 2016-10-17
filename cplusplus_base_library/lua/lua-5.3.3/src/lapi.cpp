@@ -989,10 +989,13 @@ LUA_API int lua_pcallk(
 
     c.func=L->top-(nargs+1);  /* function to be called */
 
+#if __LUA_COROUTINE_FUNCTIONS
     if ((k==nullptr)||(L->nny>0)) {  /* no continuation or no yieldable? */
-        lua_checkstack(L,26);
+#endif
+        lua_checkstack(L,26)/* [-0, +0, –] */;
         c.nresults=nresults;  /* do a 'conventional' protected call */
         status=luaD_pcall(L,&f_call,&c,savestack(L,c.func),func)/*noexcept(true)*/;
+#if __LUA_COROUTINE_FUNCTIONS
     }
     else {  /* prepare continuation (call is already protected by 'resume') */
         lua_checkstack(L,16);
@@ -1013,6 +1016,7 @@ LUA_API int lua_pcallk(
         L->errfunc=ci->u.c.old_errfunc;
         status=LUA_OK;  /* if it is here, there were no errors */
     }
+#endif
     adjustresults(L,nresults);
 
     /*多线程解锁*/
