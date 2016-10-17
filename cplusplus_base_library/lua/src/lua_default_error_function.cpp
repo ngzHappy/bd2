@@ -25,4 +25,8 @@ int default_lua_error_function(lua::State*L) {
     return 0;
 }
 
+int(*get_default_lua_error_function())(lua::State*){
+    return &default_lua_error_function;
+}
+
 }

@@ -198,7 +198,7 @@ lua::ThreadStatus deep_copy_table(lua::State*L,int/*from*/argFrom,int/*to*/argTo
         lua::pushcfunction(L,&__private::deep_copy_table);
         lua::pushvalue(L,argFrom)/*from table*/;
         lua::pushvalue(L,argTo)/*to table*/;
-        lua::pushcfunction(L,&luaL::default_lua_error_function)/*error function*/;
+        lua::pushcfunction(L,luaL::get_default_lua_error_function())/*error function*/;
         auto epos=lua::gettop(L);
         return lua::pcall(L,3,lua::MULTRET,epos);
     }

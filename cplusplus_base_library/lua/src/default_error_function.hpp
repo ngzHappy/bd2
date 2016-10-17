@@ -31,7 +31,7 @@ public:
     operator const lua::State *() const { return L_; }
 };
 
-//LUA_API int default_lua_error_function(lua::State*);
+LUA_API int(*get_default_lua_error_function())(lua::State*);
 
 }
 

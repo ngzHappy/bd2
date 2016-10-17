@@ -681,7 +681,7 @@ lua::ThreadStatus print_table(lua::State*L,int t,PrintTableCallback*c) {
     {
         lua::pushcfunction(L,&__private::print_table<PrintTableCallback>);
         lua::pushvalue(L,t);
-        lua::pushcfunction(L,&luaL::default_lua_error_function);
+        lua::pushcfunction(L,luaL::get_default_lua_error_function());
         auto epos=lua::gettop(L);
         lua::pushlightuserdata(L,c);
         return lua::pcall(L,3,lua::MULTRET,epos);

@@ -961,6 +961,7 @@ LUA_API int lua_pcallk(
     int errfunc,
     lua_KContext ctx,
     lua_KFunction k) {
+    (void)ctx; (void)k;
 
     struct CallS c;
     int status;

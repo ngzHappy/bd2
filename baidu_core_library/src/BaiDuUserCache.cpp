@@ -134,17 +134,17 @@ void BaiDuUserCache::read(){
                 }
                 else {
                     lua::pushlstring(L,"there must be a table");
-                    luaL::default_lua_error_function(L);
+                    luaL::get_default_lua_error_function()(L);
                     _m_L.reset();
                 }
             }
             else {
-                luaL::default_lua_error_function(L);
+                luaL::get_default_lua_error_function()(L);
                 _m_L.reset();
             }
         }
         else {
-            luaL::default_lua_error_function(L);
+            luaL::get_default_lua_error_function()(L);
             _m_L.reset();
         }
 
