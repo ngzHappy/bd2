@@ -4,6 +4,7 @@
 #include <memory/MemoryLibrary.hpp>
 #include <exception/exception.hpp>
 #include <function/function.hpp>
+#include <runtime/runtime.hpp>
 #include "TestStaticPointer.hpp"
 #include "TestCompiler.hpp"
 #include "TestNetWork.hpp"
