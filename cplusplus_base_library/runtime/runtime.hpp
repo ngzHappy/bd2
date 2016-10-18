@@ -1,4 +1,6 @@
-﻿/**/
+﻿#ifndef __HPP_35765_RUNTIME_BASICSHAREDDATA_
+#define __HPP_35765_RUNTIME_BASICSHAREDDATA_() 1
+
 #include <memory>
 #include <cstddef>
 #include <typeinfo>
@@ -1261,4 +1263,5 @@ inline BasicSharedData&BasicSharedData::operator=(BasicSharedData&&arg) {
 
 }/*namespace runtime*/
 
+#endif/*__HPP_35765_RUNTIME_BASICSHAREDDATA_*/
 

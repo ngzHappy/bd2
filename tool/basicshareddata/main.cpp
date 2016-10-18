@@ -7,7 +7,9 @@
 
 using namespace std::string_literals;
 
-std::string headers=u8R"=___=(/**/
+std::string headers=u8R"=___=(#ifndef __HPP_35765_RUNTIME_BASICSHAREDDATA_
+#define __HPP_35765_RUNTIME_BASICSHAREDDATA_() 1
+
 #include <memory>
 #include <cstddef>
 #include <typeinfo>
@@ -634,6 +636,7 @@ inline BasicSharedData&BasicSharedData::operator=(BasicSharedData&&arg) {
     ofs<<"}/*namespace runtime*/";
     ofs<<u8R"(
 
+#endif/*__HPP_35765_RUNTIME_BASICSHAREDDATA_*/
 
 )";
 }
