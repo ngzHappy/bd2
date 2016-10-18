@@ -203,6 +203,8 @@ public:
     ofs<<u8R"(public:
     inline BasicSharedData(const BasicSharedData&);
     inline BasicSharedData(BasicSharedData&&);
+    inline BasicSharedData&operator=(const BasicSharedData&);
+    inline BasicSharedData&operator=(BasicSharedData&&);
 )";
 
     ofs<<u8R"(
@@ -566,6 +568,58 @@ inline void BasicSharedData::_p_copy_pod(BasicDataType arg,const BasicData&var) 
 }
 )";
     }
+
+    ofs<<u8R"(
+inline BasicSharedData&BasicSharedData::operator=(const BasicSharedData&arg) {
+    if (this==&arg) { return *this; }
+    if (arg.isSharedPointer()) {
+        if (isSharedPointer()) {
+            _m_data._m_shared_pointer=arg._m_data._m_shared_pointer;
+            _m_is_const=arg._m_is_const;
+            _m_type_index=arg._m_type_index;
+        }
+        else {
+            _p_create(arg._m_data._m_shared_pointer);
+            _m_type=basictype_shared_pointer;
+            _m_is_const=arg._m_is_const;
+            _m_type_index=arg._m_type_index;
+        }
+    }
+    else {
+        _p_try_free();
+        _m_is_const=arg._m_is_const;
+        _m_type_index=arg._m_type_index;
+        _m_type=arg._m_type;
+        _p_copy_pod(_m_type,arg._m_data);
+    }
+    return *this;
+}
+inline BasicSharedData&BasicSharedData::operator=(BasicSharedData&&arg) {
+    if (this==&arg) { return *this; }
+    if (arg.isSharedPointer()) {
+        if (isSharedPointer()) {
+            _m_data._m_shared_pointer=std::move(arg._m_data._m_shared_pointer);
+            _m_is_const=arg._m_is_const;
+            _m_type_index=arg._m_type_index;
+        }
+        else {
+            _p_create(std::move(arg._m_data._m_shared_pointer));
+            _m_type=basictype_shared_pointer;
+            _m_is_const=arg._m_is_const;
+            _m_type_index=arg._m_type_index;
+        }
+    }
+    else {
+        _p_try_free();
+        _m_is_const=arg._m_is_const;
+        _m_type_index=arg._m_type_index;
+        _m_type=arg._m_type;
+        _p_copy_pod(_m_type,arg._m_data);
+    }
+    return *this;
+}
+)";
+
 }
 
 
