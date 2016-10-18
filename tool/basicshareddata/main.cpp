@@ -17,6 +17,12 @@ std::string headers=u8R"=___=(/**/
 
 namespace runtime {
 
+class string_view {
+public:
+    const char *data;
+    int length;
+};
+
 )=___=";
 
 class TypeInfo {
@@ -37,6 +43,7 @@ inline void TypeInfo::_p_update_() {
 }
 
 std::vector<TypeInfo>types={
+"string_view"s,
 "int"s,
 "char"s,
 "bool"s,

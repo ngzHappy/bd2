@@ -1,4 +1,5 @@
-﻿#include <memory>
+﻿/**/
+#include <memory>
 #include <cstddef>
 #include <typeinfo>
 #include <typeindex>
@@ -7,12 +8,19 @@
 
 namespace runtime {
 
+class string_view {
+public:
+    const char *data;
+    int length;
+};
+
 union BasicData {
     /*pointer data*/
     void * _m_void_pointer;
     /*shared pointer data*/
     std::shared_ptr<void> _m_shared_pointer;
     /*pod data*/
+    string_view /**/ _m_string_view;
     int /**/ _m_int;
     char /**/ _m_char;
     bool /**/ _m_bool;
@@ -32,6 +40,7 @@ union BasicData {
     unsigned short /**/ _m_unsigned_short;
     unsigned long long /**/ _m_unsigned_long_long;
     /*construct*/
+    BasicData(const string_view/**/& arg):_m_string_view(arg) {}
     BasicData(const int/**/& arg):_m_int(arg) {}
     BasicData(const char/**/& arg):_m_char(arg) {}
     BasicData(const bool/**/& arg):_m_bool(arg) {}
@@ -70,6 +79,7 @@ public:
     enum BasicDataType :std::uint8_t {
         basictype_void_pointer,
         basictype_shared_pointer,
+        basictype_string_view,
         basictype_int,
         basictype_char,
         basictype_bool,
@@ -118,6 +128,7 @@ public:
     inline BasicSharedData(void*&,const std::type_index&);
     inline BasicSharedData(const decltype(nullptr)&);
 public:
+    inline BasicSharedData(const string_view/**/&);
     inline BasicSharedData(const int/**/&);
     inline BasicSharedData(const char/**/&);
     inline BasicSharedData(const bool/**/&);
@@ -137,6 +148,7 @@ public:
     inline BasicSharedData(const unsigned short/**/&);
     inline BasicSharedData(const unsigned long long/**/&);
 
+    inline BasicSharedData(string_view/**/&);
     inline BasicSharedData(int/**/&);
     inline BasicSharedData(char/**/&);
     inline BasicSharedData(bool/**/&);
@@ -161,6 +173,7 @@ public:
     inline void setVoid(void *&,const std::type_index&);
     inline void set(void *&arg,const std::type_index&argI) { setVoid(arg,argI); }
     inline void set(const void *&arg,const std::type_index&argI) { setVoid(arg,argI); }
+    inline void set(const string_view &);
     inline void set(const int &);
     inline void set(const char &);
     inline void set(const bool &);
@@ -179,6 +192,7 @@ public:
     inline void set(const unsigned long &);
     inline void set(const unsigned short &);
     inline void set(const unsigned long long &);
+    inline void set(string_view &);
     inline void set(int &);
     inline void set(char &);
     inline void set(bool &);
@@ -258,6 +272,12 @@ inline BasicSharedData::BasicSharedData(void *&arg,const std::type_index&argI):
     _m_type_index(argI),
     _m_type(basictype_void_pointer),
     _m_is_const(false) {
+}
+inline BasicSharedData::BasicSharedData(const string_view & arg):
+    _m_data(arg),
+    _m_type_index(typeid(string_view)),
+    _m_type(basictype_string_view),
+    _m_is_const(false/*pod is false*/) {
 }
 inline BasicSharedData::BasicSharedData(const int & arg):
     _m_data(arg),
@@ -368,6 +388,12 @@ inline BasicSharedData::BasicSharedData(const unsigned long long & arg):
     _m_is_const(false/*pod is false*/) {
 }
 
+inline BasicSharedData::BasicSharedData(string_view & arg):
+    _m_data(arg),
+    _m_type_index(typeid(string_view)),
+    _m_type(basictype_string_view),
+    _m_is_const(false) {
+}
 inline BasicSharedData::BasicSharedData(int & arg):
     _m_data(arg),
     _m_type_index(typeid(int)),
@@ -480,6 +506,7 @@ inline void * BasicSharedData::_p_get_data() const {
     switch (this->_m_type) {
         case basictype_void_pointer:return _m_data._m_void_pointer;
         case basictype_shared_pointer:return _m_data._m_shared_pointer.get();
+        case basictype_string_view: return const_cast<string_view*>(&(_m_data._m_string_view));
         case basictype_int: return const_cast<int*>(&(_m_data._m_int));
         case basictype_char: return const_cast<char*>(&(_m_data._m_char));
         case basictype_bool: return const_cast<bool*>(&(_m_data._m_bool));
@@ -537,6 +564,19 @@ inline void BasicSharedData::setVoid(void *&arg,const std::type_index&argI) {
     _m_type_index=argI;
     _m_type=basictype_void_pointer;
     _m_is_const=false;
+}
+inline void BasicSharedData::set(const string_view & arg) {
+    if (_m_type==basictype_string_view) {
+        _m_data._m_string_view=arg;
+        _m_type_index=typeid(string_view);
+        _m_is_const=false/*pod is false*/;
+        return;
+    }
+    _p_try_free();
+    _m_data._m_string_view=arg;
+    _m_type_index=typeid(string_view);
+    _m_type=basictype_string_view;
+    _m_is_const=false/*pod is false*/;
 }
 inline void BasicSharedData::set(const int & arg) {
     if (_m_type==basictype_int) {
@@ -771,6 +811,19 @@ inline void BasicSharedData::set(const unsigned long long & arg) {
     _m_type_index=typeid(unsigned long long);
     _m_type=basictype_unsigned_long_long;
     _m_is_const=false/*pod is false*/;
+}
+inline void BasicSharedData::set(string_view & arg) {
+    if (_m_type==basictype_string_view) {
+        _m_data._m_string_view=arg;
+        _m_type_index=typeid(string_view);
+        _m_is_const=false;
+        return;
+    }
+    _p_try_free();
+    _m_data._m_string_view=arg;
+    _m_type_index=typeid(string_view);
+    _m_type=basictype_string_view;
+    _m_is_const=false;
 }
 inline void BasicSharedData::set(int & arg) {
     if (_m_type==basictype_int) {
@@ -1134,6 +1187,7 @@ inline void BasicSharedData::_p_copy_pod(BasicDataType arg,const BasicData&var) 
     switch (arg) {
         case basictype_void_pointer:_m_data._m_void_pointer=var._m_void_pointer; return;
         case basictype_shared_pointer:return;
+        case basictype_string_view:_m_data._m_string_view=var._m_string_view; return;
         case basictype_int:_m_data._m_int=var._m_int; return;
         case basictype_char:_m_data._m_char=var._m_char; return;
         case basictype_bool:_m_data._m_bool=var._m_bool; return;
@@ -1206,3 +1260,5 @@ inline BasicSharedData&BasicSharedData::operator=(BasicSharedData&&arg) {
 }
 
 }/*namespace runtime*/
+
+
