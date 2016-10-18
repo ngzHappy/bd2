@@ -43,7 +43,8 @@ SUBDIRS += \
     tool_indexclassmaker \
     tool/deleteclassmaker \
     tool/stringsplit \
-    tool_class_maker
+    tool_class_maker \
+    tool/basicshareddata
 
 
 
