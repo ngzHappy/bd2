@@ -15,6 +15,8 @@ std::string headers=u8R"=___=(/**/
 #include <cinttypes>
 #include <type_traits>
 
+namespace runtime {
+
 )=___=";
 
 class TypeInfo {
@@ -31,7 +33,7 @@ inline void TypeInfo::_p_update_() {
     const static std::regex reg(u8R"=rrr=( )=rrr="s);
     auto tmp=std::regex_replace(type_name,reg,"_"s);
     type_name_index="basictype_"s+tmp;
-    type_name_name="_m_"s+tmp;
+    type_name_name="_m_"s+std::move(tmp);
 }
 
 std::vector<TypeInfo>types={
@@ -54,6 +56,7 @@ std::vector<TypeInfo>types={
 "unsigned short"s,
 "unsigned long long"s,
 };
+
 //u8R"==()==";
 int main(int,char **) {
 
@@ -119,7 +122,7 @@ public:
     inline BasicDataType getType() const noexcept(true);
     inline bool isSharedPointer() const noexcept(true);
     inline const std::type_index&getTypeIndex() const noexcept(true);
-    inline bool isConst() const noexcept(true);  
+    inline bool isConst() const noexcept(true);
 inline void * getData() const {return _p_get_data();}
 )"s;
 
@@ -261,13 +264,13 @@ inline BasicSharedData::BasicSharedData(void *&arg,const std::type_index&argI):
 
     for (const auto & i:types) {
         ofs<<u8R"(inline BasicSharedData::BasicSharedData()"s;
-        ofs<<u8R"(const )"s<<i.type_name<<u8R"( & arg ): 
+        ofs<<u8R"(const )"s<<i.type_name<<u8R"( & arg ):
 )"s;
         ofs<<u8R"(_m_data(arg),
 )"s;
         ofs<<u8R"(_m_type_index(typeid( )"s<<i.type_name<<u8R"( )) ,
 )"s;
-        ofs<<u8R"(_m_type( )"s<<i.type_name_index<<u8R"( ), 
+        ofs<<u8R"(_m_type( )"s<<i.type_name_index<<u8R"( ),
 )"s;
         ofs<<u8R"(_m_is_const(false/*pod is false*/) {}
  )"s;
@@ -279,13 +282,13 @@ inline BasicSharedData::BasicSharedData(void *&arg,const std::type_index&argI):
 
     for (const auto & i:types) {
         ofs<<u8R"(inline BasicSharedData::BasicSharedData()"s;
-        ofs<<u8R"()"s<<i.type_name<<u8R"( & arg ): 
+        ofs<<u8R"()"s<<i.type_name<<u8R"( & arg ):
 )"s;
         ofs<<u8R"(_m_data(arg),
 )"s;
         ofs<<u8R"(_m_type_index(typeid( )"s<<i.type_name<<u8R"( )) ,
 )"s;
-        ofs<<u8R"(_m_type( )"s<<i.type_name_index<<u8R"( ), 
+        ofs<<u8R"(_m_type( )"s<<i.type_name_index<<u8R"( ),
 )"s;
         ofs<<u8R"(_m_is_const(false) {}
  )"s;
@@ -618,8 +621,14 @@ inline BasicSharedData&BasicSharedData::operator=(BasicSharedData&&arg) {
     }
     return *this;
 }
+
 )";
 
+    ofs<<"}/*namespace runtime*/";
+    ofs<<u8R"(
+
+
+)";
 }
 
 
