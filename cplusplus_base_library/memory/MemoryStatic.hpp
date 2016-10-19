@@ -88,10 +88,13 @@ public:
 
 template<typename __T_>
 class StaticData {
+    using _nr_T_=std::remove_reference_t<__T_>;
     union _unused_type_ {
-        std::remove_cv_t<__T_> _value_;
+        std::remove_cv_t<
+            std::conditional_t<
+            std::is_reference<__T_>::value,
+            _nr_T_*,__T_>> _value_;
         const int * _limit_pointer_;
-        const int & _limit_ref_;
         _unused_type_() {}
         ~_unused_type_() {}
     };
@@ -131,6 +134,7 @@ class StaticPoionter final :
         :public std::true_type {
         template<typename _D_>static void close(_D_*arg) { arg->close(); }
     };
+    static_assert(false==std::is_reference<_T_>::value,"must not ref");
 public:
     StaticPoionter()=delete;
     StaticPoionter(const StaticPoionter&)=delete;
@@ -177,6 +181,7 @@ template<
 >class StaticPoionter<_T_,_need_close_,_is_plugin_,true> final :
     public _ns_static_pointer_private_memory_::StaticPointerPOD<_T_> {
     using _S_=_ns_static_pointer_private_memory_::StaticPointerPOD<_T_>;
+    static_assert(false==std::is_reference<_T_>::value,"must not ref");
 public:
     StaticPoionter()=default;
     using _S_::_S_;

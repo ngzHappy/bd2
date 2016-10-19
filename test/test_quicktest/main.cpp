@@ -35,7 +35,8 @@ inline int test() {
     return f.f_return({});
 
     try {
-
+        memory::StaticData<int&> x123;
+        x123.data();
     }
     catch (const int &) {
     }
