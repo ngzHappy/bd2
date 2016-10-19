@@ -86,6 +86,27 @@ public:
 
 }
 
+template<typename __T_>
+class StaticData {
+    union _unused_type_ {
+        __T_ _value_;
+        _unused_type_() {}
+        ~_unused_type_() {}
+    };
+    char _m_data[sizeof(_unused_type_)];
+public:
+    StaticData()=default;
+    ~StaticData()=default;
+    StaticData(const StaticData&)=default;
+    StaticData(StaticData&&)=default;
+    StaticData&operator=(const StaticData&)=default;
+    StaticData&operator=(StaticData&&)=default;
+    operator const void*()const { return &(this->_m_data); }
+    operator void*() { return &(this->_m_data); }
+    const void * data() const { return &(this->_m_data); }
+    void * data() { return &(this->_m_data); }
+};
+
 template<
     typename _T_,
     bool _need_close_=false,
