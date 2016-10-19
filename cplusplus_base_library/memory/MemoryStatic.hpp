@@ -89,7 +89,9 @@ public:
 template<typename __T_>
 class StaticData {
     union _unused_type_ {
-        __T_ _value_;
+        std::remove_cv_t<__T_> _value_;
+        const int * _limit_pointer_;
+        const int & _limit_ref_;
         _unused_type_() {}
         ~_unused_type_() {}
     };
