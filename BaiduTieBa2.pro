@@ -44,7 +44,9 @@ SUBDIRS += \
     tool/deleteclassmaker \
     tool/stringsplit \
     tool_class_maker \
-    tool/basicshareddata
+    tool/basicshareddata \
+    memory_test/test \
+    memory_test/memory_maker
 
 
 
