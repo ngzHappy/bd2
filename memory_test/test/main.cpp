@@ -23,13 +23,18 @@ int main(int,char **) {
         memory::free(data);
     }
 
-    for (int i=1; i<1024*33; ++i) {
-        void *data=memory::malloc(i);
-        auto size=memory::size(data);
-        if (size>0) {
-            assert(size>=i);
+    {
+        int *data;
+        for (int i=sizeof(int); i<1024*33; ++i) {
+            data=reinterpret_cast<int *>(memory::malloc(i));
+            *data=332;
+            auto size=memory::size(data);
+            if (size>0) {
+                assert(size>=i);
+                assert((size-i)<=100);    
+            }
+            memory::free(data);
         }
-        memory::free(data);
     }
-
+    
 }
