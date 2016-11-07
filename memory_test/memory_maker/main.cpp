@@ -158,7 +158,7 @@ inline void make(
         ofs<<u8R"((Memory *arg){)";
         ofs<<u8R"(return arg->_pm_item_)"_sw;
         ofs<<i;
-        ofs<<u8R"(.malloc();};
+        ofs<<u8R"(.malloc();}
 )"_sw;
     }
 
@@ -215,7 +215,7 @@ void * malloc(int_t n){
         if(arg==nullptr){return 0;}
         auto var=reinterpret_cast<Item *>(arg);
         --var;
-        return var->data->size();
+        return var->data->size(var);
     }
 private:
 )"_sw;
