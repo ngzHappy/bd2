@@ -1541,9 +1541,10 @@ public:
 
     /*+++*/
     void * malloc(int_t n) {
+        constexpr static int_t var_size_of_Item=sizeof(Item);
         if (n<1) { return nullptr; }
-        if (n>(32768-sizeof(Item))) { return _pm_item_default.malloc(n); }
-        switch (n+sizeof(Item)) {
+        if (n>(32768-var_size_of_Item)) { return _pm_item_default.malloc(n); }
+        switch (n+var_size_of_Item) {
             case 0:return nullptr;
             case 1:return _pm_item_4.malloc();
             case 2:return _pm_item_4.malloc();

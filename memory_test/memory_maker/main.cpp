@@ -153,13 +153,14 @@ inline void make(
         ofs<<u8R"(
 /*+++*/ 
 void * malloc(int_t n){
+        constexpr static int_t var_size_of_Item=sizeof(Item);
         if(n<1){return nullptr;}
         if(n>()"_sw;
 
         ofs<<var_max;
         
-        ofs<<u8R"(-sizeof(Item))){return _pm_item_default.malloc(n);}
-        switch ( n+sizeof(Item) ) {
+        ofs<<u8R"(-var_size_of_Item)){return _pm_item_default.malloc(n);}
+        switch ( n+var_size_of_Item ) {
  case 0:return nullptr;
 )"_sw;
 
