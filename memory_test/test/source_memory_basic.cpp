@@ -34317,7 +34317,7 @@ public:
     void * malloc(int_t n) {
         constexpr static int_t var_size_of_Item=sizeof(Item);
         if (n<1) { return nullptr; }
-        if (n>(32768-var_size_of_Item)) { return _pm_item_default.malloc(n); }
+        if (n>(32768-var_size_of_Item)) { return _pm_item_default.malloc(n+var_size_of_Item); }
         return _pm_malloc_functions[n+var_size_of_Item](this);
     }
 

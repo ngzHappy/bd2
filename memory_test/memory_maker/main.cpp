@@ -187,7 +187,7 @@ void * malloc(int_t n){
 
         ofs<<var_max;
 
-        ofs<<u8R"(-var_size_of_Item)){return _pm_item_default.malloc(n);}
+        ofs<<u8R"(-var_size_of_Item)){return _pm_item_default.malloc(n+var_size_of_Item);}
         return _pm_malloc_functions[ n+var_size_of_Item ](this) ;
 }
 
