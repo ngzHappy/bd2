@@ -9,7 +9,10 @@ extern int size(void * arg);
 
 #include<cassert>
 #include<iostream>
+#include<memory>
+
 int main(int,char **) {
+     
 
     {
         void * data=memory::malloc(4);
@@ -29,10 +32,17 @@ int main(int,char **) {
             data=reinterpret_cast<int *>(memory::malloc(i));
             *data=332;
             auto size=memory::size(data);
+            assert(size);
             if (size>0) {
-                assert(size>=i);
+                assert(size>i);
                 assert((size-i)<=100);    
             }
+#ifdef _MSC_VER
+            else {
+                auto msize=_msize( reinterpret_cast<char *>(data)-sizeof(int *) );
+                assert(msize>i);
+            }
+#endif
             memory::free(data);
         }
     }
