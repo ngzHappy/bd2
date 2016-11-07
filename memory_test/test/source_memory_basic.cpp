@@ -29,7 +29,7 @@ public:
     public:
         virtual ~MFItem()=default;
         virtual void free(void *)=0;
-        virtual int_t size() const=0;
+        virtual int_t size(void *) const=0;
     };
 
     class Item {
@@ -39,7 +39,13 @@ public:
 
     class Item_default final :public MFItem {
     public:
-        int_t size()const override { return -1; }
+        int_t size(void *arg)const override {
+#ifdef _MSC_VER
+            return static_cast<int_t>(::_msize(arg));
+#endif
+            return -1;
+            (void)arg;
+        }
         void free(void * arg) override { std::free(arg); }
         void * malloc(int_t arg) {
             auto var=reinterpret_cast<Item *>(std::malloc(arg));
@@ -53,7 +59,7 @@ public:
         pool_t _pm_pool{ N };
     public:
         void clean() { _pm_pool.release_memory(); }
-        int_t size()const override { return N; }
+        int_t size(void *)const override { return N; }
         void free(void * arg) override { _pm_pool.free(arg); }
         void * malloc() {
             auto var=reinterpret_cast<Item *>(_pm_pool.malloc());
@@ -34332,7 +34338,7 @@ public:
         if (arg==nullptr) { return 0; }
         auto var=reinterpret_cast<Item *>(arg);
         --var;
-        return var->data->size();
+        return var->data->size(var);
     }
 private:
     /*+++*/
