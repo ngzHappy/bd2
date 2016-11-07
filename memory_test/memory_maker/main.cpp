@@ -145,7 +145,35 @@ inline void make(
         ofs<<i;
         ofs<<u8R"(> _pm_item_)"_sw;
         ofs<<i;
-        ofs<<u8R"(;
+        ofs<<u8R"(;static void *_p_malloc_)"_sw;
+        ofs<<i;
+        ofs<<u8R"((Memory *arg){)";
+        ofs<<u8R"(return arg->_pm_item_)"_sw;
+        ofs<<i;
+        ofs<<u8R"(.malloc();};
+)"_sw;
+    }
+
+    {
+        ofs<<u8R"(
+typedef void*(*type_malloc)(Memory *);
+    type_malloc _pm_malloc_functions[)"_sw;
+        ofs<<var_items.size();
+        ofs<<u8R"(+1];
+    Memory() {
+_pm_malloc_functions[0]=[](Memory*)->void*{return nullptr;};
+    )"_sw;
+
+        for (const auto &i:var_items) {
+            ofs<<u8R"(_pm_malloc_functions[)"_sw;
+            ofs<<i.source;
+            ofs<<u8R"(]=&Memory::_p_malloc_)"_sw;
+            ofs<<i.target;
+            ofs<<u8R"(;
+)"_sw;
+        }
+
+        ofs<<u8R"(}
 )"_sw;
     }
 
@@ -158,24 +186,11 @@ void * malloc(int_t n){
         if(n>()"_sw;
 
         ofs<<var_max;
-        
+
         ofs<<u8R"(-var_size_of_Item)){return _pm_item_default.malloc(n);}
-        switch ( n+var_size_of_Item ) {
- case 0:return nullptr;
-)"_sw;
+        return _pm_malloc_functions[ n+var_size_of_Item ](this) ;
+}
 
-        for (const auto & i:var_items) {
-            ofs<<u8R"(case )"_sw;
-            ofs<<i.source;
-            ofs<<u8R"(:return _pm_item_)"_sw;
-            ofs<<i.target;
-            ofs<<u8R"(.malloc();
-)"_sw;
-        }
-
-        ofs<<u8R"( }
-        return nullptr;
-    }
 )"_sw;
 
     }
@@ -264,10 +279,10 @@ int main(int,char **) {
     std::ofstream ofs("xxx123.cpp");
     std::vector<int_t> s;
     s.reserve(1024*1024);
-    for (int i=1; i<=1024;++i) {
+    for (int i=1; i<=1024; ++i) {
         s.push_back(i*4);
     }
-    for (int i=(4096+64); i<=(32*1024);i+=64) {
+    for (int i=(4096+64); i<=(32*1024); i+=64) {
         s.push_back(i);
     }
     make(ofs,s);
