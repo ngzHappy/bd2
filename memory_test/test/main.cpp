@@ -12,7 +12,7 @@ extern int size(void * arg);
 #include<memory>
 
 int main(int,char **) {
-     
+
 
     {
         void * data=memory::malloc(4);
@@ -32,13 +32,13 @@ int main(int,char **) {
             data=reinterpret_cast<int *>(memory::malloc(i));
             *data=332;
             auto size=memory::size(data);
-            assert(size>0); 
+            assert(size>0);
             assert(size>i);
-            assert((size-i)<=100);    
-            
- 
+            assert((size-i)<=100);
+
+            (void)size;
             memory::free(data);
         }
     }
-    
+
 }

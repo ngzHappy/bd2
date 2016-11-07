@@ -110,8 +110,10 @@ inline void make(
          class Item_default final:public MFItem{
          public:
              int_t size(void *arg)const override{
-#ifdef _MSC_VER
+#if defined(WIN32)||defined(_WIN32)
             return static_cast<int_t>(::_msize(arg));
+#else
+            return static_cast<int_t>(::malloc_usable_size(arg));
 #endif
     return -1;
     (void)arg;
