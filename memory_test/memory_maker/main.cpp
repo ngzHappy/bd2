@@ -132,10 +132,13 @@ inline void make(
 }
              void free(void * arg) override{std::free(arg);}
              void * malloc(int_t arg){
-                 auto var=reinterpret_cast<Item *>(std::malloc(arg));
-                 if(var){var->data=this;}
-                 return ++var;
+                auto var=reinterpret_cast<Item *>(std::malloc(arg));
+                if (var) { 
+                 var->data=this;
+                  return ++var;
              }
+             return nullptr;
+             }/*malloc(int_t arg)*/
          }_pm_item_default;
 
          template<int_t N>
@@ -152,7 +155,7 @@ inline void make(
                 return ++var;
             }
             return nullptr;
-             }
+             }/*void * malloc()*/
          }/*class Item_N*/;
 
          /*+++*/
