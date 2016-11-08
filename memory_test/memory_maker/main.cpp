@@ -162,19 +162,25 @@ inline void make(
          )___"_sw;
     }
 
-    for (const auto & i:items) {
-
-        ofs<<u8R"(Item_N<)"_sw;
-        ofs<<i;
-        ofs<<u8R"(> _pm_item_)"_sw;
-        ofs<<i;
-        ofs<<u8R"(;static void *_p_malloc_)"_sw;
-        ofs<<i;
-        ofs<<u8R"((Memory *arg){)";
-        ofs<<u8R"(return arg->_pm_item_)"_sw;
-        ofs<<i;
-        ofs<<u8R"(.malloc();}
-)"_sw;
+    {
+        int j=0;
+        for (const auto & i:items) {
+            ofs<<u8R"(Item_N<)"_sw;
+            ofs<<i;
+            ofs<<u8R"(> _pm_item_)"_sw;
+            ofs<<i;
+            ofs<<u8R"(;static void *_p_malloc_)"_sw;
+            ofs<<i;
+            ofs<<u8R"((Memory *arg){)";
+            ofs<<u8R"(return arg->_pm_item_)"_sw;
+            ofs<<i;
+            ofs<<u8R"(.malloc();})"_sw;
+            if ((++j)==63) {
+                j=0;
+                ofs<<"\n";
+            }
+        }
+        ofs<<"\n";
     }
 
     {
@@ -186,14 +192,20 @@ typedef void*(*type_malloc)(Memory *);
 /*0*/[](Memory*)->void* {return nullptr; },
     )"_sw;
 
-        for (const auto &i:var_items) {
-            ofs<<u8R"(/*)"_sw;
-            ofs<<i.source;
-            ofs<<u8R"(*/)"_sw;
-            ofs<<u8R"(&Memory::_p_malloc_)"_sw;
-            ofs<<i.target;
-            ofs<<u8R"(,
-)"_sw;
+        {
+            int j=0;
+            for (const auto &i:var_items) {
+                ofs<<u8R"(/*)"_sw;
+                ofs<<i.source;
+                ofs<<u8R"(*/)"_sw;
+                ofs<<u8R"(&Memory::_p_malloc_)"_sw;
+                ofs<<i.target;
+                ofs<<u8R"(,)"_sw;
+                if (++j==64) {
+                    ofs<<"\n"; j=0;
+                }
+            }
+            ofs<<"\n";
         }
 
         ofs<<u8R"(};
@@ -247,11 +259,17 @@ private:
         try{
 )"_sw;
 
-        for (const auto & i:items) {
-            ofs<<u8R"(_pm_item_)"_sw;
-            ofs<<i;
-            ofs<<u8R"(.clean();
-)"_sw;
+        {
+            int j=0;
+            for (const auto & i:items) {
+                ofs<<u8R"(_pm_item_)"_sw;
+                ofs<<i;
+                ofs<<u8R"(.clean();)"_sw;
+                if ((j++)==63) {
+                    j=0; ofs<<"\n";
+                }
+            }
+            ofs<<"\n";
         }
 
         ofs<<u8R"( 
