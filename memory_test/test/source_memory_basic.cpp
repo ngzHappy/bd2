@@ -722,6 +722,7 @@ namespace memory {
 void * malloc(int arg) { return _p_file::get_memory()->malloc(arg); }
 void free(void * arg) { return _p_file::get_memory()->free(arg); }
 int size(void * arg) { return _p_file::get_memory()->size(arg); }
+int cookie_size() { return sizeof(_p_file::Memory::Item*); }
 
 }/*memroy*/
 
