@@ -179,21 +179,26 @@ inline void make(
 typedef void*(*type_malloc)(Memory *);
     type_malloc _pm_malloc_functions[)"_sw;
         ofs<<var_items.size();
-        ofs<<u8R"(+1];
-    Memory() {
-_pm_malloc_functions[0]=[](Memory*)->void*{return nullptr;};
+        ofs<<u8R"(+1]={
+/*0*/[](Memory*)->void* {return nullptr; },
     )"_sw;
 
         for (const auto &i:var_items) {
-            ofs<<u8R"(_pm_malloc_functions[)"_sw;
+            ofs<<u8R"(/*)"_sw;
             ofs<<i.source;
-            ofs<<u8R"(]=&Memory::_p_malloc_)"_sw;
+            ofs<<u8R"(*/)"_sw;
+            ofs<<u8R"(&Memory::_p_malloc_)"_sw;
             ofs<<i.target;
-            ofs<<u8R"(;
+            ofs<<u8R"(,
 )"_sw;
         }
 
-        ofs<<u8R"(}
+        ofs<<u8R"(};
+Memory() =default;
+Memory(const Memory&)=delete;
+Memory&operator=(const Memory&)=delete;
+Memory(Memory&&)=delete;
+Memory&operator=(Memory&&)=delete;
 )"_sw;
     }
 
