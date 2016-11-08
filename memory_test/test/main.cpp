@@ -9,10 +9,11 @@ extern int size(void * arg);
 #include<mutex>
 #include<cassert>
 #include<iostream>
+#include<cstdlib>
 #include<memory>
+#include<thread>
 
 int main(int,char **) {
-    
 
     {
         void * data=memory::malloc(4);
@@ -26,19 +27,54 @@ int main(int,char **) {
         memory::free(data);
     }
 
-    {
-        int *data;
-        for (int i=sizeof(int); i<1024*33; ++i) {
-            data=reinterpret_cast<int *>(memory::malloc(i));
-            *data=332;
-            auto size=memory::size(data);
-            assert(size>0);
-            assert(size>i);
-            assert((size-i)<=100);
+    auto test=[]() {
+       
+        {
+            int *data;
+            for (int i=sizeof(int); i<1024*33; ++i) {
+                for (int j=0; j<8; ++j) {
+                    data=reinterpret_cast<int *>(memory::malloc(i));
+                    *data=332;
+                    auto size=memory::size(data);
+                    assert(size>0);
+                    assert(size>i);
+                    assert((size-i)<=100);
 
-            (void)size;
-            memory::free(data);
+                    (void)size;
+                    memory::free(data);
+                }
+            }
+        }
+    };
+
+    /*test in one thread*/
+    test();
+
+    /*test in multi thread*/
+    std::thread all_test[]={
+        std::thread(test),
+        std::thread(test),
+        std::thread(test),
+        std::thread(test),
+        std::thread(test),
+        std::thread(test),
+        std::thread(test),
+        std::thread(test),
+        std::thread(test),
+        std::thread(test),
+        std::thread(test),
+        std::thread(test),
+        std::thread(test),
+    };
+
+    for (auto & i:all_test) {
+        if (i.joinable()) {
+            i.join();
         }
     }
+
+#if defined(_MSC_VER)
+    system("pause");
+#endif
 
 }
