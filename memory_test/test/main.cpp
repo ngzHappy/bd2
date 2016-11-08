@@ -6,13 +6,13 @@ extern int size(void * arg);
 
 }/*memroy*/
 
-
+#include<mutex>
 #include<cassert>
 #include<iostream>
 #include<memory>
 
 int main(int,char **) {
-
+    
 
     {
         void * data=memory::malloc(4);

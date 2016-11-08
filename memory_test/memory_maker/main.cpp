@@ -70,6 +70,7 @@ inline void make(
 
     {/*write header*/
         ofs<<u8R"___(/*std::*/
+#include <mutex>
      #include <memory>
      #include <atomic>
      #include <thread>
@@ -89,8 +90,19 @@ inline void make(
      class Memory{
      public:
          typedef int int_t;
-         /*boost::pool*/
-         typedef boost::pool<boost::default_user_allocator_malloc_free> pool_t;
+          /*boost::pool*/
+    class pool_t {
+        typedef boost::pool<boost::default_user_allocator_malloc_free> _pool_t;
+        typedef std::recursive_mutex _mutex_t;
+        typedef std::unique_lock<_mutex_t> _mlock_t;
+        _pool_t _pm_data;
+        _mutex_t _pm_mutex;
+        public:
+            pool_t(int_t arg):_pm_data(arg) {}
+            void * malloc() { _mlock_t _{_pm_mutex}; return _pm_data.malloc(); }
+            void free(void *arg) {_mlock_t _{_pm_mutex}; return _pm_data.free(arg); }
+            void release_memory() {_mlock_t _{_pm_mutex}; _pm_data.release_memory(); }
+    };
      public:
          std::atomic_bool _pm_is_free_memroy_not_used{false};
      public:
