@@ -180,6 +180,9 @@ static void stack_init(lua_State *L1,lua_State *L) {
     setnilvalue(L1->top++);  /* 'function' entry for this 'ci' */
     ci->top=L1->top+LUA_MINSTACK;
     L1->ci=ci;
+
+    /**/
+    L1->errfunc=(char *)(L1->stack_base)-(char *)(L1->stack);
 }
 
 
