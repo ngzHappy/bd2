@@ -40,7 +40,7 @@ ToPlainTextAns _remove_bom_and_to_utf8(const char *argBegin,const char *argEnd) 
 ToPlainTextAns to_plain_text(const char *argBegin,const char *argEnd) {
     auto varLength=argEnd-argBegin;
 
-    if (varLength==0) {
+    if (varLength<=0) {
         return{ nullptr,nullptr };
     }
 
